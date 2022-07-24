@@ -1,3 +1,4 @@
+// Package pi provides API to develop retro games.
 package pi
 
 import (
@@ -15,10 +16,10 @@ const (
 	defaultScreenHeight      = 128
 )
 
-// User parameters. Will be used on Boot
+// User parameters. Will be used during Boot (and Run).
 var (
-	Update = func() {} // Update is executed every frame
-	Draw   = func() {} // Draw is executed every frame, if he can.
+	Update = func() {} // Update is a user provided function executed each frame.
+	Draw   = func() {} // Draw is a user provided function executed each frame (if he can).
 
 	Resources fs.ReadFileFS // Resources contains files like sprite-sheet.png
 
@@ -27,12 +28,15 @@ var (
 	// SpriteSheetHeight will be used if sprite-sheet.png was not found.
 	SpriteSheetHeight = defaultSpriteSheetHeight
 
-	ScreenWidth  = defaultScreenWidth
+	// ScreenWidth specifies the width of the screen (in pixels).
+	ScreenWidth = defaultScreenWidth
+	// ScreenHeight specifies the height of the screen (in pixels).
 	ScreenHeight = defaultScreenHeight
 )
 
-// Run opens the window and run the game. It returns error when something terrible happened during initialization
-// or the game panicked during execution.
+// Run boots the game, opens the window and run the game loop.
+//
+// It returns error when something terrible happened during initialization.
 func Run() error {
 	if err := Boot(); err != nil {
 		return fmt.Errorf("booting game failed: %w", err)
@@ -43,8 +47,9 @@ func Run() error {
 	return run()
 }
 
-// RunOrPanic opens the window and run he game. It panics when something terrible happened. Useful for quick and dirty
-// testing.
+// RunOrPanic does the same as Run, but panics instead of returning an error.
+//
+// Useful for writing unit tests and quick and dirty prototypes. Do not use on production ;)
 func RunOrPanic() {
 	if err := Run(); err != nil {
 		panic(fmt.Sprintf("Something terrible happened! Pi cannot be run: %v\n", err))
@@ -63,6 +68,8 @@ func Reset() {
 	Color = 6
 }
 
+// Boot initializes the engine based on user parameters such as ScreenWidth and ScreenHeight.
+// It loads the resources like sprite-sheet.png.
 func Boot() error {
 	if SpriteSheetWidth%8 != 0 || SpriteSheetWidth == 0 {
 		return fmt.Errorf("sprite sheet width %d is not a multiplcation of 8", SpriteSheetWidth)
@@ -98,6 +105,9 @@ func Boot() error {
 	return nil
 }
 
+// BootOrPanic does the same as Boot, but panics instead of returning an error.
+//
+// Useful for writing unit tests and quick and dirty prototypes. Do not use on production ;)
 func BootOrPanic() {
 	if err := Boot(); err != nil {
 		panic("init failed " + err.Error())

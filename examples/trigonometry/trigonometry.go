@@ -1,3 +1,4 @@
+// Example plotting sin and cos on screen
 package main
 
 import (
