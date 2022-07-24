@@ -1,3 +1,6 @@
+// (c) 2022 Jacek Olszak
+// This code is licensed under MIT license (see LICENSE for details)
+
 // Package pi provides API to develop retro games.
 package pi
 
