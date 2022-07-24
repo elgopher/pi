@@ -1,3 +1,4 @@
+// Example animating HELLO WORLD text on screen.
 package main
 
 import (

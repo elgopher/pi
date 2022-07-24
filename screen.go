@@ -2,17 +2,29 @@ package pi
 
 import "github.com/elgopher/pi/image"
 
+// Screen-specific data
 var (
-	Color byte = 6 // Color is a currently used color in draw state.
+	Color byte = 6 // Color is a currently used color in draw state. Used by Pset.
 
-	// Palette has all colors available in the game. Up to 256. Palette is taken from sprite sheet PNG file with indexed color mode.
+	// Palette has all colors available in the game. Up to 256.
+	// Palette is taken from loaded sprite sheet (which must be
+	// a PNG file with indexed color mode). If sprite-sheet.png was not
+	// found, then default 16 color palette is used.
 	//
 	// Can be freely read and updated. Changes will be visible immediately.
 	Palette [256]image.RGB
 
-	// ScreenData contains pixel colors for screen visible by the player. Each pixel is one byte. It is initialized during pi.Boot.
+	// ScreenData contains pixel colors for the screen visible by the player.
+	// Each pixel is one byte. It is initialized during pi.Boot.
 	//
-	// Can be freely read and updated. Useful when you want to use your own functions for pixel manipulation. Pi will panic if you try to change the length of the slice.
+	// Pixels on the screen are organized from left to right,
+	// top to bottom. Slice element number 0 has pixel located
+	// in the top-left corner. Slice element number 1 has pixel color
+	// on the right and so on.
+	//
+	// Can be freely read and updated. Useful when you want to use your own
+	// functions for pixel manipulation.
+	// Pi will panic if you try to change the length of the slice.
 	ScreenData []byte
 
 	scrWidth, scrHeight int
@@ -21,10 +33,12 @@ var (
 	clippingRegion      rect
 )
 
+// Cls cleans the entire screen with color 0. It does not take into account any draw state parameters such as clipping region or camera.
 func Cls() {
 	copy(ScreenData, zeroScreenData)
 }
 
+// ClsCol cleans the entire screen with specified color. It does not take into account any draw state parameters such as clipping region or camera.
 func ClsCol(col byte) {
 	for i := 0; i < len(lineOfScreenWidth); i++ {
 		lineOfScreenWidth[i] = col
@@ -37,6 +51,7 @@ func ClsCol(col byte) {
 	}
 }
 
+// Pset sets a pixel color on the screen to Color.
 func Pset(x, y int) {
 	x -= camera.x
 	y -= camera.y
@@ -69,6 +84,7 @@ func Pset(x, y int) {
 	ScreenData[y*scrWidth+x] = Color
 }
 
+// Pget gets a pixel color on the screen.
 func Pget(x, y int) byte {
 	x -= camera.x
 	y -= camera.y
@@ -105,10 +121,9 @@ type rect struct {
 	x, y, w, h int
 }
 
-func ClipReset() (prevX, prevY, prevW, prevH int) {
-	return Clip(0, 0, scrWidth, scrHeight)
-}
-
+// Clip sets the clipping region in the form of rectangle. All screen drawing operations will not affect any pixels outside the region.
+//
+// Clip returns previous clipping region.
 func Clip(x, y, w, h int) (prevX, prevY, prevW, prevH int) {
 	prev := clippingRegion
 
@@ -138,6 +153,11 @@ func Clip(x, y, w, h int) (prevX, prevY, prevW, prevH int) {
 	return prev.x, prev.y, prev.w, prev.h
 }
 
+// ClipReset resets the clipping region, which means that entire screen will be clipped.
+func ClipReset() (prevX, prevY, prevW, prevH int) {
+	return Clip(0, 0, scrWidth, scrHeight)
+}
+
 //func ClipPrev(x, y, w, h int) {}
 
 type pos struct {
@@ -146,6 +166,7 @@ type pos struct {
 
 var camera pos
 
+// Camera sets the camera offset used for all subsequent draw operations.
 func Camera(x, y int) (prevX, prevY int) {
 	prev := camera
 	camera.x = x
@@ -153,18 +174,28 @@ func Camera(x, y int) (prevX, prevY int) {
 	return prev.x, prev.y
 }
 
+// CameraReset resets the camera offset to origin (0,0).
 func CameraReset() (prevX, prevY int) {
 	return Camera(0, 0)
 }
 
+// Spr draws a sprite with specified number on the screen.
+// Sprites are counted from left to right, top to bottom. Sprite 0 is on top-left corner, sprite 1 is to the right and so on.
 func Spr(n, x, y int) {
 	SprSize(n, x, y, 1.0, 1.0)
 }
 
+// SprSize draws a range of sprites on the screen.
+//
+// n is a sprite number in the top-left corner.
+//
+// Non-integer w or h may be used to draw partial sprites.
 func SprSize(n, x, y int, w, h float64) {
 	SprSizeFlip(n, x, y, w, h, false, false)
 }
 
+// SprSizeFlip draws a range of sprites on the screen.
+//
 // TODO Flipping is not implemented yet
 func SprSizeFlip(n, x, y int, w, h float64, flipX, flipY bool) {
 	if n < 0 {
