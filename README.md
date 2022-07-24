@@ -1,6 +1,6 @@
 # pi
 
-The retro game development engine for Go, inspired by [Pico-8](https://www.lexaloffle.com/pico-8.php) and powered by [Ebiten](https://ebiten.org/).
+The retro game development engine for Go, inspired by [Pico-8](https://www.lexaloffle.com/pico-8.php) and powered by [Ebitengine](https://ebiten.org/).
 
 ## FAQ
 
