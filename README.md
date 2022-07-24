@@ -1,5 +1,7 @@
 # pi
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/elgopher/pi.svg)](https://pkg.go.dev/github.com/elgopher/pi)
+
 The retro game development engine for Go, inspired by [Pico-8](https://www.lexaloffle.com/pico-8.php) and powered by [Ebitengine](https://ebiten.org/).
 
 ## FAQ
