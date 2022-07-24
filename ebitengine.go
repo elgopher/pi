@@ -3,13 +3,13 @@ package pi
 import (
 	"fmt"
 
-	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func run() error {
 	ebiten.SetMaxTPS(30)
 	ebiten.SetRunnableOnUnfocused(true)
-	ebiten.SetWindowResizable(true)
+	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowSize(scrWidth, scrHeight)
 	ebiten.SetWindowTitle("Pi Game")
 
@@ -24,7 +24,7 @@ type ebitengineGame struct {
 	screenDataRGBA []byte // reused RGBA pixels
 }
 
-func (e *ebitengineGame) Update(screen *ebiten.Image) error {
+func (e *ebitengineGame) Update() error {
 	updateTime()
 
 	if Update != nil {
@@ -57,7 +57,7 @@ func (e *ebitengineGame) replaceScreenPixels(screen *ebiten.Image) {
 		offset += 4
 	}
 
-	_ = screen.ReplacePixels(e.screenDataRGBA)
+	screen.ReplacePixels(e.screenDataRGBA)
 }
 
 func (e *ebitengineGame) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
