@@ -95,6 +95,27 @@ func TestBoot(t *testing.T) {
 		assert.Equal(t, img.Pixels, pi.SpriteSheetData)
 		assert.Equal(t, img.Palette, pi.Palette)
 	})
+
+	t.Run("should reset draw state", func(t *testing.T) {
+		pi.Reset()
+		require.NoError(t, pi.Boot())
+		pi.Color = 14
+		pi.Camera(1, 2)
+		pi.Clip(1, 2, 3, 4)
+		// when
+		err := pi.Boot()
+		// then
+		require.NoError(t, err)
+		camX, camY := pi.CameraReset()
+		assert.Zero(t, camX)
+		assert.Zero(t, camY)
+		x, y, w, h := pi.ClipReset()
+		assert.Zero(t, x)
+		assert.Zero(t, y)
+		assert.Equal(t, pi.ScreenWidth, w)
+		assert.Equal(t, pi.ScreenHeight, h)
+		assert.Equal(t, byte(14), pi.Color)
+	})
 }
 
 func TestTime(t *testing.T) {
