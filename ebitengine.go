@@ -26,7 +26,7 @@ func run() error {
 }
 
 func scale() int {
-	return int(math.Round(ebiten.DeviceScaleFactor() * 2))
+	return int(math.Round(ebiten.DeviceScaleFactor() * 3))
 }
 
 type ebitengineGame struct {
