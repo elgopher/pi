@@ -12,25 +12,50 @@ import (
 )
 
 func TestBoot(t *testing.T) {
-	t.Run("should fail if SpriteSheetWidth is not multiplication of 8", func(t *testing.T) {
-		tests := [...]int{
-			0, 1, 7, 9,
-		}
-		for _, width := range tests {
+	invalidSpriteSheetSizes := [...]int{
+		0, 1, 7, 9,
+	}
+
+	t.Run("should return error if SpriteSheetWidth is not multiplication of 8", func(t *testing.T) {
+		for _, width := range invalidSpriteSheetSizes {
 			t.Run(strconv.Itoa(width), func(t *testing.T) {
+				pi.Reset()
 				pi.SpriteSheetWidth = width
 				err := pi.Boot()
 				assert.Error(t, err)
 			})
 		}
 	})
-	t.Run("should fail if SpriteSheetHeight is not multiplication of 8", func(t *testing.T) {
-		tests := [...]int{
-			0, 1, 7, 9,
-		}
-		for _, height := range tests {
+
+	t.Run("should return error if SpriteSheetHeight is not multiplication of 8", func(t *testing.T) {
+		for _, height := range invalidSpriteSheetSizes {
 			t.Run(strconv.Itoa(height), func(t *testing.T) {
+				pi.Reset()
 				pi.SpriteSheetHeight = height
+				err := pi.Boot()
+				assert.Error(t, err)
+			})
+		}
+	})
+
+	invalidScreenSizes := [...]int{-2, -1, 0}
+
+	t.Run("should return error when ScreenWidth is not greater than 0", func(t *testing.T) {
+		for _, size := range invalidScreenSizes {
+			t.Run(strconv.Itoa(size), func(t *testing.T) {
+				pi.Reset()
+				pi.ScreenWidth = size
+				err := pi.Boot()
+				assert.Error(t, err)
+			})
+		}
+	})
+
+	t.Run("should return error when ScreenHeight is not greater than 0", func(t *testing.T) {
+		for _, size := range invalidScreenSizes {
+			t.Run(strconv.Itoa(size), func(t *testing.T) {
+				pi.Reset()
+				pi.ScreenHeight = size
 				err := pi.Boot()
 				assert.Error(t, err)
 			})
