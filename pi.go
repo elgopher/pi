@@ -37,7 +37,8 @@ var (
 	ScreenHeight = defaultScreenHeight
 )
 
-// Run boots the game, opens the window and run the game loop.
+// Run boots the game, opens the window and run the game loop. It must be
+// called from the main thread.
 //
 // It returns error when something terrible happened during initialization.
 func Run() error {
