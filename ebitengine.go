@@ -15,6 +15,7 @@ func run() error {
 	ebiten.SetRunnableOnUnfocused(true)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowSize(scrWidth*scale(), scrHeight*scale())
+	ebiten.SetWindowSizeLimits(scrWidth, scrHeight, -1, -1)
 	ebiten.SetWindowTitle("Pi Game")
 
 	if err := ebiten.RunGame(&ebitengineGame{}); err != nil {
