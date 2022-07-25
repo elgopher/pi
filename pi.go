@@ -78,6 +78,9 @@ func Reset() {
 
 // Boot initializes the engine based on user parameters such as ScreenWidth and ScreenHeight.
 // It loads the resources like sprite-sheet.png.
+//
+// If sprite-sheet.png was not found in pi.Resources, then empty sprite-sheet is used with
+// the size of pi.SpriteSheetWidth * pi.SpriteSheetHeight.
 func Boot() error {
 	if err := validateUserParameters(); err != nil {
 		return err
