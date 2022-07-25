@@ -79,12 +79,10 @@ func Reset() {
 // Boot initializes the engine based on user parameters such as ScreenWidth and ScreenHeight.
 // It loads the resources like sprite-sheet.png.
 func Boot() error {
-	if SpriteSheetWidth%8 != 0 || SpriteSheetWidth == 0 {
-		return fmt.Errorf("sprite sheet width %d is not a multiplcation of 8", SpriteSheetWidth)
+	if err := validateUserParameters(); err != nil {
+		return err
 	}
-	if SpriteSheetHeight%8 != 0 || SpriteSheetHeight == 0 {
-		return fmt.Errorf("sprite sheet height %d is not a multiplcation of 8", SpriteSheetHeight)
-	}
+
 	ssWidth = SpriteSheetWidth
 	ssHeight = SpriteSheetHeight
 	numberOfSprites = (ssWidth * ssHeight) / (SpriteWidth * SpriteHeight)
@@ -109,6 +107,24 @@ func Boot() error {
 
 	Clip(0, 0, scrWidth, scrHeight)
 	Camera(0, 0)
+
+	return nil
+}
+
+func validateUserParameters() error {
+	if SpriteSheetWidth%8 != 0 || SpriteSheetWidth == 0 {
+		return fmt.Errorf("sprite sheet width %d is not a multiplcation of 8", SpriteSheetWidth)
+	}
+	if SpriteSheetHeight%8 != 0 || SpriteSheetHeight == 0 {
+		return fmt.Errorf("sprite sheet height %d is not a multiplcation of 8", SpriteSheetHeight)
+	}
+
+	if ScreenWidth <= 0 {
+		return fmt.Errorf("screen width %d is not greather than 0", ScreenWidth)
+	}
+	if ScreenHeight <= 0 {
+		return fmt.Errorf("screen height %d is not greather than 0", ScreenWidth)
+	}
 
 	return nil
 }
