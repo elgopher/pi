@@ -5,6 +5,7 @@ package pi
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -13,7 +14,7 @@ func run() error {
 	ebiten.SetMaxTPS(30)
 	ebiten.SetRunnableOnUnfocused(true)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
-	ebiten.SetWindowSize(scrWidth, scrHeight)
+	ebiten.SetWindowSize(scrWidth*scale(), scrHeight*scale())
 	ebiten.SetWindowTitle("Pi Game")
 
 	if err := ebiten.RunGame(&ebitengineGame{}); err != nil {
@@ -21,6 +22,10 @@ func run() error {
 	}
 
 	return nil
+}
+
+func scale() int {
+	return int(math.Round(ebiten.DeviceScaleFactor() * 2))
 }
 
 type ebitengineGame struct {
