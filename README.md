@@ -58,6 +58,7 @@ Pi is under development. Only limited functionality is provided. API is not stab
 * [ ] Add keyboard support
 * [ ] Add gamepad/joystick support
 * [ ] Add mouse support
+* [ ] Add Map API
 * [ ] Development console
   * [ ] pausing, resuming the game
   * [ ] running public functions
