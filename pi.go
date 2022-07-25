@@ -92,6 +92,8 @@ func Reset() {
 //
 // If sprite-sheet.png was not found in pi.Resources, then empty sprite-sheet is used with
 // the size of pi.SpriteSheetWidth * pi.SpriteSheetHeight.
+//
+// Boot also resets all draw state information like color, camera position and clipping region.
 func Boot() error {
 	if err := validateUserParameters(); err != nil {
 		return err
