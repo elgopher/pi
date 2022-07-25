@@ -3,19 +3,9 @@
 
 package pi
 
-import "github.com/elgopher/pi/image"
-
 // Screen-specific data
 var (
 	Color byte = 6 // Color is a currently used color in draw state. Used by Pset.
-
-	// Palette has all colors available in the game. Up to 256.
-	// Palette is taken from loaded sprite sheet (which must be
-	// a PNG file with indexed color mode). If sprite-sheet.png was not
-	// found, then default 16 color palette is used.
-	//
-	// Can be freely read and updated. Changes will be visible immediately.
-	Palette [256]image.RGB
 
 	// ScreenData contains pixel colors for the screen visible by the player.
 	// Each pixel is one byte. It is initialized during pi.Boot.

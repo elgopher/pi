@@ -14,6 +14,8 @@ import (
 	"fmt"
 	"io/fs"
 	"time"
+
+	"github.com/elgopher/pi/image"
 )
 
 const (
@@ -29,6 +31,14 @@ var (
 	Draw   = func() {} // Draw is a user provided function executed each frame (if he can).
 
 	Resources fs.ReadFileFS // Resources contains files like sprite-sheet.png
+
+	// Palette has all colors available in the game. Up to 256.
+	// Palette is taken from loaded sprite sheet (which must be
+	// a PNG file with indexed color mode). If sprite-sheet.png was not
+	// found, then default 16 color palette is used.
+	//
+	// Can be freely read and updated. Changes will be visible immediately.
+	Palette [256]image.RGB = defaultPalette()
 
 	// SpriteSheetWidth will be used if sprite-sheet.png was not found.
 	SpriteSheetWidth = defaultSpriteSheetWidth
@@ -74,6 +84,7 @@ func Reset() {
 	ScreenWidth = defaultScreenWidth
 	ScreenHeight = defaultScreenHeight
 	Color = 6
+	Palette = defaultPalette()
 }
 
 // Boot initializes the engine based on user parameters such as ScreenWidth and ScreenHeight.

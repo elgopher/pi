@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/image"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -67,10 +68,15 @@ func TestBoot(t *testing.T) {
 		pi.Reset()
 		pi.SpriteSheetWidth = 16
 		pi.SpriteSheetHeight = 8
+		allBlacks := [256]image.RGB{}
+		pi.Palette = allBlacks
+		// when
 		err := pi.Boot()
+		// then
 		require.NoError(t, err)
 		expectedSpriteSheetData := make([]byte, 16*8)
 		assert.Equal(t, expectedSpriteSheetData, pi.SpriteSheetData)
+		assert.Equal(t, allBlacks, pi.Palette)
 	})
 }
 
