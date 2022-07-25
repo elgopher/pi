@@ -117,3 +117,12 @@ func BootOrPanic() {
 		panic("init failed " + err.Error())
 	}
 }
+
+var gameLoopStopped bool
+
+// Stop will stop the game loop after Update is finished, but before Draw.
+// For now the entire app will be closed, but later it will show a dev console instead,
+// where developer will be able to resume the game.
+func Stop() {
+	gameLoopStopped = true
+}

@@ -41,7 +41,6 @@ Pi is under development. Only limited functionality is provided. API is not stab
   * [x] add sprite-sheet loader
   * [ ] add more options: full screen, specifying tps and scale
   * [x] Time function
-  * [ ] add a programmatic way to stop the game
 * [ ] Implement Graphics API
   * [x] drawing sprites and pixels with camera and clipping support
   * [x] add the ability to directly access pixels on the screen and sprite-sheet
@@ -60,7 +59,9 @@ Pi is under development. Only limited functionality is provided. API is not stab
 * [ ] Add mouse support
 * [ ] Add Map API
 * [ ] Development console
-  * [ ] pausing, resuming the game
+  * [ ] stopping, resuming the game
+    * [x] add a programmatic way to stop the game
+    * [ ] resume the game using console command
   * [ ] running public functions
   * [ ] sprite-sheet editor
   * [ ] map editor

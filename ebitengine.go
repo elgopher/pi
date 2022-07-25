@@ -4,11 +4,14 @@
 package pi
 
 import (
+	"errors"
 	"fmt"
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
+
+var gameStoppedErr = errors.New("game stopped")
 
 func run() error {
 	ebiten.SetMaxTPS(30)
@@ -19,6 +22,10 @@ func run() error {
 	ebiten.SetWindowTitle("Pi Game")
 
 	if err := ebiten.RunGame(&ebitengineGame{}); err != nil {
+		if err == gameStoppedErr {
+			return nil
+		}
+
 		return fmt.Errorf("running game using Ebiten failed: %w", err)
 	}
 
@@ -38,6 +45,10 @@ func (e *ebitengineGame) Update() error {
 
 	if Update != nil {
 		Update()
+	}
+
+	if gameLoopStopped {
+		return gameStoppedErr
 	}
 
 	return nil
