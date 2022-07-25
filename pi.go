@@ -2,6 +2,10 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 // Package pi provides API to develop retro games.
+//
+// Please note that the entire pi package is not concurrency-safe.
+// This means that it is unsafe to run functions and access package
+// variables from go-routines started by your code.
 package pi
 
 import (
