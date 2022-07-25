@@ -9,6 +9,7 @@ import (
 
 	"github.com/elgopher/pi"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestBoot(t *testing.T) {
@@ -60,6 +61,16 @@ func TestBoot(t *testing.T) {
 				assert.Error(t, err)
 			})
 		}
+	})
+
+	t.Run("should use custom size sprite sheet when sprite-sheet.png was not found in resources", func(t *testing.T) {
+		pi.Reset()
+		pi.SpriteSheetWidth = 16
+		pi.SpriteSheetHeight = 8
+		err := pi.Boot()
+		require.NoError(t, err)
+		expectedSpriteSheetData := make([]byte, 16*8)
+		assert.Equal(t, expectedSpriteSheetData, pi.SpriteSheetData)
 	})
 }
 
