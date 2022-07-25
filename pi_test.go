@@ -65,6 +65,17 @@ func TestBoot(t *testing.T) {
 		}
 	})
 
+	t.Run("should initialize screen data", func(t *testing.T) {
+		pi.Reset()
+		pi.ScreenWidth = 2
+		pi.ScreenHeight = 3
+		// when
+		err := pi.Boot()
+		// then
+		require.NoError(t, err)
+		assert.Equal(t, make([]byte, 6), pi.ScreenData)
+	})
+
 	t.Run("should use custom size sprite sheet when sprite-sheet.png was not found in resources", func(t *testing.T) {
 		pi.Reset()
 		pi.SpriteSheetWidth = 16
