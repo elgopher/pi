@@ -153,6 +153,22 @@ func TestBoot(t *testing.T) {
 			pi.ClsCol(7)
 		})
 	})
+
+	t.Run("should use sprite-sheet size loaded from sprite-sheet.png", func(t *testing.T) {
+		pi.SpriteSheetWidth = 32 // 2x times bigger than actual sprite-sheet.png width
+		pi.SpriteSheetHeight = 32
+		pi.Resources = fstest.MapFS{
+			"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
+		}
+		pi.BootOrPanic()
+		assert.NotPanics(t, func() {
+			pi.Spr(4, 0, 0) // sprite-sheet.png has only 4 sprites (from 0 to 3)
+			pi.SprSize(4, 0, 0, 1.0, 1.0)
+			pi.SprSizeFlip(4, 0, 0, 1.0, 1.0, false, false)
+			pi.Pset(16, 16) // sprite-sheet.png is only 16x16 pixels (0..15)
+			pi.Pget(16, 16)
+		})
+	})
 }
 
 func TestTime(t *testing.T) {
