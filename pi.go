@@ -107,7 +107,6 @@ func Boot() error {
 		return err
 	}
 
-	// TODO TEST IF different size of sprite sheet is actually used for Spr operation and Sset, Sget
 	ssWidth = SpriteSheetWidth
 	ssHeight = SpriteSheetHeight
 	numberOfSprites = (ssWidth * ssHeight) / (SpriteWidth * SpriteHeight)
