@@ -189,7 +189,8 @@ func SprSize(n, x, y int, w, h float64) {
 
 // SprSizeFlip draws a range of sprites on the screen.
 //
-// TODO Flipping is not implemented yet
+// If flipX is true then sprite is flipped horizontally.
+// If flipY is true then sprite is flipped vertically.
 func SprSizeFlip(n, x, y int, w, h float64, flipX, flipY bool) {
 	if n < 0 {
 		return
