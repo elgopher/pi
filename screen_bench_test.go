@@ -57,10 +57,26 @@ func BenchmarkSprSize(b *testing.B) {
 }
 
 func BenchmarkSprSizeFlip(b *testing.B) {
-	runBenchmarks(b, func(res Resolution) {
-		for i := 0; i < 100; i++ { // SprSizeFlip is too fast
-			pi.SprSizeFlip(0, 16, 16, 2.0, 2.0, true, true)
-		}
+	b.Run("flip x only", func(b *testing.B) {
+		runBenchmarks(b, func(res Resolution) {
+			for i := 0; i < 100; i++ { // SprSizeFlip is too fast
+				pi.SprSizeFlip(0, 16, 16, 2.0, 2.0, true, false)
+			}
+		})
+	})
+	b.Run("flip y only", func(b *testing.B) {
+		runBenchmarks(b, func(res Resolution) {
+			for i := 0; i < 100; i++ { // SprSizeFlip is too fast
+				pi.SprSizeFlip(0, 16, 16, 2.0, 2.0, false, true)
+			}
+		})
+	})
+	b.Run("flip xy", func(b *testing.B) {
+		runBenchmarks(b, func(res Resolution) {
+			for i := 0; i < 100; i++ { // SprSizeFlip is too fast
+				pi.SprSizeFlip(0, 16, 16, 2.0, 2.0, true, true)
+			}
+		})
 	})
 }
 

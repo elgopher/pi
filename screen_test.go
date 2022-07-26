@@ -529,6 +529,35 @@ func TestSprSizeFlip(t *testing.T) {
 	testSprSize(t, func(spriteNo int, x, y int, w, h float64) {
 		pi.SprSizeFlip(spriteNo, x, y, w, h, false, false)
 	})
+
+	t.Run("should flip", func(t *testing.T) {
+		tests := map[string]struct {
+			flipX, flipY       bool
+			h                  float64
+			expectedScreenFile string
+		}{
+			"sprite 0 at (0,0), flip y":           {flipY: true, h: 1, expectedScreenFile: "spr_0_at_00_flipy.png"},
+			"sprite 0 at (0,0), flip x":           {flipX: true, h: 1, expectedScreenFile: "spr_0_at_00_flipx.png"},
+			"sprite 0 at (0,0), flip xy":          {flipX: true, flipY: true, h: 1, expectedScreenFile: "spr_0_at_00_flipxy.png"},
+			"sprite 0 at (0,0), no flip":          {h: 1, expectedScreenFile: "spr_0_at_00.png"},
+			"sprite 0 at (0,0), height 0, flip y": {flipY: true, h: 0, expectedScreenFile: "zeros_8x8.png"},
+		}
+		for name, test := range tests {
+			t.Run(name, func(t *testing.T) {
+				pi.ScreenWidth = 8
+				pi.ScreenHeight = 8
+				pi.Resources = fstest.MapFS{
+					"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
+				}
+				pi.BootOrPanic()
+				expectedScreen := decodePNG(t, "internal/testimage/"+test.expectedScreenFile)
+				// when
+				pi.SprSizeFlip(0, 0, 0, 1.0, test.h, test.flipX, test.flipY)
+				// then
+				assert.Equal(t, expectedScreen.Pixels, pi.ScreenData)
+			})
+		}
+	})
 }
 
 func clone(s []byte) []byte {
