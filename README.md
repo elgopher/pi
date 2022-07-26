@@ -35,6 +35,15 @@ Because it's the easiest way to write a game in Go. IMHO ;)
 
 Pi is under development. Only limited functionality is provided. API is not stable. See [roadmap](#roadmap) for details.
 
+### How to get started?
+
+1. Install dependencies
+  * Go 1.18+
+  * Pi is powered by [Ebitengine](https://ebiten.org/) which has its own dependencies. See [instructions](https://ebiten.org/documents/install.html) how to install them.
+2. Create a new game using provided [Github template](https://github.com/elgopher/pi-template). 
+
+See also [examples](examples) directory and [documentation](https://pkg.go.dev/github.com/elgopher/pi).
+
 ## Roadmap
 
 * [x] Present game on the screen
