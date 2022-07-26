@@ -26,7 +26,7 @@ func run() error {
 			return nil
 		}
 
-		return fmt.Errorf("running game using Ebiten failed: %w", err)
+		return fmt.Errorf("running game using Ebitengine failed: %w", err)
 	}
 
 	return nil
