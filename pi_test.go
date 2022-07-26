@@ -127,6 +127,32 @@ func TestBoot(t *testing.T) {
 		assert.Equal(t, pi.ScreenHeight, h)
 		assert.Equal(t, byte(14), pi.Color)
 	})
+
+	t.Run("changing the user parameters after Boot should not ends up in a panic", func(t *testing.T) {
+		pi.Reset()
+		pi.ScreenWidth = 8
+		pi.ScreenHeight = 8
+		pi.SpriteSheetWidth = 8
+		pi.SpriteSheetHeight = 8
+		pi.BootOrPanic()
+		// when
+		pi.ScreenWidth = 1
+		pi.ScreenHeight = 1
+		pi.SpriteSheetWidth = 1
+		pi.SpriteSheetHeight = 1
+		// then
+		assert.NotPanics(t, func() {
+			pi.Pset(1, 1)
+			pi.Pget(1, 1)
+			pi.Sset(1, 1, 7)
+			pi.Sget(1, 1)
+			pi.Spr(1, 1, 1)
+			pi.SprSize(1, 1, 1, 1.0, 1.0)
+			pi.SprSizeFlip(1, 1, 1, 1.0, 1.0, true, true)
+			pi.Cls()
+			pi.ClsCol(7)
+		})
+	})
 }
 
 func TestTime(t *testing.T) {
