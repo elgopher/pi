@@ -99,10 +99,6 @@ func Boot() error {
 		return err
 	}
 
-	ssWidth = SpriteSheetWidth
-	ssHeight = SpriteSheetHeight
-	numberOfSprites = (ssWidth * ssHeight) / (SpriteWidth * SpriteHeight)
-
 	if Resources == nil {
 		Resources = embed.FS{}
 	}
@@ -110,6 +106,11 @@ func Boot() error {
 	if err := loadResources(Resources); err != nil {
 		return err
 	}
+
+	// TODO TEST IF different size of sprite sheet is actually used for Spr operation and Sset, Sget
+	ssWidth = SpriteSheetWidth
+	ssHeight = SpriteSheetHeight
+	numberOfSprites = (ssWidth * ssHeight) / (SpriteWidth * SpriteHeight)
 
 	spritesInLine = ssWidth / SpriteWidth
 	spritesRows = ssHeight / SpriteHeight

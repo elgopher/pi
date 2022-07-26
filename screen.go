@@ -240,9 +240,23 @@ func SprSizeFlip(n, x, y int, w, h float64, flipX, flipY bool) {
 		height = clippingRegion.h - y
 	}
 
+	spriteSheetStep := ssWidth
+
+	if flipY {
+		spriteSheetOffset += (height - 1) * ssWidth
+		spriteSheetStep = -ssWidth
+	}
+
 	for i := 0; i < height; i++ {
-		copy(ScreenData[screenOffset:screenOffset+width], SpriteSheetData[spriteSheetOffset:spriteSheetOffset+width])
+		spriteSheetLine := SpriteSheetData[spriteSheetOffset : spriteSheetOffset+width]
+		if flipX {
+			for j := 0; j < len(spriteSheetLine); j++ {
+				ScreenData[screenOffset+j] = spriteSheetLine[len(spriteSheetLine)-1-j]
+			}
+		} else {
+			copy(ScreenData[screenOffset:screenOffset+width], spriteSheetLine)
+		}
 		screenOffset += scrWidth
-		spriteSheetOffset += ssWidth
+		spriteSheetOffset += spriteSheetStep
 	}
 }
