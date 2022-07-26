@@ -94,6 +94,8 @@ func Reset() {
 // the size of pi.SpriteSheetWidth * pi.SpriteSheetHeight.
 //
 // Boot also resets all draw state information like color, camera position and clipping region.
+//
+// Boot can be run multiple times. This is useful for writing unit tests.
 func Boot() error {
 	if err := validateUserParameters(); err != nil {
 		return err
