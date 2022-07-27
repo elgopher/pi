@@ -25,7 +25,6 @@ var (
 	ssWidth, ssHeight int
 	numberOfSprites   int
 	spritesInLine     int
-	spritesRows       int
 )
 
 // Sset sets the pixel color on the sprite sheet. It does not update the global Color.

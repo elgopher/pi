@@ -204,20 +204,22 @@ func SprSizeFlip(n, x, y int, w, h float64, flipX, flipY bool) {
 
 	screenOffset := y*scrWidth + x
 
-	spriteX := n % spritesInLine
-	spriteY := n / spritesInLine
-
-	if spriteX+int(w) >= spritesInLine {
-		w = float64(spritesInLine - spriteX)
-	}
-
-	if spriteY+int(h) >= spritesRows {
-		h = float64(spritesRows - spriteY)
-	}
-
-	spriteSheetOffset := spriteY*ssWidth*SpriteHeight + spriteX*SpriteWidth
+	spriteX := (n % spritesInLine) * SpriteWidth
+	spriteY := (n / spritesInLine) * SpriteHeight
 
 	width := int(SpriteWidth * w)
+	height := int(SpriteHeight * h)
+
+	if spriteX+width > ssWidth {
+		width = ssWidth - spriteX
+	}
+
+	if spriteY+height > ssHeight {
+		height = ssHeight - spriteY
+	}
+
+	spriteSheetOffset := spriteY*ssWidth + spriteX
+
 	if x < clippingRegion.x {
 		dx := clippingRegion.x - x
 		width -= dx
@@ -231,7 +233,6 @@ func SprSizeFlip(n, x, y int, w, h float64, flipX, flipY bool) {
 		return
 	}
 
-	height := int(SpriteHeight * h)
 	if y < clippingRegion.y {
 		dy := clippingRegion.y - y
 		height -= dy
