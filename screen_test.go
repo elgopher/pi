@@ -494,20 +494,25 @@ func testSprSize(t *testing.T, sprSize func(spriteNo int, x, y int, w, h float64
 
 	t.Run("should draw sprite", func(t *testing.T) {
 		tests := map[string]struct {
+			spriteNo           int
 			w, h               float64
 			x, y               int
 			expectedScreenFile string
 		}{
-			"sprite at (0,0,0.5,1.0)": {w: 0.5, h: 1.0, expectedScreenFile: "spr_0_0_0.5_1.0.png"},
-			"sprite at (0,0,1.0,0.5)": {w: 1.0, h: 0.5, expectedScreenFile: "spr_0_0_1.0_0.5.png"},
-			"sprite at (0,0,2.0,1.0)": {w: 2.0, h: 1.0, expectedScreenFile: "spr_0_0_2.0_1.0.png"},
-			"sprite at (0,0,1.0,2.0)": {w: 1.0, h: 2.0, expectedScreenFile: "spr_0_0_1.0_2.0.png"},
-			"sprite at (0,0,2.5,1.0)": {w: 2.5, h: 1.0, expectedScreenFile: "spr_0_0_2.0_1.0.png"},
-			"sprite at (0,0,1.0,2.5)": {w: 1.0, h: 2.5, expectedScreenFile: "spr_0_0_1.0_2.0.png"},
-			"sprite at (8,0,2.0,1.0)": {x: 8, w: 2.0, h: 1.0, expectedScreenFile: "spr_8_0_2.0_1.0.png"},
-			"sprite at (0,8,1.0,2.0)": {y: 8, w: 1.0, h: 2.0, expectedScreenFile: "spr_0_8_1.0_2.0.png"},
-			"sprite at (0,0,1.1,0.5)": {w: 1.1, h: 0.5, expectedScreenFile: "spr_0_0_1.0_0.5.png"}, // should floor(w*8)
-			"sprite at (0,0,0.5,1.1)": {w: 0.5, h: 1.1, expectedScreenFile: "spr_0_0_0.5_1.0.png"}, // should floor(h*8)
+			"sprite at (0,0,0.5,1.0)":   {w: 0.5, h: 1.0, expectedScreenFile: "spr_0_0_0.5_1.0.png"},
+			"sprite at (0,0,1.0,0.5)":   {w: 1.0, h: 0.5, expectedScreenFile: "spr_0_0_1.0_0.5.png"},
+			"sprite at (0,0,2.0,1.0)":   {w: 2.0, h: 1.0, expectedScreenFile: "spr_0_0_2.0_1.0.png"},
+			"sprite at (0,0,1.0,2.0)":   {w: 1.0, h: 2.0, expectedScreenFile: "spr_0_0_1.0_2.0.png"},
+			"sprite at (0,0,2.5,1.0)":   {w: 2.5, h: 1.0, expectedScreenFile: "spr_0_0_2.0_1.0.png"},
+			"sprite at (0,0,1.0,2.5)":   {w: 1.0, h: 2.5, expectedScreenFile: "spr_0_0_1.0_2.0.png"},
+			"sprite at (8,0,2.0,1.0)":   {x: 8, w: 2.0, h: 1.0, expectedScreenFile: "spr_8_0_2.0_1.0.png"},
+			"sprite at (0,8,1.0,2.0)":   {y: 8, w: 1.0, h: 2.0, expectedScreenFile: "spr_0_8_1.0_2.0.png"},
+			"sprite at (0,0,1.1,0.5)":   {w: 1.1, h: 0.5, expectedScreenFile: "spr_0_0_1.0_0.5.png"}, // should floor(w*8)
+			"sprite at (0,0,0.5,1.1)":   {w: 0.5, h: 1.1, expectedScreenFile: "spr_0_0_0.5_1.0.png"}, // should floor(h*8)
+			"sprite 1 at (0,0,2.0,1.0)": {spriteNo: 1, w: 2.0, h: 1.0, expectedScreenFile: "spr_1_at_0_0_2.0_1.0.png"},
+			"sprite 1 at (0,0,1.9,1.0)": {spriteNo: 1, w: 1.9, h: 1.0, expectedScreenFile: "spr_1_at_0_0_2.0_1.0.png"},
+			"sprite 2 at (0,0,1.0,2.0)": {spriteNo: 2, w: 1.0, h: 2.0, expectedScreenFile: "spr_2_at_0_0_1.0_2.0.png"},
+			"sprite 2 at (0,0,1.0,1.9)": {spriteNo: 2, w: 1.0, h: 1.9, expectedScreenFile: "spr_2_at_0_0_1.0_2.0.png"},
 		}
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
@@ -519,7 +524,7 @@ func testSprSize(t *testing.T, sprSize func(spriteNo int, x, y int, w, h float64
 				pi.BootOrPanic()
 				expectedScreen := decodePNG(t, "internal/testimage/"+test.expectedScreenFile)
 				// when
-				sprSize(0, test.x, test.y, test.w, test.h)
+				sprSize(test.spriteNo, test.x, test.y, test.w, test.h)
 				// then
 				assert.Equal(t, expectedScreen.Pixels, pi.ScreenData)
 			})

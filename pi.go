@@ -114,7 +114,6 @@ func Boot() error {
 	numberOfSprites = (ssWidth * ssHeight) / (SpriteWidth * SpriteHeight)
 
 	spritesInLine = ssWidth / SpriteWidth
-	spritesRows = ssHeight / SpriteHeight
 
 	scrWidth = ScreenWidth
 	scrHeight = ScreenHeight
