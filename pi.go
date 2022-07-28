@@ -38,7 +38,7 @@ var (
 	// found, then default 16 color palette is used.
 	//
 	// Can be freely read and updated. Changes will be visible immediately.
-	Palette [256]image.RGB = defaultPalette()
+	Palette [256]image.RGB = defaultPalette
 
 	// SpriteSheetWidth will be used if sprite-sheet.png was not found.
 	SpriteSheetWidth = defaultSpriteSheetWidth
@@ -84,7 +84,7 @@ func Reset() {
 	ScreenWidth = defaultScreenWidth
 	ScreenHeight = defaultScreenHeight
 	Color = 6
-	Palette = defaultPalette()
+	Palette = defaultPalette
 }
 
 // Boot initializes the engine based on user parameters such as ScreenWidth and ScreenHeight.
