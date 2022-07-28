@@ -409,12 +409,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 		}
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.ScreenWidth = 8
-				pi.ScreenHeight = 8
-				pi.Resources = fstest.MapFS{
-					"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
-				}
-				pi.BootOrPanic()
+				boot(8, 8, spriteSheet16x16)
 				expectedScreen := decodePNG(t, "internal/testimage/"+test.expectedScreenFile)
 				// when
 				pi.Camera(test.cameraX, test.cameraY)
@@ -439,12 +434,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 		}
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.ScreenWidth = 8
-				pi.ScreenHeight = 8
-				pi.Resources = fstest.MapFS{
-					"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
-				}
-				pi.BootOrPanic()
+				boot(8, 8, spriteSheet16x16)
 				expectedScreen := decodePNG(t, "internal/testimage/"+test.expectedScreenFile)
 				// when
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
@@ -456,13 +446,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 	})
 
 	t.Run("should not draw color 0 by default", func(t *testing.T) {
-		pi.Reset()
-		pi.ScreenWidth = 8
-		pi.ScreenHeight = 8
-		pi.Resources = fstest.MapFS{
-			"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
-		}
-		pi.BootOrPanic()
+		boot(8, 8, spriteSheet16x16)
 		spr(2, 0, 0)
 		// when
 		spr(1, 0, 0)
@@ -472,13 +456,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 	})
 
 	t.Run("should not draw color 0 after PaltReset", func(t *testing.T) {
-		pi.Reset()
-		pi.ScreenWidth = 8
-		pi.ScreenHeight = 8
-		pi.Resources = fstest.MapFS{
-			"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
-		}
-		pi.BootOrPanic()
+		boot(8, 8, spriteSheet16x16)
 		spr(2, 0, 0)
 		pi.Palt(0, false) // make color 0 opaque
 		// when
@@ -490,13 +468,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 	})
 
 	t.Run("should not draw transparent colors", func(t *testing.T) {
-		pi.Reset()
-		pi.ScreenWidth = 8
-		pi.ScreenHeight = 8
-		pi.Resources = fstest.MapFS{
-			"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
-		}
-		pi.BootOrPanic()
+		boot(8, 8, spriteSheet16x16)
 		spr(2, 0, 0)
 		// when
 		pi.Palt(0, false)
@@ -568,12 +540,7 @@ func testSprSize(t *testing.T, sprSize func(spriteNo int, x, y int, w, h float64
 		}
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.ScreenWidth = 16
-				pi.ScreenHeight = 16
-				pi.Resources = fstest.MapFS{
-					"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
-				}
-				pi.BootOrPanic()
+				boot(16, 16, spriteSheet16x16)
 				expectedScreen := decodePNG(t, "internal/testimage/"+test.expectedScreenFile)
 				// when
 				sprSize(test.spriteNo, test.x, test.y, test.w, test.h)
@@ -603,12 +570,7 @@ func TestSprSizeFlip(t *testing.T) {
 		}
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.ScreenWidth = 8
-				pi.ScreenHeight = 8
-				pi.Resources = fstest.MapFS{
-					"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
-				}
-				pi.BootOrPanic()
+				boot(8, 8, spriteSheet16x16)
 				expectedScreen := decodePNG(t, "internal/testimage/"+test.expectedScreenFile)
 				// when
 				pi.SprSizeFlip(0, 0, 0, 1.0, test.h, test.flipX, test.flipY)
@@ -619,13 +581,7 @@ func TestSprSizeFlip(t *testing.T) {
 	})
 
 	t.Run("should not draw transparent colors", func(t *testing.T) {
-		pi.Reset()
-		pi.ScreenWidth = 8
-		pi.ScreenHeight = 8
-		pi.Resources = fstest.MapFS{
-			"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
-		}
-		pi.BootOrPanic()
+		boot(8, 8, spriteSheet16x16)
 		pi.SprSizeFlip(2, 0, 0, 1.0, 1.0, true, false)
 		// when
 		pi.Palt(0, false)
@@ -653,4 +609,14 @@ func decodePNG(t *testing.T, file string) image.Image {
 	data, err := image.DecodePNG(bytes.NewReader(payload))
 	require.NoError(t, err)
 	return data
+}
+
+func boot(screenWidth, screenHeight int, spriteSheet []byte) {
+	pi.Reset()
+	pi.ScreenWidth = screenWidth
+	pi.ScreenHeight = screenHeight
+	pi.Resources = fstest.MapFS{
+		"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet},
+	}
+	pi.BootOrPanic()
 }
