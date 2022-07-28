@@ -249,16 +249,43 @@ func SprSizeFlip(n, x, y int, w, h float64, flipX, flipY bool) {
 		spriteSheetStep = -ssWidth
 	}
 
+	startingPixel := 0
+	step := 1
+
+	if flipX {
+		startingPixel = width - 1
+		step = -1
+	}
+
 	for i := 0; i < height; i++ {
 		spriteSheetLine := SpriteSheetData[spriteSheetOffset : spriteSheetOffset+width]
-		if flipX {
-			for j := 0; j < len(spriteSheetLine); j++ {
-				ScreenData[screenOffset+j] = spriteSheetLine[len(spriteSheetLine)-1-j]
+
+		for j := 0; j < len(spriteSheetLine); j++ {
+			col := spriteSheetLine[startingPixel+(step*j)]
+			if colorIsTransparent[col] {
+				continue
 			}
-		} else {
-			copy(ScreenData[screenOffset:screenOffset+width], spriteSheetLine)
+
+			ScreenData[screenOffset+j] = col
 		}
 		screenOffset += scrWidth
 		spriteSheetOffset += spriteSheetStep
 	}
+}
+
+var colorIsTransparent [256]bool
+
+// Palt sets color transparency. If true then the color will not be drawn
+// for next drawing operations.
+//
+// Color transparency is used by Spr, SprSize and SprSizeFlip.
+func Palt(color byte, transparent bool) {
+	colorIsTransparent[color] = transparent
+}
+
+var defaultTransparency = [256]bool{true}
+
+// PaltReset sets all transparent colors to false and makes color 0 transparent.
+func PaltReset() {
+	colorIsTransparent = defaultTransparency
 }

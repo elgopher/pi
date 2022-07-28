@@ -80,6 +80,14 @@ func BenchmarkSprSizeFlip(b *testing.B) {
 	})
 }
 
+func BenchmarkPaltReset(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		runBenchmarks(b, func(res Resolution) {
+			pi.PaltReset()
+		})
+	}
+}
+
 type Resolution struct{ W, H int }
 
 func (s Resolution) String() string {

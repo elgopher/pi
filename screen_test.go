@@ -454,6 +454,58 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 			})
 		}
 	})
+
+	t.Run("should not draw color 0 by default", func(t *testing.T) {
+		pi.Reset()
+		pi.ScreenWidth = 8
+		pi.ScreenHeight = 8
+		pi.Resources = fstest.MapFS{
+			"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
+		}
+		pi.BootOrPanic()
+		spr(2, 0, 0)
+		// when
+		spr(1, 0, 0)
+		// then
+		expectedScreen := decodePNG(t, "internal/testimage/spr_1_on_top_of_2_trans_0.png")
+		assert.Equal(t, expectedScreen.Pixels, pi.ScreenData)
+	})
+
+	t.Run("should not draw color 0 after PaltReset", func(t *testing.T) {
+		pi.Reset()
+		pi.ScreenWidth = 8
+		pi.ScreenHeight = 8
+		pi.Resources = fstest.MapFS{
+			"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
+		}
+		pi.BootOrPanic()
+		spr(2, 0, 0)
+		pi.Palt(0, false) // make color 0 opaque
+		// when
+		pi.PaltReset() // and then make color 0 transparent again
+		spr(1, 0, 0)
+		// then
+		expectedScreen := decodePNG(t, "internal/testimage/spr_1_on_top_of_2_trans_0.png")
+		assert.Equal(t, expectedScreen.Pixels, pi.ScreenData)
+	})
+
+	t.Run("should not draw transparent colors", func(t *testing.T) {
+		pi.Reset()
+		pi.ScreenWidth = 8
+		pi.ScreenHeight = 8
+		pi.Resources = fstest.MapFS{
+			"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
+		}
+		pi.BootOrPanic()
+		spr(2, 0, 0)
+		// when
+		pi.Palt(0, false)
+		pi.Palt(50, true)
+		spr(1, 0, 0)
+		// then
+		expectedScreen := decodePNG(t, "internal/testimage/spr_1_on_top_of_2_trans_50.png")
+		assert.Equal(t, expectedScreen.Pixels, pi.ScreenData)
+	})
 }
 
 func TestSprSize(t *testing.T) {
@@ -564,6 +616,24 @@ func TestSprSizeFlip(t *testing.T) {
 				assert.Equal(t, expectedScreen.Pixels, pi.ScreenData)
 			})
 		}
+	})
+
+	t.Run("should not draw transparent colors", func(t *testing.T) {
+		pi.Reset()
+		pi.ScreenWidth = 8
+		pi.ScreenHeight = 8
+		pi.Resources = fstest.MapFS{
+			"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
+		}
+		pi.BootOrPanic()
+		pi.SprSizeFlip(2, 0, 0, 1.0, 1.0, true, false)
+		// when
+		pi.Palt(0, false)
+		pi.Palt(50, true)
+		pi.SprSizeFlip(1, 0, 0, 1.0, 1.0, true, false)
+		// then
+		expectedScreen := decodePNG(t, "internal/testimage/spr_1_on_top_of_2_trans_50_flipx.png")
+		assert.Equal(t, expectedScreen.Pixels, pi.ScreenData)
 	})
 }
 
