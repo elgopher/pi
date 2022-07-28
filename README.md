@@ -54,7 +54,7 @@ See also [examples](examples) directory and [documentation](https://pkg.go.dev/g
 * [ ] Implement Graphics API
   * [x] drawing sprites and pixels with camera and clipping support
   * [x] add the ability to directly access pixels on the screen and sprite-sheet
-  * [ ] palette transparency
+  * [x] palette transparency
   * [ ] palette swapping
   * [ ] printing text on the screen
   * [ ] drawing shapes
