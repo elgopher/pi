@@ -103,11 +103,7 @@ func loadSpriteSheet(resources fs.ReadFileFS) error {
 		return fmt.Errorf("error loading sprite-sheet.png file: %w", err)
 	}
 
-	if err = useSpriteSheet(fileContents); err != nil {
-		return err
-	}
-
-	return nil
+	return useSpriteSheet(fileContents)
 }
 
 func useDefaultSpriteSheet() {
