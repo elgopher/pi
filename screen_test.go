@@ -17,11 +17,42 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-//go:embed internal/testimage/sprite-sheet-16x16.png
-var spriteSheet16x16 []byte
+var (
+	//go:embed internal/testimage/sprite-sheet-16x16.png
+	spriteSheet16x16 []byte
+	//go:embed internal/testimage/*.png
+	images embed.FS
+)
 
-//go:embed internal/testimage/*.png
-var images embed.FS
+func TestColor(t *testing.T) {
+	t.Run("should return default color", func(t *testing.T) {
+		pi.BootOrPanic()
+		assert.Equal(t, byte(6), pi.Color(2))
+	})
+
+	t.Run("should return previous color", func(t *testing.T) {
+		pi.BootOrPanic()
+		prev := byte(3)
+		pi.Color(prev)
+		assert.Equal(t, prev, pi.Color(4))
+	})
+}
+
+func TestColorReset(t *testing.T) {
+	t.Run("should reset color to default", func(t *testing.T) {
+		pi.BootOrPanic()
+		pi.Color(3)
+		pi.ColorReset()
+		assert.Equal(t, byte(6), pi.Color(5))
+	})
+
+	t.Run("should return previous color", func(t *testing.T) {
+		pi.BootOrPanic()
+		prev := byte(5)
+		pi.Color(prev)
+		assert.Equal(t, prev, pi.ColorReset())
+	})
+}
 
 func TestCls(t *testing.T) {
 	t.Run("should clean screen using color 0", func(t *testing.T) {
@@ -58,7 +89,7 @@ func TestPset(t *testing.T) {
 		pi.ScreenHeight = 2
 		pi.BootOrPanic()
 		// when
-		pi.Color = col
+		pi.Color(col)
 		pi.Pset(1, 1)
 		// then
 		assert.Equal(t, col, pi.ScreenData[3])
@@ -81,7 +112,7 @@ func TestPset(t *testing.T) {
 			name := fmt.Sprintf("%+v", coords)
 			t.Run(name, func(t *testing.T) {
 				// when
-				pi.Color = col
+				pi.Color(col)
 				pi.Pset(coords.X, coords.Y)
 				// then
 				assert.Equal(t, emptyScreen, pi.ScreenData)
@@ -105,7 +136,7 @@ func TestPset(t *testing.T) {
 				pi.BootOrPanic()
 				pi.Clip(1, 1, 1, 1)
 				// when
-				pi.Color = col
+				pi.Color(col)
 				pi.Pset(coords.X, coords.Y)
 				// then
 				assert.Equal(t, emptyScreen, pi.ScreenData)
@@ -118,7 +149,7 @@ func TestPset(t *testing.T) {
 		pi.ScreenHeight = 2
 		pi.BootOrPanic()
 		pi.Camera(1, 2)
-		pi.Color = 8
+		pi.Color(8)
 		// when
 		pi.Pset(1, 2)
 		// then
@@ -149,7 +180,7 @@ func TestPset(t *testing.T) {
 			name := fmt.Sprintf("%+v", coords)
 			t.Run(name, func(t *testing.T) {
 				pi.BootOrPanic()
-				pi.Color = col
+				pi.Color(col)
 				// when
 				pi.Camera(1, 1)
 				pi.Pset(coords.X, coords.Y)
@@ -163,7 +194,7 @@ func TestPset(t *testing.T) {
 		pi.ScreenWidth = 1
 		pi.ScreenHeight = 1
 		pi.BootOrPanic()
-		pi.Color = 1
+		pi.Color(1)
 		pi.Pal(1, 2)
 		// when
 		pi.Pset(0, 0)
@@ -175,7 +206,7 @@ func TestPset(t *testing.T) {
 		pi.ScreenWidth = 1
 		pi.ScreenHeight = 1
 		pi.BootOrPanic()
-		pi.Color = 1
+		pi.Color(1)
 		pi.Pal(1, 2)
 		pi.PalReset()
 		// when
@@ -191,7 +222,7 @@ func TestPget(t *testing.T) {
 		pi.ScreenHeight = 2
 		pi.BootOrPanic()
 		col := byte(7)
-		pi.Color = col
+		pi.Color(col)
 		pi.Pset(1, 1)
 		// expect
 		assert.Equal(t, col, pi.Pget(1, 1))
@@ -249,12 +280,12 @@ func TestPget(t *testing.T) {
 		pi.ScreenHeight = 2
 		pi.BootOrPanic()
 		pi.Camera(1, 2)
-		pi.Color = 8
+		pi.Color(8)
 		pi.Pset(1, 2)
 		// when
 		actual := pi.Pget(1, 2)
 		// then
-		assert.Equal(t, pi.Color, actual)
+		assert.Equal(t, pi.ColorReset(), actual)
 	})
 
 	t.Run("should get color 0 for pixels outside the screen when camera is set", func(t *testing.T) {

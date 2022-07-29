@@ -18,7 +18,7 @@ func main() {
 
 	pi.Draw = func() {
 		pi.Cls()
-		pi.Color = 1
+		pi.Color(1)
 
 		draw(32, 8, pi.Sin)
 		draw(96, 11, pi.Cos)
@@ -28,10 +28,10 @@ func main() {
 }
 
 func draw(line int, color byte, f func(x float64) float64) {
-	pi.Color = 1
+	pi.Color(1)
 	drawHorizontalAxis(line)
 
-	pi.Color = color
+	pi.Color(color)
 	for x := 0.0; x < 128; x++ {
 		angle := float64(x+start*speed) / 128
 		dy := math.Round(f(angle) * 16)

@@ -110,7 +110,7 @@ func TestBoot(t *testing.T) {
 	t.Run("should reset draw state", func(t *testing.T) {
 		pi.Reset()
 		require.NoError(t, pi.Boot())
-		pi.Color = 14
+		pi.Color(14)
 		pi.Camera(1, 2)
 		pi.Clip(1, 2, 3, 4)
 		// when
@@ -125,7 +125,7 @@ func TestBoot(t *testing.T) {
 		assert.Zero(t, y)
 		assert.Equal(t, pi.ScreenWidth, w)
 		assert.Equal(t, pi.ScreenHeight, h)
-		assert.Equal(t, byte(14), pi.Color)
+		assert.Equal(t, byte(6), pi.ColorReset())
 	})
 
 	t.Run("changing the user parameters after Boot should not ends up in a panic", func(t *testing.T) {
