@@ -147,6 +147,10 @@ func validateUserParameters() error {
 	return nil
 }
 
+func loadResources(resources fs.ReadFileFS) error {
+	return loadSpriteSheet(resources)
+}
+
 // BootOrPanic does the same as Boot, but panics instead of returning an error.
 //
 // Useful for writing unit tests and quick and dirty prototypes. Do not use on production ;)
