@@ -49,34 +49,10 @@
     <g
        id="g11162"
        transform="translate(5.2916667,5.2916667)">
-      <rect
-         style="fill:#fff1e8;fill-opacity:1;fill-rule:evenodd;stroke-width:0;stroke-dasharray:none;stroke:none"
+      <path
          id="rect3020"
-         width="31.75"
-         height="5.2916665"
-         x="0"
-         y="0" />
-      <rect
          style="fill:#fff1e8;fill-opacity:1;fill-rule:evenodd;stroke-width:0;stroke-dasharray:none;stroke:none"
-         id="rect4604"
-         width="5.2916665"
-         height="26.458334"
-         x="5.2916665"
-         y="5.2916665" />
-      <rect
-         style="fill:#fff1e8;fill-opacity:1;fill-rule:evenodd;stroke-width:0;stroke-dasharray:none;stroke:none"
-         id="rect11154"
-         width="5.2916665"
-         height="21.166666"
-         x="21.166666"
-         y="5.2916665" />
-      <rect
-         style="fill:#fff1e8;fill-opacity:1;fill-rule:evenodd;stroke-width:0;stroke-dasharray:none;stroke:none"
-         id="rect11156"
-         width="5.2916665"
-         height="5.2916665"
-         x="26.458334"
-         y="26.458334" />
+         d="M -1.375e-07 -1.375e-07 L -1.375e-07 5.2916664 L 5.2916664 5.2916664 L 5.2916664 31.749999 L 10.583333 31.749999 L 10.583333 5.2916664 L 21.166666 5.2916664 L 21.166666 26.458333 L 26.458333 26.458333 L 26.458333 5.2916664 L 31.749999 5.2916664 L 31.749999 -1.375e-07 L -1.375e-07 -1.375e-07 z M 26.458333 26.458333 L 26.458333 31.749999 L 31.749999 31.749999 L 31.749999 26.458333 L 26.458333 26.458333 z " />
     </g>
   </g>
 </svg>
