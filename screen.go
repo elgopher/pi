@@ -5,8 +5,6 @@ package pi
 
 // Screen-specific data
 var (
-	Color byte = 6 // Color is a currently used color in draw state. Used by Pset.
-
 	// ScreenData contains pixel colors for the screen visible by the player.
 	// Each pixel is one byte. It is initialized during pi.Boot.
 	//
@@ -24,6 +22,7 @@ var (
 	lineOfScreenWidth   []byte
 	zeroScreenData      []byte
 	clippingRegion      rect
+	color               = defaultColor // Color is a currently used color in draw state. Used by Pset.
 )
 
 // Cls cleans the entire screen with color 0. It does not take into account any draw state parameters such as clipping region or camera.
@@ -42,6 +41,22 @@ func ClsCol(col byte) {
 		copy(ScreenData[offset:offset+scrWidth], lineOfScreenWidth)
 		offset += scrWidth
 	}
+}
+
+// Color sets the color used by Pset.
+//
+// Color returns previously used color.
+func Color(col byte) (prevCol byte) {
+	prevCol = color
+	color = col
+	return
+}
+
+// ColorReset resets the color to default value which is 6.
+//
+// ColorReset returns previously used color.
+func ColorReset() (prevCol byte) {
+	return Color(defaultColor)
 }
 
 // Pset sets a pixel color on the screen to Color.
@@ -74,7 +89,7 @@ func Pset(x, y int) {
 		return
 	}
 
-	ScreenData[y*scrWidth+x] = drawPalette[Color]
+	ScreenData[y*scrWidth+x] = drawPalette[color]
 }
 
 // Pget gets a pixel color on the screen.

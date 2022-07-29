@@ -23,6 +23,7 @@ const (
 	defaultSpriteSheetHeight = 128
 	defaultScreenWidth       = 128
 	defaultScreenHeight      = 128
+	defaultColor             = byte(6)
 )
 
 // User parameters. Will be used during Boot (and Run).
@@ -83,7 +84,6 @@ func Reset() {
 	SpriteSheetHeight = defaultSpriteSheetHeight
 	ScreenWidth = defaultScreenWidth
 	ScreenHeight = defaultScreenHeight
-	Color = 6
 	Palette = defaultPalette
 }
 
@@ -126,6 +126,7 @@ func Boot() error {
 	Camera(0, 0)
 	PaltReset()
 	PalReset()
+	Color(defaultColor)
 
 	return nil
 }
