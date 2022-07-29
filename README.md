@@ -1,4 +1,4 @@
-# pi
+# pi <img src="internal/logo.svg" align="right" style="width: 20%"/>
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/elgopher/pi.svg)](https://pkg.go.dev/github.com/elgopher/pi)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
