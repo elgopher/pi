@@ -158,6 +158,31 @@ func TestPset(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("should draw swapped color", func(t *testing.T) {
+		pi.ScreenWidth = 1
+		pi.ScreenHeight = 1
+		pi.BootOrPanic()
+		pi.Color = 1
+		pi.Pal(1, 2)
+		// when
+		pi.Pset(0, 0)
+		// then
+		assert.Equal(t, []byte{2}, pi.ScreenData)
+	})
+
+	t.Run("should draw original color after PalReset", func(t *testing.T) {
+		pi.ScreenWidth = 1
+		pi.ScreenHeight = 1
+		pi.BootOrPanic()
+		pi.Color = 1
+		pi.Pal(1, 2)
+		pi.PalReset()
+		// when
+		pi.Pset(0, 0)
+		// then
+		assert.Equal(t, []byte{1}, pi.ScreenData)
+	})
 }
 
 func TestPget(t *testing.T) {
@@ -476,6 +501,33 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 		spr(1, 0, 0)
 		// then
 		expectedScreen := decodePNG(t, "internal/testimage/spr_1_on_top_of_2_trans_50.png")
+		assert.Equal(t, expectedScreen.Pixels, pi.ScreenData)
+	})
+
+	t.Run("should swap color", func(t *testing.T) {
+		pi.SpriteSheetWidth, pi.SpriteSheetHeight = 8, 8
+		pi.ScreenWidth, pi.ScreenHeight = 8, 8
+		pi.BootOrPanic()
+		const originalColor byte = 7
+		const replacementColor byte = 15
+		pi.Sset(5, 5, originalColor)
+		pi.Pal(originalColor, replacementColor)
+		// when
+		spr(0, 0, 0)
+		// then
+		actual := pi.Pget(5, 5)
+		assert.Equal(t, replacementColor, actual)
+	})
+
+	t.Run("should draw original color after reset", func(t *testing.T) {
+		boot(8, 8, spriteSheet16x16)
+		expectedScreen := decodePNG(t, "internal/testimage/spr_0_at_00.png")
+		// when
+		pi.Pal(1, 3)
+		pi.Pal(28, 30)
+		pi.PalReset()
+		spr(0, 0, 0)
+		// then
 		assert.Equal(t, expectedScreen.Pixels, pi.ScreenData)
 	})
 }

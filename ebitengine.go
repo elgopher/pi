@@ -69,7 +69,7 @@ func (e *ebitengineGame) replaceScreenPixels(screen *ebiten.Image) {
 
 	offset := 0
 	for _, col := range ScreenData {
-		rgb := Palette[col]
+		rgb := Palette[displayPalette[col]]
 		e.screenDataRGBA[offset] = rgb.R
 		e.screenDataRGBA[offset+1] = rgb.G
 		e.screenDataRGBA[offset+2] = rgb.B

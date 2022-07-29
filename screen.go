@@ -74,7 +74,7 @@ func Pset(x, y int) {
 		return
 	}
 
-	ScreenData[y*scrWidth+x] = Color
+	ScreenData[y*scrWidth+x] = drawPalette[Color]
 }
 
 // Pget gets a pixel color on the screen.
@@ -266,7 +266,7 @@ func SprSizeFlip(n, x, y int, w, h float64, flipX, flipY bool) {
 				continue
 			}
 
-			ScreenData[screenOffset+j] = col
+			ScreenData[screenOffset+j] = drawPalette[col]
 		}
 		screenOffset += scrWidth
 		spriteSheetOffset += spriteSheetStep
@@ -288,4 +288,38 @@ var defaultTransparency = [256]bool{true}
 // PaltReset sets all transparent colors to false and makes color 0 transparent.
 func PaltReset() {
 	colorIsTransparent = defaultTransparency
+}
+
+var drawPalette [256]byte
+
+// Pal replaces color with another one for all subsequent drawings (it is changing
+// the so-called draw palette).
+//
+// Affected functions are Pset, Spr, SprSize and SprSizeFlip.
+func Pal(color byte, replacementColor byte) {
+	drawPalette[color] = replacementColor
+}
+
+var displayPalette [256]byte
+
+// PalDisplay replaces color with another one for the whole screen at the end of a frame
+// (it is changing the so-called display palette).
+func PalDisplay(color byte, replacementColor byte) {
+	displayPalette[color] = replacementColor
+}
+
+// PalSecondary
+
+var notSwappedPalette [256]byte
+
+func init() {
+	for i := 0; i < 256; i++ {
+		notSwappedPalette[i] = byte(i)
+	}
+}
+
+// PalReset resets all swapped colors for all palettes.
+func PalReset() {
+	drawPalette = notSwappedPalette
+	displayPalette = notSwappedPalette
 }

@@ -125,6 +125,7 @@ func Boot() error {
 	Clip(0, 0, scrWidth, scrHeight)
 	Camera(0, 0)
 	PaltReset()
+	PalReset()
 
 	return nil
 }

@@ -55,7 +55,7 @@ See also [examples](examples) directory and [documentation](https://pkg.go.dev/g
   * [x] drawing sprites and pixels with camera and clipping support
   * [x] add the ability to directly access pixels on the screen and sprite-sheet
   * [x] palette transparency
-  * [ ] palette swapping
+  * [x] palette swapping
   * [ ] printing text on the screen
   * [ ] drawing shapes
     * [ ] lines, rectangles, circles, ovals
