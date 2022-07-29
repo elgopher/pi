@@ -7,7 +7,6 @@ import (
 	"github.com/elgopher/pi"
 )
 
-// Go compiler will automatically add sprite sheet to binary
 //go:embed sprite-sheet.png
 var resources embed.FS
 
