@@ -64,10 +64,11 @@ See also [examples](examples) directory and [documentation](https://pkg.go.dev/g
     * [x] Cos, Sin, Atan2
     * [ ] Min, Max, Mid
   * [ ] stretching sprites
-* [ ] Add keyboard support
-* [ ] Add gamepad/joystick support
-* [ ] Add mouse support
-* [ ] Add Map API
+* [x] Game controller support: gamepad and keyboard
+* [ ] Mouse support (dev mode)
+* [ ] Full keyboard support (dev mode)
+* [ ] Map API
+* [ ] Menu screen
 * [ ] Development console
   * [ ] stopping, resuming the game
     * [x] add a programmatic way to stop the game
