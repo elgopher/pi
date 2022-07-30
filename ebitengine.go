@@ -42,6 +42,7 @@ type ebitengineGame struct {
 
 func (e *ebitengineGame) Update() error {
 	updateTime()
+	updateController()
 
 	if Update != nil {
 		Update()
