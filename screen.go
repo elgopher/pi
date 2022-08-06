@@ -3,6 +3,14 @@
 
 package pi
 
+import (
+	"fmt"
+	"image"
+	stdcolor "image/color"
+	"image/png"
+	"os"
+)
+
 // Screen-specific data
 var (
 	// ScreenData contains pixel colors for the screen visible by the player.
@@ -28,6 +36,7 @@ var (
 // Cls cleans the entire screen with color 0. It does not take into account any draw state parameters such as clipping region or camera.
 func Cls() {
 	copy(ScreenData, zeroScreenData)
+	CursorReset()
 }
 
 // ClsCol cleans the entire screen with specified color. It does not take into account any draw state parameters such as clipping region or camera.
@@ -337,4 +346,36 @@ func init() {
 func PalReset() {
 	drawPalette = notSwappedPalette
 	displayPalette = notSwappedPalette
+}
+
+// Snap takes a screenshot and saves it to temp dir.
+//
+// Snap returns a filename. If something went wrong error is returned.
+func Snap() (string, error) {
+	var palette stdcolor.Palette
+	for _, col := range displayPalette {
+		rgb := Palette[col]
+		rgba := &stdcolor.NRGBA{R: rgb.R, G: rgb.G, B: rgb.B, A: 255}
+		palette = append(palette, rgba)
+	}
+
+	size := image.Rectangle{Max: image.Point{X: scrWidth, Y: scrHeight}}
+	img := image.NewPaletted(size, palette)
+
+	copy(img.Pix, ScreenData)
+
+	file, err := os.CreateTemp("", "pi-screenshot")
+	if err != nil {
+		return "", fmt.Errorf("error creating temp file for screenshot: %w", err)
+	}
+
+	if err = png.Encode(file, img); err != nil {
+		return "", fmt.Errorf("error encoding screenshot into PNG file: %w", err)
+	}
+
+	if err = file.Close(); err != nil {
+		return "", fmt.Errorf("error closing file: %w", err)
+	}
+
+	return file.Name(), nil
 }
