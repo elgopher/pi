@@ -47,19 +47,21 @@ See also [examples](examples) directory and [documentation](https://pkg.go.dev/g
 ## Roadmap
 
 * [x] Present game on the screen
-  * [x] add the ability to change the resolution and palette
-  * [x] add sprite-sheet loader
-  * [ ] add more options: full screen, specifying tps and scale
-  * [x] Time function
+  * [x] ability to change the resolution and palette
+  * [x] sprite-sheet loader
+  * [ ] more options: full screen, specifying tps and scale
+  * [x] Game loop
 * [ ] Implement Graphics API
   * [x] drawing sprites and pixels with camera and clipping support
   * [x] add the ability to directly access pixels on the screen and sprite-sheet
   * [x] palette transparency
   * [x] palette swapping
   * [ ] printing text on the screen
+    * [x] system font
+    * [ ] custom font and additional features: escape characters, offsets
   * [ ] drawing shapes
     * [ ] lines, rectangles, circles, ovals
-    * [ ] add support for fill patterns
+    * [ ] fill patterns
   * [ ] math API
     * [x] Cos, Sin, Atan2
     * [ ] Min, Max, Mid

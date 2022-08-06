@@ -101,6 +101,10 @@ func Boot() error {
 		return err
 	}
 
+	if err := loadSystemFont(); err != nil {
+		return err
+	}
+
 	if Resources == nil {
 		Resources = embed.FS{}
 	}
@@ -122,11 +126,12 @@ func Boot() error {
 	zeroScreenData = make([]byte, screenSize)
 	lineOfScreenWidth = make([]byte, scrWidth)
 
-	Clip(0, 0, scrWidth, scrHeight)
-	Camera(0, 0)
+	ClipReset()
+	CameraReset()
 	PaltReset()
 	PalReset()
 	Color(defaultColor)
+	CursorReset()
 
 	return nil
 }

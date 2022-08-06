@@ -8,6 +8,7 @@ import (
 	"embed"
 	_ "embed"
 	"fmt"
+	"os"
 	"testing"
 	"testing/fstest"
 
@@ -20,7 +21,7 @@ import (
 var (
 	//go:embed internal/testimage/sprite-sheet-16x16.png
 	spriteSheet16x16 []byte
-	//go:embed internal/testimage/*.png
+	//go:embed internal/testimage/*
 	images embed.FS
 )
 
@@ -676,6 +677,41 @@ func TestSprSizeFlip(t *testing.T) {
 	})
 }
 
+func TestSnap(t *testing.T) {
+	t.Run("should take screenshot and store it to temp file", func(t *testing.T) {
+		pi.Reset()
+		pi.BootOrPanic()
+		for i := 0; i < len(pi.ScreenData); i++ {
+			pi.ScreenData[i] = byte(i % 16) // 16 colors by default
+		}
+		// when
+		screenshot, err := pi.Snap()
+		// then
+		require.NoError(t, err)
+		img := decodeScreenshot(t, screenshot)
+		assert.Equal(t, pi.ScreenWidth, img.Width)
+		assert.Equal(t, pi.ScreenHeight, img.Height)
+		assert.Equal(t, pi.ScreenData, img.Pixels)
+		assert.Equal(t, pi.Palette, img.Palette)
+	})
+
+	t.Run("should use display palette", func(t *testing.T) {
+		pi.Reset()
+		pi.ScreenWidth, pi.ScreenHeight = 1, 1
+		pi.BootOrPanic()
+		original, replacement := byte(1), byte(2)
+		pi.PalDisplay(original, replacement) // replace 1 by 2
+		pi.Color(original)
+		pi.Pset(0, 0)
+		screenshot, err := pi.Snap()
+		// then
+		require.NoError(t, err)
+		img := decodeScreenshot(t, screenshot)
+		assert.Equal(t, pi.Palette[2], img.Palette[1]) // 1 is replaced by 2
+		assert.Equal(t, pi.ScreenData, img.Pixels)
+	})
+}
+
 func clone(s []byte) []byte {
 	cloned := make([]byte, len(s))
 	copy(cloned, s)
@@ -692,6 +728,14 @@ func decodePNG(t *testing.T, file string) image.Image {
 	data, err := image.DecodePNG(bytes.NewReader(payload))
 	require.NoError(t, err)
 	return data
+}
+
+func decodeScreenshot(t *testing.T, screenshot string) image.Image {
+	file, err := os.Open(screenshot)
+	require.NoError(t, err)
+	img, err := image.DecodePNG(file)
+	require.NoError(t, err)
+	return img
 }
 
 func boot(screenWidth, screenHeight int, spriteSheet []byte) {
