@@ -541,7 +541,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
 				boot(8, 8, spriteSheet16x16)
-				expectedScreen := decodePNG(t, "internal/testimage/"+test.expectedScreenFile)
+				expectedScreen := decodePNG(t, "internal/testimage/spr/"+test.expectedScreenFile)
 				// when
 				pi.Camera(test.cameraX, test.cameraY)
 				spr(test.spriteNo, test.x, test.y)
@@ -566,7 +566,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
 				boot(8, 8, spriteSheet16x16)
-				expectedScreen := decodePNG(t, "internal/testimage/"+test.expectedScreenFile)
+				expectedScreen := decodePNG(t, "internal/testimage/spr/"+test.expectedScreenFile)
 				// when
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
 				spr(0, 0, 0)
@@ -582,7 +582,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 		// when
 		spr(1, 0, 0)
 		// then
-		expectedScreen := decodePNG(t, "internal/testimage/spr_1_on_top_of_2_trans_0.png")
+		expectedScreen := decodePNG(t, "internal/testimage/spr/spr_1_on_top_of_2_trans_0.png")
 		assert.Equal(t, expectedScreen.Pixels, pi.ScreenData)
 	})
 
@@ -594,7 +594,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 		pi.PaltReset() // and then make color 0 transparent again
 		spr(1, 0, 0)
 		// then
-		expectedScreen := decodePNG(t, "internal/testimage/spr_1_on_top_of_2_trans_0.png")
+		expectedScreen := decodePNG(t, "internal/testimage/spr/spr_1_on_top_of_2_trans_0.png")
 		assert.Equal(t, expectedScreen.Pixels, pi.ScreenData)
 	})
 
@@ -606,7 +606,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 		pi.Palt(50, true)
 		spr(1, 0, 0)
 		// then
-		expectedScreen := decodePNG(t, "internal/testimage/spr_1_on_top_of_2_trans_50.png")
+		expectedScreen := decodePNG(t, "internal/testimage/spr/spr_1_on_top_of_2_trans_50.png")
 		assert.Equal(t, expectedScreen.Pixels, pi.ScreenData)
 	})
 
@@ -627,7 +627,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 
 	t.Run("should draw original color after reset", func(t *testing.T) {
 		boot(8, 8, spriteSheet16x16)
-		expectedScreen := decodePNG(t, "internal/testimage/spr_0_at_00.png")
+		expectedScreen := decodePNG(t, "internal/testimage/spr/spr_0_at_00.png")
 		// when
 		pi.Pal(1, 3)
 		pi.Pal(28, 30)
@@ -699,7 +699,7 @@ func testSprSize(t *testing.T, sprSize func(spriteNo int, x, y int, w, h float64
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
 				boot(16, 16, spriteSheet16x16)
-				expectedScreen := decodePNG(t, "internal/testimage/"+test.expectedScreenFile)
+				expectedScreen := decodePNG(t, "internal/testimage/spr/"+test.expectedScreenFile)
 				// when
 				sprSize(test.spriteNo, test.x, test.y, test.w, test.h)
 				// then
@@ -729,7 +729,7 @@ func TestSprSizeFlip(t *testing.T) {
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
 				boot(8, 8, spriteSheet16x16)
-				expectedScreen := decodePNG(t, "internal/testimage/"+test.expectedScreenFile)
+				expectedScreen := decodePNG(t, "internal/testimage/spr/"+test.expectedScreenFile)
 				// when
 				pi.SprSizeFlip(0, 0, 0, 1.0, test.h, test.flipX, test.flipY)
 				// then
@@ -746,7 +746,7 @@ func TestSprSizeFlip(t *testing.T) {
 		pi.Palt(50, true)
 		pi.SprSizeFlip(1, 0, 0, 1.0, 1.0, true, false)
 		// then
-		expectedScreen := decodePNG(t, "internal/testimage/spr_1_on_top_of_2_trans_50_flipx.png")
+		expectedScreen := decodePNG(t, "internal/testimage/spr/spr_1_on_top_of_2_trans_50_flipx.png")
 		assert.Equal(t, expectedScreen.Pixels, pi.ScreenData)
 	})
 }
