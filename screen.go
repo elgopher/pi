@@ -91,10 +91,10 @@ func Pset(x, y int) {
 	if y < clippingRegion.y {
 		return
 	}
-	if x > clippingRegion.w {
+	if x >= clippingRegion.x+clippingRegion.w {
 		return
 	}
-	if y > clippingRegion.h {
+	if y >= clippingRegion.y+clippingRegion.h {
 		return
 	}
 
@@ -124,10 +124,10 @@ func Pget(x, y int) byte {
 	if y < clippingRegion.y {
 		return 0
 	}
-	if x > clippingRegion.w {
+	if x >= clippingRegion.x+clippingRegion.w {
 		return 0
 	}
-	if y > clippingRegion.h {
+	if y >= clippingRegion.y+clippingRegion.h {
 		return 0
 	}
 

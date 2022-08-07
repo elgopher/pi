@@ -145,6 +145,43 @@ func TestPset(t *testing.T) {
 		}
 	})
 
+	t.Run("should not set pixel outside the clipping region (x,y higher than w,h)", func(t *testing.T) {
+		pi.ScreenWidth = 8
+		pi.ScreenHeight = 8
+		emptyScreen := make([]byte, 8*8)
+		tests := []struct{ X, Y int }{
+			{1, 2}, {2, 2}, {3, 2},
+			{1, 3} /*   */, {3, 3},
+			{1, 4} /*   */, {3, 4},
+			{1, 5}, {2, 5}, {3, 5},
+		}
+		for _, coords := range tests {
+			name := fmt.Sprintf("%+v", coords)
+			t.Run(name, func(t *testing.T) {
+				pi.BootOrPanic()
+				pi.Clip(2, 3, 1, 2)
+				// when
+				pi.Color(col)
+				pi.Pset(coords.X, coords.Y)
+				// then
+				assert.Equal(t, emptyScreen, pi.ScreenData)
+			})
+		}
+	})
+
+	t.Run("should set pixel inside the clipping region", func(t *testing.T) {
+		pi.ScreenWidth = 8
+		pi.ScreenHeight = 8
+		emptyScreen := make([]byte, 8*8)
+		pi.BootOrPanic()
+		pi.Clip(2, 3, 1, 1)
+		// when
+		pi.Color(col)
+		pi.Pset(2, 3)
+		// then
+		assert.NotEqual(t, emptyScreen, pi.ScreenData)
+	})
+
 	t.Run("should set pixel taking camera position into consideration", func(t *testing.T) {
 		pi.ScreenWidth = 2
 		pi.ScreenHeight = 2
@@ -274,6 +311,43 @@ func TestPget(t *testing.T) {
 				assert.Zero(t, actual)
 			})
 		}
+	})
+
+	t.Run("should get color 0 if outside the clipping region (x,y higher than w,h)", func(t *testing.T) {
+		pi.ScreenWidth = 8
+		pi.ScreenHeight = 8
+		tests := []struct{ X, Y int }{
+			{1, 2}, {2, 2}, {3, 2},
+			{1, 3} /*   */, {3, 3},
+			{1, 4} /*   */, {3, 4},
+			{1, 5}, {2, 5}, {3, 5},
+		}
+		for _, coords := range tests {
+			name := fmt.Sprintf("%+v", coords)
+			t.Run(name, func(t *testing.T) {
+				pi.BootOrPanic()
+				pi.Pset(coords.X, coords.Y)
+				pi.Clip(2, 3, 1, 2)
+				// when
+				actual := pi.Pget(coords.X, coords.Y)
+				// then
+				assert.Zero(t, actual)
+			})
+		}
+	})
+
+	t.Run("should get pixel inside the clipping region", func(t *testing.T) {
+		pi.ScreenWidth = 8
+		pi.ScreenHeight = 8
+		pi.BootOrPanic()
+		col := byte(6)
+		pi.Color(col)
+		pi.Pset(2, 3)
+		pi.Clip(2, 3, 1, 1)
+		// when
+		actual := pi.Pget(2, 3)
+		// then
+		assert.Equal(t, col, actual)
 	})
 
 	t.Run("should get pixel taking camera position into consideration", func(t *testing.T) {
