@@ -64,10 +64,16 @@ var (
 // Run boots the game, opens the window and run the game loop. It must be
 // called from the main thread.
 //
+// Run does not boot the game once the game has been booted. Thanks to this,
+// the user can call Boot directly and draw to the screen
+// before the game loop starts.
+//
 // It returns error when something terrible happened during initialization.
 func Run() error {
-	if err := Boot(); err != nil {
-		return fmt.Errorf("booting game failed: %w", err)
+	if !booted {
+		if err := Boot(); err != nil {
+			return fmt.Errorf("booting game failed: %w", err)
+		}
 	}
 
 	timeStarted = time.Now()
@@ -95,6 +101,8 @@ func Reset() {
 	ScreenHeight = defaultScreenHeight
 	Palette = defaultPalette
 }
+
+var booted bool
 
 // Boot initializes the engine based on user parameters such as ScreenWidth and ScreenHeight.
 // It loads the resources like sprite-sheet.png.
@@ -141,6 +149,8 @@ func Boot() error {
 	PalReset()
 	Color(defaultColor)
 	CursorReset()
+
+	booted = true
 
 	return nil
 }
