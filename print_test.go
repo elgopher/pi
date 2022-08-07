@@ -18,7 +18,7 @@ func TestPrint(t *testing.T) {
 	pi.ScreenHeight = 24
 
 	t.Run("should print chars using color on the top-left corner", func(t *testing.T) {
-		chars := []string{`!`, `A`, `a`, `AB`, `ABCD`}
+		chars := []string{`!`, `A`, `b`, `AB`, `ABCD`}
 		for _, char := range chars {
 			t.Run(char, func(t *testing.T) {
 				pi.BootOrPanic()
