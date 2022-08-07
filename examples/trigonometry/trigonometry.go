@@ -9,8 +9,6 @@ import (
 
 var start float64
 
-const speed = 1
-
 func main() {
 	pi.Update = func() {
 		start += 1
@@ -33,7 +31,7 @@ func draw(line int, color byte, f func(x float64) float64) {
 
 	pi.Color(color)
 	for x := 0.0; x < 128; x++ {
-		angle := float64(x+start*speed) / 128
+		angle := (x + start) / 128
 		dy := math.Round(f(angle) * 16)
 		pi.Pset(int(x), line+int(dy))
 	}
