@@ -1,6 +1,7 @@
 # pi <img src="internal/logo.svg" align="right" style="width: 10%"/>
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/elgopher/pi.svg)](https://pkg.go.dev/github.com/elgopher/pi)
+[![codecov](https://codecov.io/gh/elgopher/pi/branch/master/graph/badge.svg)](https://codecov.io/gh/elgopher/pi)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 
 The retro game development engine for Go, inspired by [Pico-8](https://www.lexaloffle.com/pico-8.php) and powered by [Ebitengine](https://ebiten.org/).
