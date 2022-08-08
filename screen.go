@@ -319,7 +319,7 @@ var drawPalette [256]byte
 // Pal replaces color with another one for all subsequent drawings (it is changing
 // the so-called draw palette).
 //
-// Affected functions are Pset, Spr, SprSize and SprSizeFlip.
+// Affected functions are Pset, Spr, SprSize, SprSizeFlip, Rect and RectFill.
 func Pal(color byte, replacementColor byte) {
 	drawPalette[color] = replacementColor
 }
