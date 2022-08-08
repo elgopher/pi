@@ -61,7 +61,8 @@ See also [examples](examples) directory and [documentation](https://pkg.go.dev/g
     * [x] system font
     * [ ] custom font and additional features: escape characters, offsets
   * [ ] drawing shapes
-    * [ ] lines, rectangles, circles, ovals
+    * [x] rectangles
+    * [ ] lines, circles, ovals
     * [ ] fill patterns
   * [ ] math API
     * [x] Cos, Sin, Atan2
