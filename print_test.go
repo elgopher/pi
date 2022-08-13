@@ -166,6 +166,14 @@ func TestPrint(t *testing.T) {
 				cursorY:      pi.ScreenHeight - charHeight + 1,
 				expectedFile: "internal/testimage/print/scroll-print-scroll.png",
 			},
+			"scroll entire screen": {
+				cursorY:      2 * pi.ScreenHeight,
+				expectedFile: "internal/testimage/print/scroll-entire-screen.png",
+			},
+			"scroll entire screen 2": {
+				cursorY:      2*pi.ScreenHeight - charHeight,
+				expectedFile: "internal/testimage/print/scroll-entire-screen.png",
+			},
 		}
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {

@@ -99,6 +99,12 @@ func Print(text string) (x int) {
 }
 
 func scroll(lines int) {
+	if scrHeight <= lines {
+		Cls()
+		cursor.y = scrHeight - systemFont.Height
+		return
+	}
+
 	for y := clippingRegion.y; y < scrHeight-lines; y++ {
 		srcOffset := y*scrWidth + clippingRegion.x
 		dstOffset := srcOffset + lines*scrWidth
