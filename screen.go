@@ -73,18 +73,6 @@ func Pset(x, y int) {
 	x -= camera.x
 	y -= camera.y
 
-	if x < 0 {
-		return
-	}
-	if y < 0 {
-		return
-	}
-	if x >= scrWidth {
-		return
-	}
-	if y >= scrHeight {
-		return
-	}
 	if x < clippingRegion.x {
 		return
 	}
@@ -106,18 +94,6 @@ func Pget(x, y int) byte {
 	x -= camera.x
 	y -= camera.y
 
-	if x < 0 {
-		return 0
-	}
-	if y < 0 {
-		return 0
-	}
-	if x >= scrWidth {
-		return 0
-	}
-	if y >= scrHeight {
-		return 0
-	}
 	if x < clippingRegion.x {
 		return 0
 	}
