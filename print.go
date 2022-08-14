@@ -100,7 +100,7 @@ func Print(text string) (x int) {
 
 func scroll(lines int) {
 	if scrHeight <= lines {
-		Cls()
+		cls()
 		cursor.y = scrHeight - systemFont.Height
 		return
 	}
