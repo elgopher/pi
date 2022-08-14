@@ -56,16 +56,30 @@ func TestColorReset(t *testing.T) {
 }
 
 func TestCls(t *testing.T) {
+	pi.Reset()
+	pi.ScreenWidth = 2
+	pi.ScreenHeight = 2
+
 	t.Run("should clean screen using color 0", func(t *testing.T) {
-		pi.Reset()
-		pi.ScreenWidth = 2
-		pi.ScreenHeight = 2
 		pi.BootOrPanic()
 		pi.ScreenData = []byte{1, 2, 3, 4}
 		// when
 		pi.Cls()
 		// then
 		assert.Equal(t, []byte{0, 0, 0, 0}, pi.ScreenData)
+	})
+
+	t.Run("should reset clipping region", func(t *testing.T) {
+		pi.BootOrPanic()
+		pi.Clip(1, 2, 3, 4)
+		// when
+		pi.Cls() // clips to 0,0,w,h
+		// then
+		prevX, prevY, prevW, prevH := pi.ClipReset()
+		assert.Zero(t, prevX)
+		assert.Zero(t, prevY)
+		assert.Equal(t, pi.ScreenWidth, prevW)
+		assert.Equal(t, pi.ScreenHeight, prevH)
 	})
 }
 

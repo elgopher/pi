@@ -34,9 +34,12 @@ var (
 )
 
 // Cls cleans the entire screen with color 0. It does not take into account any draw state parameters such as clipping region or camera.
+//
+// Cls also resets the cursor used for printing text and resets the clipping region.
 func Cls() {
 	cls()
 	CursorReset()
+	ClipReset()
 }
 
 func cls() {
