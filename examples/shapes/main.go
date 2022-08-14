@@ -22,6 +22,11 @@ func main() {
 		pi.Color(3)
 		// draw rect without filling. Will be drawn on top of existing pixels
 		pi.Rect(10, 10, 80, 80)
+
+		// draw line from x0,y0 to x1,y1 inclusive
+		pi.Line(10, 10, 80, 80)
+
+		pi.Line(80, 10, 10, 80)
 	}
 
 	pi.RunOrPanic()

@@ -61,23 +61,24 @@ See also [examples](examples) directory and [documentation](https://pkg.go.dev/g
     * [x] system font
     * [ ] custom font and additional features: escape characters, offsets
   * [ ] drawing shapes
-    * [x] rectangles
-    * [ ] lines, circles, ovals
+    * [x] rectangles, lines
+    * [ ] circles
     * [ ] fill patterns
-  * [ ] math API
-    * [x] Cos, Sin, Atan2
-    * [ ] Min, Max, Mid
   * [ ] stretching sprites
+  * [ ] map API
+* [ ] math API
+  * [x] Cos, Sin, Atan2
+  * [ ] Min, Max, Mid
 * [x] Game controller support: gamepad and keyboard
 * [ ] Mouse support (dev mode)
 * [ ] Full keyboard support (dev mode)
-* [ ] Map API
 * [ ] Menu screen
 * [ ] Development console
   * [ ] stopping, resuming the game
     * [x] add a programmatic way to stop the game
     * [ ] resume the game using console command
-  * [ ] running public functions
+  * [ ] scripting (running π functions)
+  * [ ] screen inspector
   * [ ] sprite-sheet editor
   * [ ] map editor
   * [ ] sound editor
@@ -87,4 +88,4 @@ See also [examples](examples) directory and [documentation](https://pkg.go.dev/g
 * [ ] Examples
   * [ ] simple programs for beginners
   * [ ] interactive programs describing how functions work
-    * [ ] Sin,Cos,Atan2 visualization
+  * [ ] simple working game

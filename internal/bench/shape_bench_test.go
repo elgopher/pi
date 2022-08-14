@@ -20,3 +20,26 @@ func BenchmarkRect(b *testing.B) {
 		pi.Rect(0, 0, r.W-1, r.H-1)
 	})
 }
+
+func BenchmarkLine(b *testing.B) {
+	b.Run("slope=1", func(b *testing.B) {
+		runBenchmarks(b, func(r Resolution) {
+			pi.Line(0, 0, r.W-1, r.H-1)
+		})
+	})
+	b.Run("slope>1", func(b *testing.B) {
+		runBenchmarks(b, func(r Resolution) {
+			pi.Line(0, 0, r.W-2, r.H-1)
+		})
+	})
+	b.Run("vertical", func(b *testing.B) {
+		runBenchmarks(b, func(r Resolution) {
+			pi.Line(0, 0, 0, r.H-1)
+		})
+	})
+	b.Run("horizontal", func(b *testing.B) {
+		runBenchmarks(b, func(r Resolution) {
+			pi.Line(0, 0, r.W-1, 0)
+		})
+	})
+}

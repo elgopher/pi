@@ -193,3 +193,293 @@ func testRect(t *testing.T, rect func(x0, y0, x1, y1 int), dir string) {
 func TestRect(t *testing.T) {
 	testRect(t, pi.Rect, "rect")
 }
+
+func TestLine(t *testing.T) {
+	pi.ScreenWidth = 16
+	pi.ScreenHeight = 16
+	const white, red = 7, 8
+	pi.Color(red)
+
+	t.Run("should not draw anything outside clipping region", func(t *testing.T) {
+		tests := map[string]struct {
+			clipX, clipY, clipW, clipH int
+			x0, y0, x1, y1             int
+		}{
+			"both x<clipX": {
+				clipW: 16, clipH: 16,
+				x0: -1, x1: -1,
+			},
+			"both x==clipX+W": {
+				clipX: 1, clipW: 15, clipH: 16,
+				x0: 16, x1: 16,
+			},
+			"both x>clipX+W": {
+				clipX: 1, clipW: 15, clipH: 16,
+				x0: 17, x1: 17,
+			},
+			"both y<clipY": {
+				clipW: 16, clipH: 16,
+				y0: -1, y1: -1,
+			},
+			"both y==clipY+H": {
+				clipY: 1, clipW: 15, clipH: 16,
+				y0: 16, y1: 16,
+			},
+			"both y>clipY+H": {
+				clipY: 1, clipW: 15, clipH: 16,
+				y0: 17, y1: 17,
+			},
+			"horizontal,both x<clipX": {
+				clipW: 16, clipH: 16,
+				x0: -2, x1: -1,
+			},
+			"horizontal,both x==clipX+W": {
+				clipX: 1, clipW: 14, clipH: 16,
+				x0: 15, y0: 0, x1: 16, y1: 0,
+			},
+			"horizontal,both x>clipX+W": {
+				clipX: 1, clipW: 14, clipH: 16,
+				x0: 16, y0: 0, x1: 17, y1: 0,
+			},
+			"horizontal line,y<clipY": {
+				clipY: 1, clipW: 16, clipH: 16,
+				y0: -1, y1: -1, x0: 0, x1: 2,
+			},
+			"horizontal line,y==clipY+H": {
+				clipY: 1, clipW: 16, clipH: 14,
+				y0: 15, y1: 15, x0: 0, x1: 2,
+			},
+			"horizontal line,y>clipY+H": {
+				clipY: 1, clipW: 16, clipH: 14,
+				y0: 16, y1: 16, x0: 0, x1: 2,
+			},
+			"slope 1,both x<clipX": {
+				clipW: 16, clipH: 16,
+				x0: -2, y0: 0, x1: -1, y1: 1,
+			},
+			"slope 1,y<clipY": {
+				clipY: 1, clipW: 16, clipH: 16,
+				y0: -3, y1: -1, x0: 0, x1: 2,
+			},
+			"slope 1,y0==clipY+H": {
+				clipY: 1, clipW: 16, clipH: 14,
+				y0: 15, y1: 17, x0: 0, x1: 2,
+			},
+			"slope 1,y0>clipY+H": {
+				clipY: 1, clipW: 16, clipH: 14,
+				y0: 16, y1: 18, x0: 0, x1: 2,
+			},
+			"slope 1,x0==clipX+W": {
+				clipX: 1, clipW: 14, clipH: 16,
+				x0: 15, y0: 0, x1: 17, y1: 2,
+			},
+			"slope 1,x0>clipX+W": {
+				clipX: 1, clipW: 14, clipH: 16,
+				x0: 16, y0: 0, x1: 18, y1: 2,
+			},
+			"slope 2,both x<clipX": {
+				clipW: 16, clipH: 16,
+				x0: -2, y0: 0, x1: -1, y1: 2,
+			},
+			"slope 2,y<clipY": {
+				clipY: 1, clipW: 16, clipH: 16,
+				y0: -5, y1: -1, x0: 0, x1: 2,
+			},
+			"slope 2,y0==clipY+H": {
+				clipY: 1, clipW: 16, clipH: 14,
+				y0: 15, y1: 19, x0: 0, x1: 2,
+			},
+			"slope 2,y0>clipY+H": {
+				clipY: 1, clipW: 16, clipH: 14,
+				y0: 16, y1: 20, x0: 0, x1: 2,
+			},
+			"slope 2,x0==clipX+W": {
+				clipX: 1, clipW: 14, clipH: 16,
+				x0: 15, y0: 0, x1: 17, y1: 4,
+			},
+			"slope 2,x0>clipX+W": {
+				clipX: 1, clipW: 14, clipH: 16,
+				x0: 16, y0: 0, x1: 18, y1: 4,
+			},
+		}
+
+		for name, test := range tests {
+			t.Run(name, func(t *testing.T) {
+				pi.BootOrPanic()
+				pi.Color(white)
+				// when
+				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
+				pi.Line(test.x0, test.y0, test.x1, test.y1)
+				// then
+				emptyScreen := make([]byte, len(pi.ScreenData))
+				assert.Equal(t, emptyScreen, pi.ScreenData)
+			})
+		}
+	})
+
+	t.Run("should draw line", func(t *testing.T) {
+		tests := map[string]struct {
+			x0, y0, x1, y1 int
+			color          byte
+		}{
+			"slope 0, white":          {0, 0, 0, 0, white},
+			"slope 0, red":            {0, 0, 0, 0, red},
+			"vertical line":           {0, 0, 0, 1, white},
+			"vertical line inverse":   {0, 1, 0, 0, white},
+			"vertical line red":       {0, 0, 0, 1, red},
+			"horizontal line":         {0, 0, 1, 0, white},
+			"horizontal line inverse": {1, 0, 0, 0, white},
+			"horizontal line red":     {0, 0, 1, 0, red},
+			"slope 1":                 {0, 0, 2, 2, white},
+			"slope -1":                {0, 2, 2, 0, white},
+			"slope 0.5":               {0, 0, 2, 1, white},
+			"slope -0.5":              {0, 1, 2, 0, white},
+			"slope 2":                 {0, 0, 2, 4, white},
+			"slope -2":                {0, 4, 2, 0, white},
+			"slope 2.5":               {0, 0, 2, 5, white},
+			"slope -2.5":              {0, 5, 2, 0, white},
+			"slope 1.5":               {0, 3, 15, 13, white},
+		}
+
+		for name, test := range tests {
+			t.Run(name, func(t *testing.T) {
+				pi.BootOrPanic()
+				pi.ClsCol(5)
+				pi.Color(test.color)
+				// when
+				pi.Line(test.x0, test.y0, test.x1, test.y1)
+				assertScreenEqual(t, "internal/testimage/line/draw/"+name+".png")
+			})
+		}
+	})
+
+	t.Run("should draw inside clipping region", func(t *testing.T) {
+		tests := map[string]struct {
+			clipX, clipY, clipW, clipH int
+			x0, y0, x1, y1             int
+		}{
+			"top-left": {
+				clipX: 1, clipW: 15, clipH: 16,
+				x0: 1, x1: 1,
+			},
+			"top-right": {
+				clipX: 1, clipW: 15, clipH: 16,
+				x0: 15, x1: 15,
+			},
+			"top": {
+				clipY: 1, clipW: 16, clipH: 15,
+				y0: 1, y1: 1,
+			},
+			"bottom": {
+				clipY: -1, clipW: 16, clipH: 16,
+				y0: 14, y1: 14,
+			},
+			"vertical line": {
+				clipW: 16, clipH: 16,
+				y0: -1, y1: 16,
+			},
+			"horizontal line": {
+				clipW: 16, clipH: 16,
+				x0: -1, x1: 17,
+			},
+			"horizontal line, clipx=1": {
+				clipX: 1, clipW: 2, clipH: 16,
+				x0: 1, x1: 2,
+			},
+			"horizontal line, bottom": {
+				clipW: 16, clipH: 16,
+				x0: 0, y0: 15, x1: 15, y1: 15,
+			},
+			"slope 1": {
+				clipW: 16, clipH: 16,
+				x0: -1, y0: -1, x1: 16, y1: 16,
+			},
+			"slope -1": {
+				clipW: 16, clipH: 16,
+				x0: 16, y0: -1, x1: -1, y1: 16,
+			},
+			"slope 2": { // different from Pico-8
+				clipW: 16, clipH: 16,
+				x0: -1, y0: -1, x1: 8, y1: 17,
+			},
+			"slope -2": { // different from Pico-8
+				clipW: 16, clipH: 16,
+				x0: 8, y0: -1, x1: -1, y1: 17,
+			},
+		}
+
+		for name, test := range tests {
+			t.Run(name, func(t *testing.T) {
+				pi.BootOrPanic()
+				pi.ClsCol(5)
+				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
+				pi.Color(white)
+				// when
+				pi.Line(test.x0, test.y0, test.x1, test.y1)
+				assertScreenEqual(t, "internal/testimage/line/clip/"+name+".png")
+			})
+		}
+	})
+
+	t.Run("should use draw palette", func(t *testing.T) {
+		tests := map[string]struct {
+			x0, y0, x1, y1 int
+		}{
+			"horizontal line": {
+				x1: 15,
+			},
+			"vertical line": {
+				y1: 15,
+			},
+			"slope 1": {
+				x1: 15, y1: 15,
+			},
+			"slope 2": {
+				x1: 15, y1: 30,
+			},
+		}
+
+		for name, test := range tests {
+			t.Run(name, func(t *testing.T) {
+				pi.BootOrPanic()
+				pi.Color(white)
+				pi.ClsCol(5)
+				pi.Pal(white, red)
+				// when
+				pi.Line(test.x0, test.y0, test.x1, test.y1)
+				assertScreenEqual(t, "internal/testimage/line/pal/"+name+".png")
+			})
+		}
+	})
+
+	t.Run("should move by camera position", func(t *testing.T) {
+		tests := map[string]struct {
+			x0, y0, x1, y1 int
+		}{
+			"horizontal line": {
+				x1: 15,
+			},
+			"vertical line": {
+				y1: 15,
+			},
+			"slope 1": {
+				x1: 15, y1: 15,
+			},
+			"slope 2": {
+				x1: 15, y1: 30,
+			},
+		}
+
+		for name, test := range tests {
+			t.Run(name, func(t *testing.T) {
+				pi.BootOrPanic()
+				pi.Color(red)
+				pi.ClsCol(5)
+				pi.Camera(-1, -2)
+				// when
+				pi.Line(test.x0, test.y0, test.x1, test.y1)
+				assertScreenEqual(t, "internal/testimage/line/camera/"+name+".png")
+			})
+		}
+	})
+}

@@ -26,3 +26,12 @@ func FuzzRectFill(f *testing.F) {
 		pi.RectFill(x0, y0, x1, y1)
 	})
 }
+
+func FuzzLine(f *testing.F) {
+	pi.ScreenWidth = 16
+	pi.ScreenHeight = 16
+	pi.BootOrPanic()
+	f.Fuzz(func(t *testing.T, x0, y0, x1, y1 int) {
+		pi.Line(x0, y0, x1, y1)
+	})
+}
