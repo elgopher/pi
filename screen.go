@@ -47,7 +47,15 @@ func cls() {
 }
 
 // ClsCol cleans the entire screen with specified color. It does not take into account any draw state parameters such as clipping region or camera.
+//
+// ClsCol also resets the cursor used for printing text and resets the clipping region.
 func ClsCol(col byte) {
+	clsCol(col)
+	CursorReset()
+	ClipReset()
+}
+
+func clsCol(col byte) {
 	for i := 0; i < len(lineOfScreenWidth); i++ {
 		lineOfScreenWidth[i] = col
 	}
