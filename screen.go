@@ -35,8 +35,12 @@ var (
 
 // Cls cleans the entire screen with color 0. It does not take into account any draw state parameters such as clipping region or camera.
 func Cls() {
-	copy(ScreenData, zeroScreenData)
+	cls()
 	CursorReset()
+}
+
+func cls() {
+	copy(ScreenData, zeroScreenData)
 }
 
 // ClsCol cleans the entire screen with specified color. It does not take into account any draw state parameters such as clipping region or camera.

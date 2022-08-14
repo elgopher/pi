@@ -147,6 +147,7 @@ func TestPrint(t *testing.T) {
 		const charHeight = 6
 
 		tests := map[string]struct {
+			cursorX      int
 			cursorY      int
 			expectedFile string
 		}{
@@ -174,13 +175,18 @@ func TestPrint(t *testing.T) {
 				cursorY:      2*pi.ScreenHeight - charHeight,
 				expectedFile: "internal/testimage/print/scroll-entire-screen.png",
 			},
+			"scroll entire screen while cursor x is set": {
+				cursorX:      1,
+				cursorY:      2 * pi.ScreenHeight,
+				expectedFile: "internal/testimage/print/scroll-entire-screen-x-is-set.png",
+			},
 		}
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
 				pi.BootOrPanic()
 				pi.ClsCol(3)
 				pi.Color(7)
-				pi.Cursor(0, test.cursorY)
+				pi.Cursor(test.cursorX, test.cursorY)
 				// when
 				pi.Print("\u0080")
 				// then
