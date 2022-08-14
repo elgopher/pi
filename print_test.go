@@ -126,6 +126,7 @@ func TestPrint(t *testing.T) {
 	t.Run("should reset cursor", func(t *testing.T) {
 		tests := map[string]func(){
 			"Cls()":         func() { pi.Cls() },
+			"ClsCol(0)":     func() { pi.ClsCol(0) },
 			"CursorReset()": func() { pi.CursorReset() },
 			"Cursor(0,0)":   func() { pi.Cursor(0, 0) },
 		}
