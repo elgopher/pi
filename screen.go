@@ -85,9 +85,11 @@ func ColorReset() (prevCol byte) {
 
 // Pset sets a pixel color on the screen to Color.
 func Pset(x, y int) {
-	x -= camera.x
-	y -= camera.y
+	pset(x-camera.x, y-camera.y)
+}
 
+// pset sets a pixel color on the screen **without** taking camera position into account.
+func pset(x, y int) {
 	if x < clippingRegion.x {
 		return
 	}
