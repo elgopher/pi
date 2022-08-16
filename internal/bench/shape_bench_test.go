@@ -43,3 +43,19 @@ func BenchmarkLine(b *testing.B) {
 		})
 	})
 }
+
+func BenchmarkCirc(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		runBenchmarks(b, func(r Resolution) {
+			pi.Circ(r.W/2, r.H/2, r.W/2, color)
+		})
+	}
+}
+
+func BenchmarkCircFill(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		runBenchmarks(b, func(r Resolution) {
+			pi.CircFill(r.W/2, r.H/2, r.W/2, color)
+		})
+	}
+}
