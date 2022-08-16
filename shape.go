@@ -255,7 +255,67 @@ func horizontalLine(y, x0, x1 int, color byte) {
 		x1 = clippingRegion.x + clippingRegion.w - 1
 	}
 
+	offset := y * scrWidth
+
 	for x := x0; x <= x1; x++ {
-		ScreenData[y*scrWidth+x] = drawPalette[color]
+		ScreenData[offset+x] = drawPalette[color]
+	}
+}
+
+// Circ draws a circle
+//
+// Circ takes into account camera position, clipping region and draw palette.
+func Circ(centerX, centerY, radius int, color byte) {
+	centerX = centerX - camera.x
+	centerY = centerY - camera.y
+	// Code based on Frédéric Goset work: http://fredericgoset.ovh/mathematiques/courbes/en/bresenham_circle.html
+	x := 0
+	y := radius
+	m := 5 - 4*radius
+
+	for x <= y {
+		pset(centerX+x, centerY+y, color)
+		pset(centerX+x, centerY-y, color)
+		pset(centerX-x, centerY+y, color)
+		pset(centerX-x, centerY-y, color)
+		pset(centerX+y, centerY+x, color)
+		pset(centerX+y, centerY-x, color)
+		pset(centerX-y, centerY+x, color)
+		pset(centerX-y, centerY-x, color)
+
+		if m > 0 {
+			y--
+			m -= 8 * y
+		}
+
+		x++
+
+		m += 8*x + 4
+	}
+}
+
+// CircFill draws a filled circle
+//
+// CircFill takes into account camera position, clipping region and draw palette.
+func CircFill(centerX, centerY, radius int, color byte) {
+	// Code based on Frédéric Goset work: http://fredericgoset.ovh/mathematiques/courbes/en/filled_circle.html
+	x := 0
+	y := radius
+	m := 5 - 4*radius
+
+	for x <= y {
+		RectFill(centerX-y, centerY-x, centerX+y, centerY-x, color)
+		RectFill(centerX-y, centerY+x, centerX+y, centerY+x, color)
+
+		if m > 0 {
+			RectFill(centerX-x, centerY-y, centerX+x, centerY-y, color)
+			RectFill(centerX-x, centerY+y, centerX+x, centerY+y, color)
+			y--
+			m -= 8 * y
+		}
+
+		x++
+
+		m += 8*x + 4
 	}
 }

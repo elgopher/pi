@@ -24,6 +24,10 @@ func main() {
 		pi.Line(10, 10, 80, 80, 3)
 
 		pi.Line(80, 10, 10, 80, 3)
+
+		pi.Circ(45, 45, 10, 8)
+
+		pi.CircFill(80, 80, 4, 11)
 	}
 
 	pi.RunOrPanic()

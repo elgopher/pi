@@ -61,8 +61,7 @@ See also [examples](examples) directory and [documentation](https://pkg.go.dev/g
     * [x] system font
     * [ ] custom font and additional features: escape characters, offsets
   * [ ] drawing shapes
-    * [x] rectangles, lines
-    * [ ] circles
+    * [x] rectangles, lines, circles
     * [ ] fill patterns
   * [ ] stretching sprites
   * [ ] map API

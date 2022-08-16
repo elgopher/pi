@@ -473,3 +473,98 @@ func TestLine(t *testing.T) {
 		}
 	})
 }
+
+func TestCirc(t *testing.T) {
+	testCirc(t, pi.Circ, "circ")
+}
+
+func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
+	pi.ScreenWidth = 16
+	pi.ScreenHeight = 16
+	const white, red = 7, 8
+
+	t.Run("should draw", func(t *testing.T) {
+		tests := map[string]struct {
+			x, y, r int
+			color   byte
+		}{
+			"radius -1":       {8, 8, -1, white},
+			"radius 0, white": {8, 8, 0, white},
+			"radius 1, white": {8, 8, 1, white},
+			"radius 1, red":   {8, 8, 1, red},
+			"radius 2":        {8, 8, 2, white},
+			"radius 3":        {8, 8, 3, white},
+			"radius 4":        {8, 8, 4, white},
+			"radius 5":        {8, 8, 5, white},
+			"radius 6":        {8, 8, 6, white},
+			"radius 7":        {8, 8, 7, white},
+		}
+
+		for name, test := range tests {
+			t.Run(name, func(t *testing.T) {
+				pi.BootOrPanic()
+				pi.ClsCol(5)
+				// when
+				circ(test.x, test.y, test.r, test.color)
+				assertScreenEqual(t, "internal/testimage/"+dir+"/draw/"+name+".png")
+			})
+		}
+	})
+
+	t.Run("should use draw palette", func(t *testing.T) {
+		pi.BootOrPanic()
+		pi.ClsCol(5)
+		pi.Pal(white, red)
+		// when
+		circ(8, 8, 1, white)
+		assertScreenEqual(t, "internal/testimage/"+dir+"/draw/radius 1, red.png")
+	})
+
+	t.Run("should move by camera position", func(t *testing.T) {
+		pi.BootOrPanic()
+		pi.ClsCol(5)
+		pi.Camera(2, 1)
+		// when
+		circ(8, 8, 5, white)
+		assertScreenEqual(t, "internal/testimage/"+dir+"/camera.png")
+	})
+
+	t.Run("should draw inside clipping region", func(t *testing.T) {
+		tests := map[string]struct {
+			clipX, clipY, clipW, clipH int
+			x, y, r                    int
+		}{
+			"left": {
+				clipW: 16, clipH: 16,
+				x: 4, y: 5, r: 5,
+			},
+			"top": {
+				clipW: 16, clipH: 16,
+				x: 5, y: 4, r: 5,
+			},
+			"right": {
+				clipW: 16, clipH: 16,
+				x: 11, y: 5, r: 5,
+			},
+			"bottom": {
+				clipW: 16, clipH: 16,
+				x: 5, y: 11, r: 5,
+			},
+		}
+
+		for name, test := range tests {
+			t.Run(name, func(t *testing.T) {
+				pi.BootOrPanic()
+				pi.ClsCol(5)
+				// when
+				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
+				circ(test.x, test.y, test.r, white)
+				assertScreenEqual(t, "internal/testimage/"+dir+"/clip/"+name+".png")
+			})
+		}
+	})
+}
+
+func TestCircFill(t *testing.T) {
+	testCirc(t, pi.CircFill, "circfill")
+}
