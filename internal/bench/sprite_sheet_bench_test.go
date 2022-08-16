@@ -12,7 +12,7 @@ import (
 func BenchmarkSset(b *testing.B) {
 	runBenchmarks(b, func(res Resolution) {
 		for i := 0; i < 1000; i++ { // Sset is too fast
-			pi.Sset(2, 2, 7)
+			pi.Sset(2, 2, color)
 		}
 	})
 }

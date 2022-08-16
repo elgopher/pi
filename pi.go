@@ -23,7 +23,6 @@ const (
 	defaultSpriteSheetHeight = 128
 	defaultScreenWidth       = 128
 	defaultScreenHeight      = 128
-	defaultColor             = byte(6)
 )
 
 // User parameters. Will be used during Boot (and Run).
@@ -110,7 +109,7 @@ var booted bool
 // If sprite-sheet.png was not found in pi.Resources, then empty sprite-sheet is used with
 // the size of pi.SpriteSheetWidth * pi.SpriteSheetHeight.
 //
-// Boot also resets all draw state information like color, camera position and clipping region.
+// Boot also resets all draw state information like camera position and clipping region.
 //
 // Boot can be run multiple times. This is useful for writing unit tests.
 func Boot() error {
@@ -147,7 +146,6 @@ func Boot() error {
 	CameraReset()
 	PaltReset()
 	PalReset()
-	Color(defaultColor)
 	CursorReset()
 
 	booted = true

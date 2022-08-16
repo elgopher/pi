@@ -15,6 +15,6 @@ func FuzzPrint(f *testing.F) {
 	pi.BootOrPanic()
 	f.Fuzz(func(t *testing.T, x, y int) {
 		pi.Cursor(x, y)
-		pi.Print("A")
+		pi.Print("A", color)
 	})
 }

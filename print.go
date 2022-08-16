@@ -67,7 +67,7 @@ func CursorReset() (prevX, prevY int) {
 }
 
 // Print prints text on the screen. It takes into consideration cursor position,
-// color, clipping region and camera position.
+// clipping region and camera position.
 //
 // After printing all characters Print goes to the next line. When there is no space
 // left on screen the clipping region is scrolled to make room.
@@ -77,7 +77,7 @@ func CursorReset() (prevX, prevY int) {
 // found here: https://github.com/elgopher/pi/blob/master/internal/system-font.png
 //
 // Print returns the right-most x position that occurred while printing.
-func Print(text string) (x int) {
+func Print(text string, color byte) (x int) {
 	if cursor.y > scrHeight-systemFont.Height {
 		lines := systemFont.Height - (scrHeight - cursor.y)
 		scroll(lines)
@@ -85,7 +85,7 @@ func Print(text string) (x int) {
 
 	startingX := cursor.x
 	for _, r := range text {
-		printRune(r)
+		printRune(r, color)
 	}
 
 	x = cursor.x
@@ -119,7 +119,7 @@ func scroll(lines int) {
 	cursor.y -= lines
 }
 
-func printRune(r rune) {
+func printRune(r rune, color byte) {
 	if r > 255 {
 		r = '?'
 	}

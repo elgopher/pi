@@ -7,9 +7,8 @@ import "math"
 
 // RectFill draws a filled rectangle between points x0,y0 and x1,y1 (inclusive).
 //
-// RectFill takes into consideration: current color, camera position,
-// clipping region and draw palette.
-func RectFill(x0, y0, x1, y1 int) {
+// RectFill takes into account camera position, clipping region and draw palette.
+func RectFill(x0, y0, x1, y1 int, color byte) {
 	xmin, xmax := x0-camera.x, x1-camera.x
 	if xmin > xmax {
 		xmin, xmax = xmax, xmin
@@ -65,9 +64,8 @@ func RectFill(x0, y0, x1, y1 int) {
 
 // Rect draws a rectangle between points x0,y0 and x1,y1 (inclusive).
 //
-// Rect takes into consideration: current color, camera position,
-// clipping region and draw palette.
-func Rect(x0, y0, x1, y1 int) {
+// Rect takes into account camera position, clipping region and draw palette.
+func Rect(x0, y0, x1, y1 int, color byte) {
 	xmin, xmax := x0-camera.x, x1-camera.x
 	if xmin > xmax {
 		xmin, xmax = xmax, xmin
@@ -141,9 +139,8 @@ func Rect(x0, y0, x1, y1 int) {
 
 // Line draws a line between points x0,y0 and x1,y1 (inclusive).
 //
-// Line takes into account the current color, camera position,
-// clipping region and draw palette.
-func Line(x0, y0, x1, y1 int) {
+// Line takes into account camera position, clipping region and draw palette.
+func Line(x0, y0, x1, y1 int, color byte) {
 	x0 -= camera.x
 	x1 -= camera.x
 	y0 -= camera.y
@@ -152,13 +149,13 @@ func Line(x0, y0, x1, y1 int) {
 	// Bresenham algorithm: https://www.youtube.com/watch?v=IDFB5CDpLDE
 	run := float64(x1 - x0)
 	if run == 0 {
-		verticalLine(x0, y0, y1)
+		verticalLine(x0, y0, y1, color)
 		return
 	}
 
 	rise := float64(y1 - y0)
 	if rise == 0 {
-		horizontalLine(y0, x0, x1)
+		horizontalLine(y0, x0, x1, color)
 		return
 	}
 
@@ -181,7 +178,7 @@ func Line(x0, y0, x1, y1 int) {
 		}
 
 		for x := x0; x <= x1; x++ {
-			pset(x, y)
+			pset(x, y, color)
 
 			offset += delta
 			if offset >= threshold {
@@ -198,7 +195,7 @@ func Line(x0, y0, x1, y1 int) {
 		}
 
 		for y := y0; y <= y1; y++ {
-			pset(x, y)
+			pset(x, y, color)
 
 			offset += delta
 			if offset >= threshold {
@@ -210,7 +207,7 @@ func Line(x0, y0, x1, y1 int) {
 }
 
 // verticalLine draws a vertical line between y0-y1 inclusive
-func verticalLine(x, y0, y1 int) {
+func verticalLine(x, y0, y1 int, color byte) {
 	if y0 > y1 {
 		y0, y1 = y1, y0
 	}
@@ -237,7 +234,7 @@ func verticalLine(x, y0, y1 int) {
 }
 
 // horizontalLine draws a vertical line between x0-x1 inclusive
-func horizontalLine(y, x0, x1 int) {
+func horizontalLine(y, x0, x1 int, color byte) {
 	if y < clippingRegion.y {
 		return
 	}
