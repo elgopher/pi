@@ -6,15 +6,16 @@ package pi_test
 import (
 	"testing"
 
-	"github.com/elgopher/pi"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elgopher/pi"
 )
 
 func TestRectFill(t *testing.T) {
 	testRect(t, pi.RectFill, "rectfill")
 }
 
-func testRect(t *testing.T, rect func(x0, y0, x1, y1 int), dir string) {
+func testRect(t *testing.T, rect func(x0, y0, x1, y1 int, color byte), dir string) {
 	pi.ScreenWidth = 16
 	pi.ScreenHeight = 16
 
@@ -59,8 +60,7 @@ func testRect(t *testing.T, rect func(x0, y0, x1, y1 int), dir string) {
 			t.Run(name, func(t *testing.T) {
 				pi.BootOrPanic()
 				pi.ClsCol(5)
-				pi.Color(test.color)
-				rect(test.x0, test.y0, test.x1, test.y1)
+				rect(test.x0, test.y0, test.x1, test.y1, test.color)
 				assertScreenEqual(t, "internal/testimage/"+dir+"/draw/"+name+".png")
 			})
 		}
@@ -113,8 +113,7 @@ func testRect(t *testing.T, rect func(x0, y0, x1, y1 int), dir string) {
 			t.Run(name, func(t *testing.T) {
 				pi.BootOrPanic()
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
-				pi.Color(white)
-				rect(test.x0, test.y0, test.x1, test.y1)
+				rect(test.x0, test.y0, test.x1, test.y1, white)
 				assertScreenEqual(t, "internal/testimage/"+dir+"/clip/"+name+".png")
 			})
 		}
@@ -162,10 +161,9 @@ func testRect(t *testing.T, rect func(x0, y0, x1, y1 int), dir string) {
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
 				pi.BootOrPanic()
-				pi.Color(white)
 				// when
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
-				rect(test.x0, test.y0, test.x1, test.y1)
+				rect(test.x0, test.y0, test.x1, test.y1, white)
 				// then
 				emptyScreen := make([]byte, len(pi.ScreenData))
 				assert.Equal(t, emptyScreen, pi.ScreenData)
@@ -175,17 +173,15 @@ func testRect(t *testing.T, rect func(x0, y0, x1, y1 int), dir string) {
 
 	t.Run("should move by camera position", func(t *testing.T) {
 		pi.BootOrPanic()
-		pi.Color(white)
 		pi.Camera(-2, -3)
-		rect(0, 1, 2, 4)
+		rect(0, 1, 2, 4, white)
 		assertScreenEqual(t, "internal/testimage/"+dir+"/camera_0,1,2,4.png")
 	})
 
 	t.Run("should replace color from draw palette", func(t *testing.T) {
 		pi.BootOrPanic()
-		pi.Color(white)
 		pi.Pal(white, 3)
-		rect(5, 5, 10, 10)
+		rect(5, 5, 10, 10, white)
 		assertScreenEqual(t, "internal/testimage/"+dir+"/pal_5,5,10,10.png")
 	})
 }
@@ -198,7 +194,6 @@ func TestLine(t *testing.T) {
 	pi.ScreenWidth = 16
 	pi.ScreenHeight = 16
 	const white, red = 7, 8
-	pi.Color(red)
 
 	t.Run("should not draw anything outside clipping region", func(t *testing.T) {
 		tests := map[string]struct {
@@ -306,10 +301,9 @@ func TestLine(t *testing.T) {
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
 				pi.BootOrPanic()
-				pi.Color(white)
 				// when
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
-				pi.Line(test.x0, test.y0, test.x1, test.y1)
+				pi.Line(test.x0, test.y0, test.x1, test.y1, white)
 				// then
 				emptyScreen := make([]byte, len(pi.ScreenData))
 				assert.Equal(t, emptyScreen, pi.ScreenData)
@@ -345,9 +339,8 @@ func TestLine(t *testing.T) {
 			t.Run(name, func(t *testing.T) {
 				pi.BootOrPanic()
 				pi.ClsCol(5)
-				pi.Color(test.color)
 				// when
-				pi.Line(test.x0, test.y0, test.x1, test.y1)
+				pi.Line(test.x0, test.y0, test.x1, test.y1, test.color)
 				assertScreenEqual(t, "internal/testimage/line/draw/"+name+".png")
 			})
 		}
@@ -413,9 +406,8 @@ func TestLine(t *testing.T) {
 				pi.BootOrPanic()
 				pi.ClsCol(5)
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
-				pi.Color(white)
 				// when
-				pi.Line(test.x0, test.y0, test.x1, test.y1)
+				pi.Line(test.x0, test.y0, test.x1, test.y1, white)
 				assertScreenEqual(t, "internal/testimage/line/clip/"+name+".png")
 			})
 		}
@@ -442,11 +434,10 @@ func TestLine(t *testing.T) {
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
 				pi.BootOrPanic()
-				pi.Color(white)
 				pi.ClsCol(5)
 				pi.Pal(white, red)
 				// when
-				pi.Line(test.x0, test.y0, test.x1, test.y1)
+				pi.Line(test.x0, test.y0, test.x1, test.y1, white)
 				assertScreenEqual(t, "internal/testimage/line/pal/"+name+".png")
 			})
 		}
@@ -473,11 +464,10 @@ func TestLine(t *testing.T) {
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
 				pi.BootOrPanic()
-				pi.Color(red)
 				pi.ClsCol(5)
 				pi.Camera(-1, -2)
 				// when
-				pi.Line(test.x0, test.y0, test.x1, test.y1)
+				pi.Line(test.x0, test.y0, test.x1, test.y1, red)
 				assertScreenEqual(t, "internal/testimage/line/camera/"+name+".png")
 			})
 		}

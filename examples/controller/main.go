@@ -21,6 +21,8 @@ const (
 	dpadInactive   = 5
 	buttonInactive = 8
 	active         = 14
+
+	yellow = 10
 )
 
 func main() {
@@ -72,8 +74,7 @@ func drawPlayerController(player, x, y int) {
 
 func drawPlayerNumber(x int, y int, player int) {
 	pi.PalReset()
-	pi.Color(10)
 	for i := 0; i <= player; i++ {
-		pi.Pset(x+50-i*2, y+8)
+		pi.Pset(x+50-i*2, y+8, yellow)
 	}
 }

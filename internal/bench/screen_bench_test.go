@@ -10,6 +10,8 @@ import (
 	"github.com/elgopher/pi"
 )
 
+const color = 7
+
 func BenchmarkCls(b *testing.B) {
 	runBenchmarks(b, func(r Resolution) {
 		pi.Cls()
@@ -18,14 +20,14 @@ func BenchmarkCls(b *testing.B) {
 
 func BenchmarkClsCol(b *testing.B) {
 	runBenchmarks(b, func(r Resolution) {
-		pi.ClsCol(7)
+		pi.ClsCol(color)
 	})
 }
 
 func BenchmarkPset(b *testing.B) {
 	runBenchmarks(b, func(res Resolution) {
 		for i := 0; i < 1000; i++ { // Pset is too fast
-			pi.Pset(2, 2)
+			pi.Pset(2, 2, color)
 		}
 	})
 }

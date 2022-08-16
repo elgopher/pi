@@ -30,7 +30,6 @@ var (
 	lineOfScreenWidth   []byte
 	zeroScreenData      []byte
 	clippingRegion      rect
-	color               = defaultColor // Color is a currently used color in draw state. Used by Pset.
 )
 
 // Cls cleans the entire screen with color 0. It does not take into account any draw state parameters such as clipping region or camera.
@@ -67,29 +66,13 @@ func clsCol(col byte) {
 	}
 }
 
-// Color sets the color used by Pset.
-//
-// Color returns previously used color.
-func Color(col byte) (prevCol byte) {
-	prevCol = color
-	color = col
-	return
-}
-
-// ColorReset resets the color to default value which is 6.
-//
-// ColorReset returns previously used color.
-func ColorReset() (prevCol byte) {
-	return Color(defaultColor)
-}
-
-// Pset sets a pixel color on the screen to Color.
-func Pset(x, y int) {
-	pset(x-camera.x, y-camera.y)
+// Pset sets a pixel color on the screen.
+func Pset(x, y int, color byte) {
+	pset(x-camera.x, y-camera.y, color)
 }
 
 // pset sets a pixel color on the screen **without** taking camera position into account.
-func pset(x, y int) {
+func pset(x, y int, color byte) {
 	if x < clippingRegion.x {
 		return
 	}

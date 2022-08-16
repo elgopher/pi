@@ -8,14 +8,17 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elgopher/pi"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elgopher/pi"
 )
 
 func TestPrint(t *testing.T) {
 	pi.ScreenWidth = 16
 	pi.ScreenHeight = 24
+
+	const color = 7
 
 	t.Run("should print chars using color on the top-left corner", func(t *testing.T) {
 		chars := []string{`!`, `A`, `b`, `AB`, `ABCD`}
@@ -23,8 +26,7 @@ func TestPrint(t *testing.T) {
 			t.Run(char, func(t *testing.T) {
 				pi.BootOrPanic()
 				// when
-				pi.Color(7)
-				pi.Print(char)
+				pi.Print(char, color)
 				// then
 				assertScreenEqual(t, "internal/testimage/print/"+char+".png")
 			})
@@ -33,30 +35,26 @@ func TestPrint(t *testing.T) {
 
 	t.Run("should print question mark for characters > 255", func(t *testing.T) {
 		pi.BootOrPanic()
-		pi.Color(7)
-		pi.Print("\u0100")
+		pi.Print("\u0100", color)
 		assertScreenEqual(t, "internal/testimage/print/unknown.png")
 	})
 
 	t.Run("should print special character", func(t *testing.T) {
 		pi.BootOrPanic()
-		pi.Color(7)
-		pi.Print("\u0080")
+		pi.Print("\u0080", color)
 		assertScreenEqual(t, "internal/testimage/print/special.png")
 	})
 
 	t.Run("should print 2 special characters", func(t *testing.T) {
 		pi.BootOrPanic()
-		pi.Color(7)
-		pi.Print("\u0080\u0081")
+		pi.Print("\u0080\u0081", color)
 		assertScreenEqual(t, "internal/testimage/print/special-2chars.png")
 	})
 
 	t.Run("should go to next line", func(t *testing.T) {
 		pi.BootOrPanic()
-		pi.Color(7)
-		pi.Print("0L")
-		pi.Print("1L")
+		pi.Print("0L", color)
+		pi.Print("1L", color)
 		assertScreenEqual(t, "internal/testimage/print/two-lines.png")
 	})
 
@@ -71,10 +69,9 @@ func TestPrint(t *testing.T) {
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
 				pi.BootOrPanic()
-				pi.Color(7)
 				pi.Cursor(test.x, test.y)
-				pi.Print("0L")
-				pi.Print("1L")
+				pi.Print("0L", color)
+				pi.Print("1L", color)
 				assertScreenEqual(t, test.file)
 			})
 		}
@@ -82,10 +79,9 @@ func TestPrint(t *testing.T) {
 
 	t.Run("should print moved by camera position", func(t *testing.T) {
 		pi.BootOrPanic()
-		pi.Color(7)
 		pi.Camera(-1, -2)
-		pi.Print("0L")
-		pi.Print("1L")
+		pi.Print("0L", color)
+		pi.Print("1L", color)
 		assertScreenEqual(t, "internal/testimage/print/two-lines-at-1.2.png")
 	})
 
@@ -101,11 +97,11 @@ func TestPrint(t *testing.T) {
 			"clip top":                 {x: 0, y: 1, w: 16, h: 16, file: "clip-top.png"},
 			"clip bottom":              {x: 0, y: 0, w: 16, h: 4, file: "clip-bottom.png"},
 			"clip left, cursorX set":   {x: 2, y: 0, w: 16, h: 16, cursorX: 1, file: "clip-left-cursorx.png"},
-			"clip right, cursorX set":  {x: 0, y: 0, w: 7, h: 16, cursorX: 1, file: "clip-right-cursorx.png"},
+			"clip right, cursorX set":  {x: 0, y: 0, w: color, h: 16, cursorX: 1, file: "clip-right-cursorx.png"},
 			"clip top, cursorY set":    {x: 0, y: 2, w: 16, h: 16, cursorY: 1, file: "clip-top-cursory.png"},
 			"clip bottom, cursorY set": {x: 0, y: 0, w: 16, h: 5, cursorY: 1, file: "clip-bottom-cursory.png"},
 			"camerax, clip left":       {x: 2, y: 0, w: 16, h: 16, cameraX: -1, file: "clip-left-cursorx.png"},
-			"camerax, clip right":      {x: 0, y: 0, w: 7, h: 16, cameraX: -1, file: "clip-right-cursorx.png"},
+			"camerax, clip right":      {x: 0, y: 0, w: color, h: 16, cameraX: -1, file: "clip-right-cursorx.png"},
 			"cameray, clip top":        {x: 0, y: 2, w: 16, h: 16, cameraY: -1, file: "clip-top-cursory.png"},
 			"cameray, clip bottom":     {x: 0, y: 0, w: 16, h: 5, cameraY: -1, file: "clip-bottom-cursory.png"},
 		}
@@ -115,9 +111,8 @@ func TestPrint(t *testing.T) {
 				pi.BootOrPanic()
 				pi.Camera(test.cameraX, test.cameraY)
 				pi.Clip(test.x, test.y, test.w, test.h)
-				pi.Color(7)
 				pi.Cursor(test.cursorX, test.cursorY)
-				pi.Print("\u0080")
+				pi.Print("\u0080", color)
 				assertScreenEqual(t, "internal/testimage/print/"+test.file)
 			})
 		}
@@ -133,11 +128,10 @@ func TestPrint(t *testing.T) {
 		for name, function := range tests {
 			t.Run(name, func(t *testing.T) {
 				pi.BootOrPanic()
-				pi.Color(7)
 				pi.Cursor(20, 20)
 				// when
 				function()
-				pi.Print("\u0080")
+				pi.Print("\u0080", color)
 				// then
 				assertScreenEqual(t, "internal/testimage/print/special.png")
 			})
@@ -186,10 +180,9 @@ func TestPrint(t *testing.T) {
 			t.Run(name, func(t *testing.T) {
 				pi.BootOrPanic()
 				pi.ClsCol(3)
-				pi.Color(7)
 				pi.Cursor(test.cursorX, test.cursorY)
 				// when
-				pi.Print("\u0080")
+				pi.Print("\u0080", color)
 				// then
 				assertScreenEqual(t, test.expectedFile)
 			})
@@ -232,10 +225,9 @@ func TestPrint(t *testing.T) {
 				pi.BootOrPanic()
 				pi.ScreenData = decodePNG(t, "internal/testimage/print/multicolor.png").Pixels
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
-				pi.Color(7)
 				pi.Cursor(0, test.cursorY)
 				// when
-				pi.Print("\u0080")
+				pi.Print("\u0080", color)
 				// then
 				assertScreenEqual(t, test.expectedFile)
 			})
@@ -258,7 +250,7 @@ func TestPrint(t *testing.T) {
 			t.Run(name, func(t *testing.T) {
 				pi.BootOrPanic()
 				// when
-				x := pi.Print(test.text)
+				x := pi.Print(test.text, color)
 				assert.Equal(t, test.expectedX, x)
 			})
 		}

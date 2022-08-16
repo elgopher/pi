@@ -8,15 +8,18 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/elgopher/pi"
-	"github.com/elgopher/pi/image"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/image"
 )
 
 func TestBoot(t *testing.T) {
+	const color = 7
+
 	invalidSpriteSheetSizes := [...]int{
-		0, 1, 7, 9,
+		0, 1, color, 9,
 	}
 
 	t.Run("should return error if SpriteSheetWidth is not multiplication of 8", func(t *testing.T) {
@@ -110,7 +113,6 @@ func TestBoot(t *testing.T) {
 	t.Run("should reset draw state", func(t *testing.T) {
 		pi.Reset()
 		require.NoError(t, pi.Boot())
-		pi.Color(14)
 		pi.Camera(1, 2)
 		pi.Clip(1, 2, 3, 4)
 		// when
@@ -125,7 +127,6 @@ func TestBoot(t *testing.T) {
 		assert.Zero(t, y)
 		assert.Equal(t, pi.ScreenWidth, w)
 		assert.Equal(t, pi.ScreenHeight, h)
-		assert.Equal(t, byte(6), pi.ColorReset())
 	})
 
 	t.Run("changing the user parameters after Boot should not ends up in a panic", func(t *testing.T) {
@@ -142,15 +143,15 @@ func TestBoot(t *testing.T) {
 		pi.SpriteSheetHeight = 1
 		// then
 		assert.NotPanics(t, func() {
-			pi.Pset(1, 1)
+			pi.Pset(1, 1, color)
 			pi.Pget(1, 1)
-			pi.Sset(1, 1, 7)
+			pi.Sset(1, 1, color)
 			pi.Sget(1, 1)
 			pi.Spr(1, 1, 1)
 			pi.SprSize(1, 1, 1, 1.0, 1.0)
 			pi.SprSizeFlip(1, 1, 1, 1.0, 1.0, true, true)
 			pi.Cls()
-			pi.ClsCol(7)
+			pi.ClsCol(color)
 		})
 	})
 
@@ -165,7 +166,7 @@ func TestBoot(t *testing.T) {
 			pi.Spr(4, 0, 0) // sprite-sheet.png has only 4 sprites (from 0 to 3)
 			pi.SprSize(4, 0, 0, 1.0, 1.0)
 			pi.SprSizeFlip(4, 0, 0, 1.0, 1.0, false, false)
-			pi.Pset(16, 16) // sprite-sheet.png is only 16x16 pixels (0..15)
+			pi.Pset(16, 16, color) // sprite-sheet.png is only 16x16 pixels (0..15)
 			pi.Pget(16, 16)
 		})
 	})

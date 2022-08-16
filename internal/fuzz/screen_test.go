@@ -9,12 +9,14 @@ import (
 	"github.com/elgopher/pi"
 )
 
+const color = 7
+
 func FuzzPset(f *testing.F) {
 	pi.ScreenWidth = 16
 	pi.ScreenHeight = 16
 	pi.BootOrPanic()
 	f.Fuzz(func(t *testing.T, x, y int) {
-		pi.Pset(x, y)
+		pi.Pset(x, y, color)
 	})
 }
 
