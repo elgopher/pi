@@ -22,7 +22,8 @@
     * [x] Cos, Sin, Atan2
     * [ ] Min, Max, Mid
 * [x] Game controller support: gamepad and keyboard
-* [ ] Mouse support (dev mode)
+* [x] Mouse support
+  * [ ] Add mouse wheel support
 * [ ] Full keyboard support (dev mode)
 * [ ] Menu screen
 * [ ] Development console
