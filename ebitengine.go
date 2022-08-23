@@ -23,6 +23,7 @@ func run() error {
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowSize(scrWidth*scale(), scrHeight*scale())
 	ebiten.SetWindowSizeLimits(scrWidth, scrHeight, -1, -1)
+	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	ebiten.SetWindowTitle("Pi Game")
 
 	if err := ebiten.RunGame(&ebitengineGame{}); err != nil {
@@ -51,6 +52,7 @@ func (e *ebitengineGame) Update() error {
 
 	updateTime()
 	updateController()
+	updateMouse()
 
 	if Update != nil {
 		Update()
