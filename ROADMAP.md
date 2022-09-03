@@ -25,6 +25,7 @@
 * [x] Mouse support
   * [ ] Add mouse wheel support
 * [ ] Full keyboard support (dev mode)
+* [x] Storing game state like savegames, hall of fame and user preferences
 * [ ] Menu screen
 * [ ] Development console
     * [ ] stopping, resuming the game
@@ -38,6 +39,10 @@
     * [ ] music editor
 * [ ] Documentation
     * [ ] Go docs
+* [ ] Support for different platforms
+  * [x] Windows, Linux, MacOS
+  * [x] Web browsers (WASM)
+  * [ ] Android, IOS, Switch
 * [ ] Examples
     * [ ] simple programs for beginners
     * [ ] interactive programs describing how functions work
