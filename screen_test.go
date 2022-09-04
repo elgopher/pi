@@ -9,6 +9,7 @@ import (
 	_ "embed"
 	"fmt"
 	"os"
+	"runtime"
 	"testing"
 	"testing/fstest"
 
@@ -734,6 +735,11 @@ func TestSprSizeFlip(t *testing.T) {
 }
 
 func TestSnap(t *testing.T) {
+	if runtime.GOOS == "js" {
+		t.Skip("storing files does not work on js")
+		return
+	}
+
 	t.Run("should take screenshot and store it to temp file", func(t *testing.T) {
 		pi.Reset()
 		pi.BootOrPanic()

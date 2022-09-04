@@ -9,6 +9,7 @@ import (
 	stdcolor "image/color"
 	"image/png"
 	"os"
+	"runtime"
 )
 
 // Screen-specific data
@@ -328,6 +329,10 @@ func PalReset() {
 //
 // Snap returns a filename. If something went wrong error is returned.
 func Snap() (string, error) {
+	if runtime.GOOS == "js" {
+		return "", fmt.Errorf("storing files does not work on js")
+	}
+
 	var palette stdcolor.Palette
 	for _, col := range displayPalette {
 		rgb := Palette[col]

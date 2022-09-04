@@ -26,6 +26,8 @@ jobs:
           sudo apt-get install libasound2-dev libgl1-mesa-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev libxxf86vm-dev
 
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v2
@@ -41,6 +43,18 @@ jobs:
 
       - name: Test
         run: make test
+
+      - name: Install chrome
+        uses: browser-actions/setup-chrome@latest
+
+      - name: Install wasmbrowsertest
+        run: go install github.com/agnivade/wasmbrowsertest@latest
+
+      - name: Setup wasmexec
+        run: mv $(go env GOPATH)/bin/wasmbrowsertest $(go env GOPATH)/bin/go_js_wasm_exec
+
+      - name: Test in the browser
+        run: GOOS=js GOARCH=wasm go test -v ./...
 
       - name: Lint
         uses: golangci/golangci-lint-action@v3.2.0
