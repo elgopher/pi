@@ -24,5 +24,5 @@ func main() {
 			pi.Spr(i, x, 60+int(y))
 		}
 	}
-	pi.RunOrPanic()
+	pi.MustRun()
 }

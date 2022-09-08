@@ -16,5 +16,5 @@ func main() {
 		}
 	}
 
-	pi.RunOrPanic()
+	pi.MustRun()
 }

@@ -33,7 +33,7 @@ func TestCls(t *testing.T) {
 	pi.ScreenHeight = 2
 
 	t.Run("should clean screen using color 0", func(t *testing.T) {
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.ScreenData = []byte{1, 2, 3, 4}
 		// when
 		pi.Cls()
@@ -46,7 +46,7 @@ func TestCls(t *testing.T) {
 
 func testCls(t *testing.T, cls func()) {
 	t.Run("should reset clipping region", func(t *testing.T) {
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.Clip(1, 2, 3, 4)
 		// when
 		cls() // clips to 0,0,w,h
@@ -63,7 +63,7 @@ func TestClsCol(t *testing.T) {
 	t.Run("should clean screen using color 7", func(t *testing.T) {
 		pi.ScreenWidth = 2
 		pi.ScreenHeight = 2
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.ScreenData = []byte{1, 2, 3, 4}
 		// when
 		pi.ClsCol(7)
@@ -82,7 +82,7 @@ func TestPset(t *testing.T) {
 	t.Run("should set color of pixel", func(t *testing.T) {
 		pi.ScreenWidth = 2
 		pi.ScreenHeight = 2
-		pi.BootOrPanic()
+		pi.MustBoot()
 		// when
 		pi.Pset(1, 1, col)
 		// then
@@ -92,7 +92,7 @@ func TestPset(t *testing.T) {
 	t.Run("should not set pixel outside the screen", func(t *testing.T) {
 		pi.ScreenWidth = 2
 		pi.ScreenHeight = 2
-		pi.BootOrPanic()
+		pi.MustBoot()
 
 		emptyScreen := make([]byte, len(pi.ScreenData))
 
@@ -126,7 +126,7 @@ func TestPset(t *testing.T) {
 		for _, coords := range tests {
 			name := fmt.Sprintf("%+v", coords)
 			t.Run(name, func(t *testing.T) {
-				pi.BootOrPanic()
+				pi.MustBoot()
 				pi.Clip(1, 1, 1, 1)
 				// when
 				pi.Pset(coords.X, coords.Y, col)
@@ -149,7 +149,7 @@ func TestPset(t *testing.T) {
 		for _, coords := range tests {
 			name := fmt.Sprintf("%+v", coords)
 			t.Run(name, func(t *testing.T) {
-				pi.BootOrPanic()
+				pi.MustBoot()
 				pi.Clip(2, 3, 1, 2)
 				// when
 				pi.Pset(coords.X, coords.Y, col)
@@ -163,7 +163,7 @@ func TestPset(t *testing.T) {
 		pi.ScreenWidth = 8
 		pi.ScreenHeight = 8
 		emptyScreen := make([]byte, 8*8)
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.Clip(2, 3, 1, 1)
 		// when
 		pi.Pset(2, 3, col)
@@ -174,7 +174,7 @@ func TestPset(t *testing.T) {
 	t.Run("should set pixel taking camera position into consideration", func(t *testing.T) {
 		pi.ScreenWidth = 2
 		pi.ScreenHeight = 2
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.Camera(1, 2)
 		// when
 		pi.Pset(1, 2, 8)
@@ -205,7 +205,7 @@ func TestPset(t *testing.T) {
 		for _, coords := range tests {
 			name := fmt.Sprintf("%+v", coords)
 			t.Run(name, func(t *testing.T) {
-				pi.BootOrPanic()
+				pi.MustBoot()
 				// when
 				pi.Camera(1, 1)
 				pi.Pset(coords.X, coords.Y, col)
@@ -218,7 +218,7 @@ func TestPset(t *testing.T) {
 	t.Run("should draw swapped color", func(t *testing.T) {
 		pi.ScreenWidth = 1
 		pi.ScreenHeight = 1
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.Pal(1, 2)
 		// when
 		pi.Pset(0, 0, 1)
@@ -229,7 +229,7 @@ func TestPset(t *testing.T) {
 	t.Run("should draw original color after PalReset", func(t *testing.T) {
 		pi.ScreenWidth = 1
 		pi.ScreenHeight = 1
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.Pal(1, 2)
 		pi.PalReset()
 		// when
@@ -243,7 +243,7 @@ func TestPget(t *testing.T) {
 	t.Run("should get color of pixel", func(t *testing.T) {
 		pi.ScreenWidth = 2
 		pi.ScreenHeight = 2
-		pi.BootOrPanic()
+		pi.MustBoot()
 		col := byte(7)
 		pi.Pset(1, 1, col)
 		// expect
@@ -253,7 +253,7 @@ func TestPget(t *testing.T) {
 	t.Run("should get color 0 if outside the screen", func(t *testing.T) {
 		pi.ScreenWidth = 2
 		pi.ScreenHeight = 2
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.ClsCol(7)
 
 		tests := []struct{ X, Y int }{
@@ -286,7 +286,7 @@ func TestPget(t *testing.T) {
 		for _, coords := range tests {
 			name := fmt.Sprintf("%+v", coords)
 			t.Run(name, func(t *testing.T) {
-				pi.BootOrPanic()
+				pi.MustBoot()
 				pi.Pset(coords.X, coords.Y, 7)
 				pi.Clip(1, 1, 1, 1)
 				// when
@@ -309,7 +309,7 @@ func TestPget(t *testing.T) {
 		for _, coords := range tests {
 			name := fmt.Sprintf("%+v", coords)
 			t.Run(name, func(t *testing.T) {
-				pi.BootOrPanic()
+				pi.MustBoot()
 				pi.Pset(coords.X, coords.Y, 7)
 				pi.Clip(2, 3, 1, 2)
 				// when
@@ -323,7 +323,7 @@ func TestPget(t *testing.T) {
 	t.Run("should get pixel inside the clipping region", func(t *testing.T) {
 		pi.ScreenWidth = 8
 		pi.ScreenHeight = 8
-		pi.BootOrPanic()
+		pi.MustBoot()
 		col := byte(6)
 		pi.Pset(2, 3, col)
 		pi.Clip(2, 3, 1, 1)
@@ -336,7 +336,7 @@ func TestPget(t *testing.T) {
 	t.Run("should get pixel taking camera position into consideration", func(t *testing.T) {
 		pi.ScreenWidth = 2
 		pi.ScreenHeight = 2
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.Camera(1, 2)
 		const color byte = 8
 		pi.Pset(1, 2, color)
@@ -366,7 +366,7 @@ func TestPget(t *testing.T) {
 		for _, coords := range tests {
 			name := fmt.Sprintf("%+v", coords)
 			t.Run(name, func(t *testing.T) {
-				pi.BootOrPanic()
+				pi.MustBoot()
 				pi.ClsCol(7)
 				pi.Camera(1, 1)
 				// when
@@ -381,7 +381,7 @@ func TestClip(t *testing.T) {
 	t.Run("should return entire screen by default", func(t *testing.T) {
 		pi.ScreenWidth = 8
 		pi.ScreenHeight = 8
-		pi.BootOrPanic()
+		pi.MustBoot()
 		x, y, w, h := pi.Clip(1, 2, 3, 4)
 		assert.Zero(t, x)
 		assert.Zero(t, y)
@@ -392,7 +392,7 @@ func TestClip(t *testing.T) {
 	t.Run("should return previous clipping region", func(t *testing.T) {
 		pi.ScreenWidth = 8
 		pi.ScreenHeight = 8
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.Clip(1, 2, 3, 4)
 		x, y, w, h := pi.Clip(5, 6, 7, 8)
 		assert.Equal(t, 1, x)
@@ -414,7 +414,7 @@ func TestClip(t *testing.T) {
 			t.Run(fmt.Sprintf("%+v", given), func(t *testing.T) {
 				pi.ScreenWidth = 8
 				pi.ScreenHeight = 8
-				pi.BootOrPanic()
+				pi.MustBoot()
 				pi.Clip(given.x, given.y, given.w, given.h)
 				x, y, w, h := pi.ClipReset()
 				assert.Equal(t, expected.x, x)
@@ -428,7 +428,7 @@ func TestClip(t *testing.T) {
 
 func TestClipReset(t *testing.T) {
 	t.Run("should return previous clip", func(t *testing.T) {
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.Clip(1, 2, 3, 4)
 		// when
 		x, y, w, h := pi.ClipReset()
@@ -440,7 +440,7 @@ func TestClipReset(t *testing.T) {
 	})
 
 	t.Run("should reset clip to full screen size", func(t *testing.T) {
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.Clip(1, 2, 3, 4)
 		// when
 		pi.ClipReset()
@@ -455,14 +455,14 @@ func TestClipReset(t *testing.T) {
 
 func TestCamera(t *testing.T) {
 	t.Run("should return initial camera", func(t *testing.T) {
-		pi.BootOrPanic()
+		pi.MustBoot()
 		initialX, initialY := pi.Camera(1, 2)
 		assert.Equal(t, 0, initialX)
 		assert.Equal(t, 0, initialY)
 	})
 
 	t.Run("should return previous camera", func(t *testing.T) {
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.Camera(1, 2)
 		x, y := pi.Camera(2, 3)
 		assert.Equal(t, 1, x)
@@ -487,7 +487,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 				pi.ScreenHeight = 8
 				pi.SpriteSheetWidth = 16
 				pi.SpriteSheetHeight = 16
-				pi.BootOrPanic()
+				pi.MustBoot()
 				pi.ClsCol(7)
 				snapshot := clone(pi.ScreenData)
 				// when
@@ -596,7 +596,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 	t.Run("should swap color", func(t *testing.T) {
 		pi.SpriteSheetWidth, pi.SpriteSheetHeight = 8, 8
 		pi.ScreenWidth, pi.ScreenHeight = 8, 8
-		pi.BootOrPanic()
+		pi.MustBoot()
 		const originalColor byte = 7
 		const replacementColor byte = 15
 		pi.Sset(5, 5, originalColor)
@@ -646,7 +646,7 @@ func testSprSize(t *testing.T, sprSize func(spriteNo int, x, y int, w, h float64
 				pi.ScreenHeight = 8
 				pi.SpriteSheetWidth = 16
 				pi.SpriteSheetHeight = 16
-				pi.BootOrPanic()
+				pi.MustBoot()
 				pi.ClsCol(7)
 				snapshot := clone(pi.ScreenData)
 				// when
@@ -742,7 +742,7 @@ func TestSnap(t *testing.T) {
 
 	t.Run("should take screenshot and store it to temp file", func(t *testing.T) {
 		pi.Reset()
-		pi.BootOrPanic()
+		pi.MustBoot()
 		for i := 0; i < len(pi.ScreenData); i++ {
 			pi.ScreenData[i] = byte(i % 16) // 16 colors by default
 		}
@@ -760,7 +760,7 @@ func TestSnap(t *testing.T) {
 	t.Run("should use display palette", func(t *testing.T) {
 		pi.Reset()
 		pi.ScreenWidth, pi.ScreenHeight = 1, 1
-		pi.BootOrPanic()
+		pi.MustBoot()
 		original, replacement := byte(1), byte(2)
 		pi.PalDisplay(original, replacement) // replace 1 by 2
 		pi.Pset(0, 0, original)
@@ -806,5 +806,5 @@ func boot(screenWidth, screenHeight int, spriteSheet []byte) {
 	pi.Resources = fstest.MapFS{
 		"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet},
 	}
-	pi.BootOrPanic()
+	pi.MustBoot()
 }

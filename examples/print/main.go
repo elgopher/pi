@@ -12,5 +12,5 @@ func main() {
 		pi.Print("HELLO,", 9) // print yellow text and go to next line
 		pi.Print("GOPHER!", 12)
 	}
-	pi.RunOrPanic()
+	pi.MustRun()
 }

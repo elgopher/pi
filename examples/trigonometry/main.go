@@ -20,7 +20,7 @@ func main() {
 		draw(96, 11, pi.Cos)
 
 	}
-	pi.RunOrPanic()
+	pi.MustRun()
 }
 
 func draw(line int, color byte, f func(x float64) float64) {

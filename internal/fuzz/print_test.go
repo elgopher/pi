@@ -14,7 +14,7 @@ import (
 func FuzzPrint(f *testing.F) {
 	pi.ScreenWidth = 16
 	pi.ScreenHeight = 24
-	pi.BootOrPanic()
+	pi.MustBoot()
 	f.Fuzz(func(t *testing.T, x, y int) {
 		pi.Cursor(x, y)
 		pi.Print("A", color)
