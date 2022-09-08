@@ -16,7 +16,7 @@ const color = 7
 func FuzzPset(f *testing.F) {
 	pi.ScreenWidth = 16
 	pi.ScreenHeight = 16
-	pi.BootOrPanic()
+	pi.MustBoot()
 	f.Fuzz(func(t *testing.T, x, y int) {
 		pi.Pset(x, y, color)
 	})
@@ -25,7 +25,7 @@ func FuzzPset(f *testing.F) {
 func FuzzPget(f *testing.F) {
 	pi.ScreenWidth = 16
 	pi.ScreenHeight = 16
-	pi.BootOrPanic()
+	pi.MustBoot()
 	f.Fuzz(func(t *testing.T, x, y int) {
 		pi.Pget(x, y)
 	})
@@ -34,7 +34,7 @@ func FuzzPget(f *testing.F) {
 func FuzzSprSizeFlip(f *testing.F) {
 	pi.ScreenWidth = 16
 	pi.ScreenHeight = 16
-	pi.BootOrPanic()
+	pi.MustBoot()
 	f.Fuzz(func(t *testing.T, n, x, y int, w, h float64, flipX, flipY bool) {
 		pi.SprSizeFlip(n, x, y, w, h, flipX, flipY)
 	})

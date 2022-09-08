@@ -58,7 +58,7 @@ func testRect(t *testing.T, rect func(x0, y0, x1, y1 int, color byte), dir strin
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.BootOrPanic()
+				pi.MustBoot()
 				pi.ClsCol(5)
 				rect(test.x0, test.y0, test.x1, test.y1, test.color)
 				assertScreenEqual(t, "internal/testimage/"+dir+"/draw/"+name+".png")
@@ -111,7 +111,7 @@ func testRect(t *testing.T, rect func(x0, y0, x1, y1 int, color byte), dir strin
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.BootOrPanic()
+				pi.MustBoot()
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
 				rect(test.x0, test.y0, test.x1, test.y1, white)
 				assertScreenEqual(t, "internal/testimage/"+dir+"/clip/"+name+".png")
@@ -160,7 +160,7 @@ func testRect(t *testing.T, rect func(x0, y0, x1, y1 int, color byte), dir strin
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.BootOrPanic()
+				pi.MustBoot()
 				// when
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
 				rect(test.x0, test.y0, test.x1, test.y1, white)
@@ -172,14 +172,14 @@ func testRect(t *testing.T, rect func(x0, y0, x1, y1 int, color byte), dir strin
 	})
 
 	t.Run("should move by camera position", func(t *testing.T) {
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.Camera(-2, -3)
 		rect(0, 1, 2, 4, white)
 		assertScreenEqual(t, "internal/testimage/"+dir+"/camera_0,1,2,4.png")
 	})
 
 	t.Run("should replace color from draw palette", func(t *testing.T) {
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.Pal(white, 3)
 		rect(5, 5, 10, 10, white)
 		assertScreenEqual(t, "internal/testimage/"+dir+"/pal_5,5,10,10.png")
@@ -300,7 +300,7 @@ func TestLine(t *testing.T) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.BootOrPanic()
+				pi.MustBoot()
 				// when
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
 				pi.Line(test.x0, test.y0, test.x1, test.y1, white)
@@ -337,7 +337,7 @@ func TestLine(t *testing.T) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.BootOrPanic()
+				pi.MustBoot()
 				pi.ClsCol(5)
 				// when
 				pi.Line(test.x0, test.y0, test.x1, test.y1, test.color)
@@ -403,7 +403,7 @@ func TestLine(t *testing.T) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.BootOrPanic()
+				pi.MustBoot()
 				pi.ClsCol(5)
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
 				// when
@@ -433,7 +433,7 @@ func TestLine(t *testing.T) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.BootOrPanic()
+				pi.MustBoot()
 				pi.ClsCol(5)
 				pi.Pal(white, red)
 				// when
@@ -463,7 +463,7 @@ func TestLine(t *testing.T) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.BootOrPanic()
+				pi.MustBoot()
 				pi.ClsCol(5)
 				pi.Camera(-1, -2)
 				// when
@@ -502,7 +502,7 @@ func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.BootOrPanic()
+				pi.MustBoot()
 				pi.ClsCol(5)
 				// when
 				circ(test.x, test.y, test.r, test.color)
@@ -512,7 +512,7 @@ func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
 	})
 
 	t.Run("should use draw palette", func(t *testing.T) {
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.ClsCol(5)
 		pi.Pal(white, red)
 		// when
@@ -521,7 +521,7 @@ func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
 	})
 
 	t.Run("should move by camera position", func(t *testing.T) {
-		pi.BootOrPanic()
+		pi.MustBoot()
 		pi.ClsCol(5)
 		pi.Camera(2, 1)
 		// when
@@ -554,7 +554,7 @@ func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.BootOrPanic()
+				pi.MustBoot()
 				pi.ClsCol(5)
 				// when
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)

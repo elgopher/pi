@@ -135,7 +135,7 @@ func TestBoot(t *testing.T) {
 		pi.ScreenHeight = 8
 		pi.SpriteSheetWidth = 8
 		pi.SpriteSheetHeight = 8
-		pi.BootOrPanic()
+		pi.MustBoot()
 		// when
 		pi.ScreenWidth = 1
 		pi.ScreenHeight = 1
@@ -161,7 +161,7 @@ func TestBoot(t *testing.T) {
 		pi.Resources = fstest.MapFS{
 			"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
 		}
-		pi.BootOrPanic()
+		pi.MustBoot()
 		assert.NotPanics(t, func() {
 			pi.Spr(4, 0, 0) // sprite-sheet.png has only 4 sprites (from 0 to 3)
 			pi.SprSize(4, 0, 0, 1.0, 1.0)

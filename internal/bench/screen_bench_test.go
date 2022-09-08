@@ -139,7 +139,7 @@ func runBenchmarks(b *testing.B, callback func(res Resolution)) {
 		b.Run(resolution.String(), func(b *testing.B) {
 			pi.ScreenWidth = resolution.W
 			pi.ScreenHeight = resolution.H
-			pi.BootOrPanic()
+			pi.MustBoot()
 
 			b.ReportAllocs()
 			b.ResetTimer()

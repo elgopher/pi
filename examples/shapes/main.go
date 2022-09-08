@@ -89,7 +89,7 @@ func main() {
 		drawMousePointer()
 	}
 
-	pi.RunOrPanic()
+	pi.MustRun()
 }
 
 func drawMousePointer() {

@@ -8,8 +8,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elgopher/pi"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elgopher/pi"
 )
 
 func TestSset(t *testing.T) {
@@ -19,7 +20,7 @@ func TestSset(t *testing.T) {
 		pi.SpriteSheetWidth = 8
 		pi.SpriteSheetHeight = 8
 		pi.Resources = embed.FS{}
-		pi.BootOrPanic()
+		pi.MustBoot()
 		// when
 		pi.Sset(2, 1, col)
 		// then
@@ -29,7 +30,7 @@ func TestSset(t *testing.T) {
 	t.Run("should not set pixel outside the sprite sheet", func(t *testing.T) {
 		pi.SpriteSheetWidth = 8
 		pi.SpriteSheetHeight = 8
-		pi.BootOrPanic()
+		pi.MustBoot()
 
 		emptySheet := make([]byte, len(pi.SpriteSheetData))
 
@@ -56,7 +57,7 @@ func TestSget(t *testing.T) {
 		pi.SpriteSheetWidth = 8
 		pi.SpriteSheetHeight = 8
 		pi.Resources = embed.FS{}
-		pi.BootOrPanic()
+		pi.MustBoot()
 		col := byte(7)
 		pi.Sset(1, 1, col)
 		// expect
@@ -66,7 +67,7 @@ func TestSget(t *testing.T) {
 	t.Run("should get color 0 if outside the sprite sheet", func(t *testing.T) {
 		pi.SpriteSheetWidth = 8
 		pi.SpriteSheetHeight = 8
-		pi.BootOrPanic()
+		pi.MustBoot()
 		for i := 0; i < len(pi.SpriteSheetData); i++ {
 			pi.SpriteSheetData[i] = 7
 		}

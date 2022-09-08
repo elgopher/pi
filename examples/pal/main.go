@@ -58,5 +58,5 @@ func draw() {
 func main() {
 	pi.Resources = resources
 	pi.Draw = draw
-	pi.RunOrPanic()
+	pi.MustRun()
 }

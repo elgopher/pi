@@ -80,10 +80,10 @@ func Run() error {
 	return run()
 }
 
-// RunOrPanic does the same as Run, but panics instead of returning an error.
+// MustRun does the same as Run, but panics instead of returning an error.
 //
 // Useful for writing unit tests and quick and dirty prototypes. Do not use on production ;)
-func RunOrPanic() {
+func MustRun() {
 	if err := Run(); err != nil {
 		panic(fmt.Sprintf("Something terrible happened! Pi cannot be run: %v\n", err))
 	}
@@ -175,10 +175,10 @@ func loadResources(resources fs.ReadFileFS) error {
 	return loadSpriteSheet(resources)
 }
 
-// BootOrPanic does the same as Boot, but panics instead of returning an error.
+// MustBoot does the same as Boot, but panics instead of returning an error.
 //
 // Useful for writing unit tests and quick and dirty prototypes. Do not use on production ;)
-func BootOrPanic() {
+func MustBoot() {
 	if err := Boot(); err != nil {
 		panic("init failed " + err.Error())
 	}

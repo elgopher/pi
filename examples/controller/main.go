@@ -34,7 +34,7 @@ func main() {
 		drawPlayerController(2, 67, 20)
 		drawPlayerController(3, 67, 70)
 	}
-	pi.RunOrPanic()
+	pi.MustRun()
 }
 
 func drawPlayerController(player, x, y int) {
