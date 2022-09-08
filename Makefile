@@ -1,7 +1,3 @@
-.PHONY: lint
-lint:
-	golangci-lint run
-
 .PHONY: test
 test:
 	go test -race -v ./...
@@ -14,3 +10,7 @@ build: $(SRC)
 		go build $$main ; \
 	done
 	rm main
+
+.PHONY: lint
+lint:
+	golangci-lint run
