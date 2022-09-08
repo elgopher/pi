@@ -17,7 +17,7 @@ var gameStoppedErr = errors.New("game stopped")
 const tps = 30
 
 func run() error {
-	ebiten.SetMaxTPS(tps)
+	ebiten.SetTPS(tps)
 	ebiten.SetScreenClearedEveryFrame(false)
 	ebiten.SetRunnableOnUnfocused(true)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
@@ -86,15 +86,15 @@ func (e *ebitengineGame) Update() error {
 func (e *ebitengineGame) Draw(screen *ebiten.Image) {
 	// Ebitengine executes Draw based on display frequency.
 	// But the screen is changed at most 30 times per second.
-	// That's why there is no need to replace pixels more often
+	// That's why there is no need to write pixels more often
 	// than 30 times per second.
 	if e.screenChanged {
-		e.replaceScreenPixels(screen)
+		e.writeScreenPixels(screen)
 		e.screenChanged = false
 	}
 }
 
-func (e *ebitengineGame) replaceScreenPixels(screen *ebiten.Image) {
+func (e *ebitengineGame) writeScreenPixels(screen *ebiten.Image) {
 	if e.screenDataRGBA == nil || len(e.screenDataRGBA)/4 != len(ScreenData) {
 		e.screenDataRGBA = make([]byte, len(ScreenData)*4)
 	}
@@ -109,7 +109,7 @@ func (e *ebitengineGame) replaceScreenPixels(screen *ebiten.Image) {
 		offset += 4
 	}
 
-	screen.ReplacePixels(e.screenDataRGBA)
+	screen.WritePixels(e.screenDataRGBA)
 }
 
 func (e *ebitengineGame) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
