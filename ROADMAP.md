@@ -24,9 +24,11 @@
 * [x] Game controller support: gamepad and keyboard
 * [x] Mouse support
   * [ ] Add mouse wheel support
-* [ ] Full keyboard support (dev mode)
+* [x] Full keyboard support
 * [x] Storing game state like savegames, hall of fame and user preferences
 * [ ] Menu screen
+  * [ ] controller mapping editor
+  * [ ] keyboard mapping editor 
 * [ ] Development console
     * [ ] stopping, resuming the game
         * [x] add a programmatic way to stop the game

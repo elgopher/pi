@@ -3,7 +3,9 @@
 
 package pi
 
-import "time"
+import (
+	"time"
+)
 
 var timeSeconds float64
 var timeStarted time.Time

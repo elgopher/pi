@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+
+	"github.com/elgopher/pi/internal/gameloop"
 )
 
 var gameStoppedErr = errors.New("game stopped")
@@ -53,6 +55,7 @@ func (e *ebitengineGame) Update() error {
 	updateTime()
 	updateController()
 	updateMouse()
+	gameloop.Update()
 
 	if Update != nil {
 		Update()
