@@ -5,6 +5,8 @@ package pi
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+
+	"github.com/elgopher/pi/internal/input"
 )
 
 type MouseButton int
@@ -38,7 +40,7 @@ func MouseBtnp(b MouseButton) bool {
 		return false
 	}
 
-	return isPressedRepeatably(mouseButtonDuration[b])
+	return input.IsPressedRepeatably(mouseButtonDuration[b])
 }
 
 // MousePos returns the position of mouse in screen coordinates.

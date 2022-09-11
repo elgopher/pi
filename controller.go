@@ -5,6 +5,8 @@ package pi
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+
+	"github.com/elgopher/pi/internal/input"
 )
 
 // Button is a virtual button on any game controller. The game controller can be a gamepad or a keyboard.
@@ -14,8 +16,8 @@ type Button int
 
 // Keyboard mappings:
 //
-//   player 0: [DPAD] - cursors  [O] - Z C N   [X] - X V M
-//   player 1: [DPAD] - SFED     [O] - LSHIFT  [X] - TAB W Q A
+//	player 0: [DPAD] - cursors  [O] - Z C N   [X] - X V M
+//	player 1: [DPAD] - SFED     [O] - LSHIFT  [X] - TAB W Q A
 //
 // First connected gamepad controller is player 0, second player 1 and so on.
 // On XBox controller [O] is A and Y, [X] is B and X.
@@ -28,32 +30,32 @@ const (
 	X     Button = 5 // X is a second fire button
 )
 
-// Btn returns true if a button is being pressed at this moment by player 0.
+// Btn returns true if a controller button is being pressed at this moment by player 0.
 func Btn(button Button) bool {
 	return BtnPlayer(button, 0)
 }
 
-// BtnPlayer returns true if a button is being pressed at this moment
+// BtnPlayer returns true if a controller button is being pressed at this moment
 // by specific player. The player can be 0..7.
 func BtnPlayer(button Button, player int) bool {
 	return isPressed(buttonDuration(player, button))
 }
 
-// Btnp returns true when the button has just been pressed.
+// Btnp returns true when the controller button has just been pressed.
 // It also returns true after the next 15 frames, and then every 4 frames.
 // This simulates keyboard-like repeating.
 func Btnp(button Button) bool {
 	return BtnpPlayer(button, 0)
 }
 
-// BtnpPlayer returns true when the button has just been pressed.
+// BtnpPlayer returns true when the controller button has just been pressed.
 // It also returns true after the next 15 frames, and then every 4 frames.
 // This simulates keyboard-like repeating. The player can be 0..7.
 func BtnpPlayer(button Button, player int) bool {
-	return isPressedRepeatably(buttonDuration(player, button))
+	return input.IsPressedRepeatably(buttonDuration(player, button))
 }
 
-// BtnBits returns the state of all buttons for players 0 and 1 as bitset.
+// BtnBits returns the state of all controller buttons for players 0 and 1 as bitset.
 //
 // The first byte contains the button states for player 0 (bits 0 through 5, bits 6 and 7 are unused).
 // The second byte contains the button states for player 1 (bits 8 through 13).
@@ -65,7 +67,7 @@ func BtnBits() int {
 	return controllers[0].bits(isPressed) + controllers[1].bits(isPressed)<<8
 }
 
-// BtnpBits returns the state of all buttons for players 0 and 1 as bitset.
+// BtnpBits returns the state of all controller buttons for players 0 and 1 as bitset.
 //
 // The first byte contains the button states for player 0 (bits 0 through 5, bits 6 and 7 are unused).
 // The second byte contains the button states for player 1 (bits 8 through 13).
@@ -74,7 +76,7 @@ func BtnBits() int {
 //
 // A bit of 1 means the button has just been pressed.
 func BtnpBits() int {
-	return controllers[0].bits(isPressedRepeatably) + controllers[1].bits(isPressedRepeatably)<<8
+	return controllers[0].bits(input.IsPressedRepeatably) + controllers[1].bits(input.IsPressedRepeatably)<<8
 }
 
 func buttonDuration(player int, button Button) int {
@@ -91,19 +93,6 @@ func buttonDuration(player int, button Button) int {
 
 func isPressed(duration int) bool {
 	return duration > 0
-}
-
-func isPressedRepeatably(duration int) bool {
-	const (
-		pressDuration = 15 // make it configurable
-		pressInterval = 4  // make it configurable
-	)
-
-	if duration == 1 {
-		return true
-	}
-
-	return duration >= pressDuration+1 && duration%pressInterval == 0
 }
 
 func updateController() {
