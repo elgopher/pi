@@ -145,3 +145,30 @@ func assertScreenEqual(t *testing.T, file string) {
 		fmt.Println("Screenshot taken", screenshot)
 	}
 }
+
+//go:embed internal/testimage/print/custom-font.png
+var customFontPng []byte
+
+//go:embed internal/testimage/print/custom-font-too-small.png
+var customFontTooSmall []byte
+
+func TestLoadFontData(t *testing.T) {
+	t.Run("should return error when font png is invalid", func(t *testing.T) {
+		font := pi.Font{}
+		err := pi.LoadFontData(make([]byte, 0), font.Data[:])
+		require.Error(t, err)
+	})
+
+	t.Run("should return error when png is valid but too small", func(t *testing.T) {
+		font := pi.Font{}
+		err := pi.LoadFontData(customFontTooSmall, font.Data[:])
+		require.Error(t, err)
+	})
+
+	t.Run("should decode png file into font data", func(t *testing.T) {
+		font := pi.Font{}
+		err := pi.LoadFontData(customFontPng, font.Data[:])
+		require.NoError(t, err)
+		assert.Equal(t, byte(0b00001111), font.Data[0])
+	})
+}
