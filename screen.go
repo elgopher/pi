@@ -10,27 +10,14 @@ import (
 	"image/png"
 	"os"
 	"runtime"
+
+	"github.com/elgopher/pi/vm"
 )
 
 // Screen-specific data
 var (
-	// ScreenData contains pixel colors for the screen visible by the player.
-	// Each pixel is one byte. It is initialized during pi.Boot.
-	//
-	// Pixels on the screen are organized from left to right,
-	// top to bottom. Slice element number 0 has pixel located
-	// in the top-left corner. Slice element number 1 has pixel color
-	// on the right and so on.
-	//
-	// Can be freely read and updated. Useful when you want to use your own
-	// functions for pixel manipulation.
-	// Pi will panic if you try to change the length of the slice.
-	ScreenData []byte
-
-	scrWidth, scrHeight int
-	lineOfScreenWidth   []byte
-	zeroScreenData      []byte
-	clippingRegion      rect
+	lineOfScreenWidth []byte
+	zeroScreenData    []byte
 )
 
 // Cls cleans the entire screen with color 0. It does not take into account any draw state parameters such as clipping region or camera.
@@ -40,7 +27,7 @@ func Cls() {
 }
 
 func cls() {
-	copy(ScreenData, zeroScreenData)
+	copy(vm.ScreenData, zeroScreenData)
 }
 
 // ClsCol cleans the entire screen with specified color. It does not take into account any draw state parameters such as clipping region or camera.
@@ -55,65 +42,61 @@ func clsCol(col byte) {
 	}
 
 	offset := 0
-	for y := 0; y < scrHeight; y++ {
-		copy(ScreenData[offset:offset+scrWidth], lineOfScreenWidth)
-		offset += scrWidth
+	for y := 0; y < vm.ScreenHeight; y++ {
+		copy(vm.ScreenData[offset:offset+vm.ScreenWidth], lineOfScreenWidth)
+		offset += vm.ScreenWidth
 	}
 }
 
 // Pset sets a pixel color on the screen.
 func Pset(x, y int, color byte) {
-	pset(x-camera.x, y-camera.y, color)
+	pset(x-vm.Camera.X, y-vm.Camera.Y, color)
 }
 
 // pset sets a pixel color on the screen **without** taking camera position into account.
 func pset(x, y int, color byte) {
-	if x < clippingRegion.x {
+	if x < vm.ClippingRegion.X {
 		return
 	}
-	if y < clippingRegion.y {
+	if y < vm.ClippingRegion.Y {
 		return
 	}
-	if x >= clippingRegion.x+clippingRegion.w {
+	if x >= vm.ClippingRegion.X+vm.ClippingRegion.W {
 		return
 	}
-	if y >= clippingRegion.y+clippingRegion.h {
+	if y >= vm.ClippingRegion.Y+vm.ClippingRegion.H {
 		return
 	}
 
-	ScreenData[y*scrWidth+x] = drawPalette[color]
+	vm.ScreenData[y*vm.ScreenWidth+x] = vm.DrawPalette[color]
 }
 
 // Pget gets a pixel color on the screen.
 func Pget(x, y int) byte {
-	x -= camera.x
-	y -= camera.y
+	x -= vm.Camera.X
+	y -= vm.Camera.Y
 
-	if x < clippingRegion.x {
+	if x < vm.ClippingRegion.X {
 		return 0
 	}
-	if y < clippingRegion.y {
+	if y < vm.ClippingRegion.Y {
 		return 0
 	}
-	if x >= clippingRegion.x+clippingRegion.w {
+	if x >= vm.ClippingRegion.X+vm.ClippingRegion.W {
 		return 0
 	}
-	if y >= clippingRegion.y+clippingRegion.h {
+	if y >= vm.ClippingRegion.Y+vm.ClippingRegion.H {
 		return 0
 	}
 
-	return ScreenData[y*scrWidth+x]
-}
-
-type rect struct {
-	x, y, w, h int
+	return vm.ScreenData[y*vm.ScreenWidth+x]
 }
 
 // Clip sets the clipping region in the form of rectangle. All screen drawing operations will not affect any pixels outside the region.
 //
 // Clip returns previous clipping region.
 func Clip(x, y, w, h int) (prevX, prevY, prevW, prevH int) {
-	prev := clippingRegion
+	prev := vm.ClippingRegion
 
 	if x < 0 {
 		w += x
@@ -125,41 +108,35 @@ func Clip(x, y, w, h int) (prevX, prevY, prevW, prevH int) {
 		y = 0
 	}
 
-	if x+w > scrWidth {
-		w = scrWidth - x
+	if x+w > vm.ScreenWidth {
+		w = vm.ScreenWidth - x
 	}
 
-	if y+h > scrHeight {
-		h = scrHeight - y
+	if y+h > vm.ScreenHeight {
+		h = vm.ScreenHeight - y
 	}
 
-	clippingRegion.x = x
-	clippingRegion.y = y
-	clippingRegion.w = w
-	clippingRegion.h = h
+	vm.ClippingRegion.X = x
+	vm.ClippingRegion.Y = y
+	vm.ClippingRegion.W = w
+	vm.ClippingRegion.H = h
 
-	return prev.x, prev.y, prev.w, prev.h
+	return prev.X, prev.Y, prev.W, prev.H
 }
 
 // ClipReset resets the clipping region, which means that entire screen will be clipped.
 func ClipReset() (prevX, prevY, prevW, prevH int) {
-	return Clip(0, 0, scrWidth, scrHeight)
+	return Clip(0, 0, vm.ScreenWidth, vm.ScreenHeight)
 }
 
 //func ClipPrev(x, y, w, h int) {}
 
-type pos struct {
-	x, y int
-}
-
-var camera pos
-
 // Camera sets the camera offset used for all subsequent draw operations.
 func Camera(x, y int) (prevX, prevY int) {
-	prev := camera
-	camera.x = x
-	camera.y = y
-	return prev.x, prev.y
+	prev := vm.Camera
+	vm.Camera.X = x
+	vm.Camera.Y = y
+	return prev.X, prev.Y
 }
 
 // CameraReset resets the camera offset to origin (0,0).
@@ -194,10 +171,10 @@ func SprSizeFlip(n, x, y int, w, h float64, flipX, flipY bool) {
 		return
 	}
 
-	x -= camera.x
-	y -= camera.y
+	x -= vm.Camera.X
+	y -= vm.Camera.Y
 
-	screenOffset := y*scrWidth + x
+	screenOffset := y*vm.ScreenWidth + x
 
 	spriteX := (n % spritesInLine) * SpriteWidth
 	spriteY := (n / spritesInLine) * SpriteHeight
@@ -205,43 +182,43 @@ func SprSizeFlip(n, x, y int, w, h float64, flipX, flipY bool) {
 	width := int(SpriteWidth * w)
 	height := int(SpriteHeight * h)
 
-	if spriteX+width > ssWidth {
-		width = ssWidth - spriteX
+	if spriteX+width > vm.SpriteSheetWidth {
+		width = vm.SpriteSheetWidth - spriteX
 	}
 
-	if spriteY+height > ssHeight {
-		height = ssHeight - spriteY
+	if spriteY+height > vm.SpriteSheetHeight {
+		height = vm.SpriteSheetHeight - spriteY
 	}
 
-	spriteSheetOffset := spriteY*ssWidth + spriteX
+	spriteSheetOffset := spriteY*vm.SpriteSheetWidth + spriteX
 
-	if x < clippingRegion.x {
-		dx := clippingRegion.x - x
+	if x < vm.ClippingRegion.X {
+		dx := vm.ClippingRegion.X - x
 		width -= dx
 		screenOffset += dx
 		spriteSheetOffset += dx
-	} else if x+width > clippingRegion.w {
-		width = clippingRegion.w - x
+	} else if x+width > vm.ClippingRegion.W {
+		width = vm.ClippingRegion.W - x
 	}
 
 	if width <= 0 {
 		return
 	}
 
-	if y < clippingRegion.y {
-		dy := clippingRegion.y - y
+	if y < vm.ClippingRegion.Y {
+		dy := vm.ClippingRegion.Y - y
 		height -= dy
-		screenOffset += dy * scrWidth
-		spriteSheetOffset += dy * ssWidth
-	} else if y+height > clippingRegion.h {
-		height = clippingRegion.h - y
+		screenOffset += dy * vm.ScreenWidth
+		spriteSheetOffset += dy * vm.SpriteSheetWidth
+	} else if y+height > vm.ClippingRegion.H {
+		height = vm.ClippingRegion.H - y
 	}
 
-	spriteSheetStep := ssWidth
+	spriteSheetStep := vm.SpriteSheetWidth
 
 	if flipY {
-		spriteSheetOffset += (height - 1) * ssWidth
-		spriteSheetStep = -ssWidth
+		spriteSheetOffset += (height - 1) * vm.SpriteSheetWidth
+		spriteSheetStep = -vm.SpriteSheetWidth
 	}
 
 	startingPixel := 0
@@ -253,54 +230,48 @@ func SprSizeFlip(n, x, y int, w, h float64, flipX, flipY bool) {
 	}
 
 	for i := 0; i < height; i++ {
-		spriteSheetLine := SpriteSheetData[spriteSheetOffset : spriteSheetOffset+width]
+		spriteSheetLine := vm.SpriteSheetData[spriteSheetOffset : spriteSheetOffset+width]
 
 		for j := 0; j < len(spriteSheetLine); j++ {
 			col := spriteSheetLine[startingPixel+(step*j)]
-			if colorIsTransparent[col] {
+			if vm.ColorTransparency[col] {
 				continue
 			}
 
-			ScreenData[screenOffset+j] = drawPalette[col]
+			vm.ScreenData[screenOffset+j] = vm.DrawPalette[col]
 		}
-		screenOffset += scrWidth
+		screenOffset += vm.ScreenWidth
 		spriteSheetOffset += spriteSheetStep
 	}
 }
-
-var colorIsTransparent [256]bool
 
 // Palt sets color transparency. If true then the color will not be drawn
 // for next drawing operations.
 //
 // Color transparency is used by Spr, SprSize and SprSizeFlip.
 func Palt(color byte, transparent bool) {
-	colorIsTransparent[color] = transparent
+	vm.ColorTransparency[color] = transparent
 }
 
 var defaultTransparency = [256]bool{true}
 
 // PaltReset sets all transparent colors to false and makes color 0 transparent.
 func PaltReset() {
-	colorIsTransparent = defaultTransparency
+	vm.ColorTransparency = defaultTransparency
 }
-
-var drawPalette [256]byte
 
 // Pal replaces color with another one for all subsequent drawings (it is changing
 // the so-called draw palette).
 //
 // Affected functions are Pset, Spr, SprSize, SprSizeFlip, Rect and RectFill.
 func Pal(color byte, replacementColor byte) {
-	drawPalette[color] = replacementColor
+	vm.DrawPalette[color] = replacementColor
 }
-
-var displayPalette [256]byte
 
 // PalDisplay replaces color with another one for the whole screen at the end of a frame
 // (it is changing the so-called display palette).
 func PalDisplay(color byte, replacementColor byte) {
-	displayPalette[color] = replacementColor
+	vm.DisplayPalette[color] = replacementColor
 }
 
 // PalSecondary
@@ -315,8 +286,8 @@ func init() {
 
 // PalReset resets all swapped colors for all palettes.
 func PalReset() {
-	drawPalette = notSwappedPalette
-	displayPalette = notSwappedPalette
+	vm.DrawPalette = notSwappedPalette
+	vm.DisplayPalette = notSwappedPalette
 }
 
 // Snap takes a screenshot and saves it to temp dir.
@@ -328,16 +299,16 @@ func Snap() (string, error) {
 	}
 
 	var palette stdcolor.Palette
-	for _, col := range displayPalette {
-		rgb := Palette[col]
+	for _, col := range vm.DisplayPalette {
+		rgb := vm.Palette[col]
 		rgba := &stdcolor.NRGBA{R: rgb.R, G: rgb.G, B: rgb.B, A: 255}
 		palette = append(palette, rgba)
 	}
 
-	size := image.Rectangle{Max: image.Point{X: scrWidth, Y: scrHeight}}
+	size := image.Rectangle{Max: image.Point{X: vm.ScreenWidth, Y: vm.ScreenHeight}}
 	img := image.NewPaletted(size, palette)
 
-	copy(img.Pix, ScreenData)
+	copy(img.Pix, vm.ScreenData)
 
 	file, err := os.CreateTemp("", "pi-screenshot")
 	if err != nil {

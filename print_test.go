@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/vm"
 )
 
 func TestPrint(t *testing.T) {
@@ -139,7 +140,7 @@ func TestPrint(t *testing.T) {
 
 func assertScreenEqual(t *testing.T, file string) {
 	expected := decodePNG(t, file).Pixels
-	if !assert.Equal(t, expected, pi.ScreenData) {
+	if !assert.Equal(t, expected, vm.ScreenData) {
 		screenshot, err := pi.Snap()
 		require.NoError(t, err)
 		fmt.Println("Screenshot taken", screenshot)

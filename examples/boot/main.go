@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	// set screen resolution:
+	// set low-level stuff, such as screen resolution:
 	pi.ScreenWidth = 44
 	pi.ScreenHeight = 44
 

@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/vm"
 )
 
 func TestSset(t *testing.T) {
@@ -24,7 +25,7 @@ func TestSset(t *testing.T) {
 		// when
 		pi.Sset(2, 1, col)
 		// then
-		assert.Equal(t, col, pi.SpriteSheetData[10])
+		assert.Equal(t, col, vm.SpriteSheetData[10])
 	})
 
 	t.Run("should not set pixel outside the sprite sheet", func(t *testing.T) {
@@ -32,7 +33,7 @@ func TestSset(t *testing.T) {
 		pi.SpriteSheetHeight = 8
 		pi.MustBoot()
 
-		emptySheet := make([]byte, len(pi.SpriteSheetData))
+		emptySheet := make([]byte, len(vm.SpriteSheetData))
 
 		tests := []struct{ X, Y int }{
 			{-1, 0},
@@ -46,7 +47,7 @@ func TestSset(t *testing.T) {
 				// when
 				pi.Sset(coords.X, coords.Y, col)
 				// then
-				assert.Equal(t, emptySheet, pi.SpriteSheetData)
+				assert.Equal(t, emptySheet, vm.SpriteSheetData)
 			})
 		}
 	})
@@ -67,9 +68,10 @@ func TestSget(t *testing.T) {
 	t.Run("should get color 0 if outside the sprite sheet", func(t *testing.T) {
 		pi.SpriteSheetWidth = 8
 		pi.SpriteSheetHeight = 8
+		pi.Resources = embed.FS{}
 		pi.MustBoot()
-		for i := 0; i < len(pi.SpriteSheetData); i++ {
-			pi.SpriteSheetData[i] = 7
+		for i := 0; i < len(vm.SpriteSheetData); i++ {
+			vm.SpriteSheetData[i] = 7
 		}
 
 		tests := []struct{ X, Y int }{
