@@ -2,15 +2,18 @@
 package main
 
 import (
+	"embed"
+
 	"github.com/elgopher/pi"
 )
 
+//go:embed custom-font.png
+var resources embed.FS
+
 func main() {
+	pi.Resources = resources
 	pi.Draw = func() {
-		pi.CursorReset()      // set cursor to 0,0
-		pi.Cursor(50, 58)     // set cursor position
-		pi.Print("HELLO,", 9) // print yellow text and go to next line
-		pi.Print("GOPHER!", 12)
+		pi.Print("HELLO,\nWORLD!", 50, 58, 9) // print two lines of yellow text using system font
 	}
 	pi.MustRun()
 }

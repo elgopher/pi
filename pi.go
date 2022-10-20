@@ -117,7 +117,7 @@ func Boot() error {
 		return err
 	}
 
-	if err := loadSystemFont(); err != nil {
+	if err := loadFontData(systemFontPNG, systemFont.Data[:]); err != nil {
 		return err
 	}
 
@@ -146,7 +146,6 @@ func Boot() error {
 	CameraReset()
 	PaltReset()
 	PalReset()
-	CursorReset()
 
 	booted = true
 
@@ -172,7 +171,11 @@ func validateUserParameters() error {
 }
 
 func loadResources(resources fs.ReadFileFS) error {
-	return loadSpriteSheet(resources)
+	if err := loadSpriteSheet(resources); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // MustBoot does the same as Boot, but panics instead of returning an error.

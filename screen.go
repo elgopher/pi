@@ -34,11 +34,8 @@ var (
 )
 
 // Cls cleans the entire screen with color 0. It does not take into account any draw state parameters such as clipping region or camera.
-//
-// Cls also resets the cursor used for printing text and resets the clipping region.
 func Cls() {
 	cls()
-	CursorReset()
 	ClipReset()
 }
 
@@ -47,11 +44,8 @@ func cls() {
 }
 
 // ClsCol cleans the entire screen with specified color. It does not take into account any draw state parameters such as clipping region or camera.
-//
-// ClsCol also resets the cursor used for printing text and resets the clipping region.
 func ClsCol(col byte) {
 	clsCol(col)
-	CursorReset()
 	ClipReset()
 }
 
