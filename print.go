@@ -31,95 +31,35 @@ type Font struct {
 	Width int
 	// WidthSpecial is a with of all special characters (code>=128)
 	WidthSpecial int
-	Height       int
+	// Height of line
+	Height int
 }
 
-func loadSystemFont() error {
-	img, err := image.DecodePNG(bytes.NewReader(systemFontPNG))
-	if err != nil {
-		return fmt.Errorf("decoding system font failed: %w", err)
-	}
-
-	if err = font.Load(img, systemFont.Data[:]); err != nil {
-		return fmt.Errorf("error loading system font: %w", err)
-	}
-
-	return nil
-}
-
-var cursor pos
-
-// Cursor set cursor position (in pixels) used by Print.
-//
-// Cursor returns previously set cursor position.
-func Cursor(x, y int) (prevX, prevY int) {
-	prevX, prevY = cursor.x, cursor.y
-	cursor.x = x
-	cursor.y = y
-	return
-}
-
-// CursorReset resets cursor position used by Print to 0,0.
-//
-// CursorReset returns previously set cursor position.
-func CursorReset() (prevX, prevY int) {
-	return Cursor(0, 0)
-}
-
-// Print prints text on the screen. It takes into consideration cursor position,
+// Print prints text on the screen at given coordinates. It takes into account
 // clipping region and camera position.
-//
-// After printing all characters Print goes to the next line. When there is no space
-// left on screen the clipping region is scrolled to make room.
 //
 // Only unicode characters with code < 256 are supported. Unsupported chars
 // are printed as question mark. The entire table of available chars can be
 // found here: https://github.com/elgopher/pi/blob/master/internal/system-font.png
 //
 // Print returns the right-most x position that occurred while printing.
-func Print(text string, color byte) (x int) {
-	if cursor.y > scrHeight-systemFont.Height {
-		lines := systemFont.Height - (scrHeight - cursor.y)
-		scroll(lines)
-	}
+func (f Font) Print(text string, x, y int, color byte) int {
+	startX := x
 
-	startingX := cursor.x
 	for _, r := range text {
-		printRune(r, color)
+		if r != '\n' {
+			width := f.printRune(r, x, y, color)
+			x += width
+		} else {
+			x = startX
+			y += f.Height
+		}
 	}
 
-	x = cursor.x
-	cursor.x = startingX
-	cursor.y += systemFont.Height
-	if cursor.y > scrHeight-systemFont.Height {
-		scroll(systemFont.Height)
-	}
-
-	return
+	return x
 }
 
-func scroll(lines int) {
-	if scrHeight <= lines {
-		cls()
-		cursor.y = scrHeight - systemFont.Height
-		return
-	}
-
-	for y := clippingRegion.y; y < scrHeight-lines; y++ {
-		srcOffset := y*scrWidth + clippingRegion.x
-		dstOffset := srcOffset + lines*scrWidth
-		copy(ScreenData[srcOffset:], ScreenData[dstOffset:dstOffset+clippingRegion.w])
-	}
-
-	for y := scrHeight - lines; y < clippingRegion.y+clippingRegion.h; y++ {
-		offset := y*scrWidth + clippingRegion.x
-		copy(ScreenData[offset:], zeroScreenData[:clippingRegion.w])
-	}
-
-	cursor.y -= lines
-}
-
-func printRune(r rune, color byte) {
+func (f Font) printRune(r rune, sx, sy int, color byte) int {
 	if r > 255 {
 		r = '?'
 	}
@@ -127,20 +67,20 @@ func printRune(r rune, color byte) {
 	index := int(r) * 8
 
 	for y := 0; y < 8; y++ {
-		if clippingRegion.y > cursor.y+y-camera.y {
+		if clippingRegion.y > sy+y-camera.y {
 			continue
 		}
-		if clippingRegion.y+clippingRegion.h <= cursor.y+y-camera.y {
+		if clippingRegion.y+clippingRegion.h <= sy+y-camera.y {
 			continue
 		}
 
-		offset := scrWidth*y + cursor.x + cursor.y*scrWidth - camera.y*scrWidth - camera.x
-		line := systemFont.Data[index+y]
+		offset := scrWidth*y + sx + sy*scrWidth - camera.y*scrWidth - camera.x
+		line := f.Data[index+y]
 		for bit := 0; bit < 8; bit++ {
-			if clippingRegion.x > cursor.x+bit-camera.x {
+			if clippingRegion.x > sx+bit-camera.x {
 				continue
 			}
-			if clippingRegion.x+clippingRegion.w <= cursor.x+bit-camera.x {
+			if clippingRegion.x+clippingRegion.w <= sx+bit-camera.x {
 				continue
 			}
 			if line&(1<<bit) == 1<<bit {
@@ -150,8 +90,41 @@ func printRune(r rune, color byte) {
 	}
 
 	if r < 128 {
-		cursor.x += systemFont.Width
+		return f.Width
 	} else {
-		cursor.x += systemFont.WidthSpecial
+		return f.WidthSpecial
 	}
+}
+
+// loadFontData loads font-sheet (png image) and converts
+// it to font data. Image must be 128x128. Each char is 8x8.
+// Char 0 is in the top-left corner. Char 1 to the right.
+//
+// This function can be used if you want to use 3rd font:
+//
+// myFont := pi.Font{Width:4, WidthSpecial:8,Height: 8}
+// pi.loadFontData(png, myFont.Data[:])
+func loadFontData(png []byte, out []byte) error {
+	img, err := image.DecodePNG(bytes.NewReader(png))
+	if err != nil {
+		return fmt.Errorf("decoding font failed: %w", err)
+	}
+
+	if err = font.Load(img, out[:]); err != nil {
+		return fmt.Errorf("error system font: %w", err)
+	}
+
+	return nil
+}
+
+// Print prints text on the screen using system font. It takes into consideration
+// clipping region and camera position.
+//
+// Only unicode characters with code < 256 are supported. Unsupported chars
+// are printed as question mark. The entire table of available chars can be
+// found here: https://github.com/elgopher/pi/blob/master/internal/system-font.png
+//
+// Print returns the right-most x position that occurred while printing.
+func Print(text string, x, y int, color byte) (rightMostX int) {
+	return systemFont.Print(text, x, y, color)
 }

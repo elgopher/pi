@@ -69,8 +69,7 @@ func drawKey(x, y, w int, b key.Button) {
 
 	str := b.String()
 	if len(str) == 1 {
-		pi.Cursor(x+2, y+2)
-		pi.Print(str, 15)
+		pi.Print(str, x+2, y+2, 15)
 	}
 
 }

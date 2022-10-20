@@ -4,6 +4,7 @@
 package pi_test
 
 import (
+	_ "embed"
 	"fmt"
 	"strings"
 	"testing"
@@ -26,7 +27,7 @@ func TestPrint(t *testing.T) {
 			t.Run(char, func(t *testing.T) {
 				pi.MustBoot()
 				// when
-				pi.Print(char, color)
+				pi.Print(char, 0, 0, color)
 				// then
 				assertScreenEqual(t, "internal/testimage/print/"+char+".png")
 			})
@@ -35,30 +36,29 @@ func TestPrint(t *testing.T) {
 
 	t.Run("should print question mark for characters > 255", func(t *testing.T) {
 		pi.MustBoot()
-		pi.Print("\u0100", color)
+		pi.Print("\u0100", 0, 0, color)
 		assertScreenEqual(t, "internal/testimage/print/unknown.png")
 	})
 
 	t.Run("should print special character", func(t *testing.T) {
 		pi.MustBoot()
-		pi.Print("\u0080", color)
+		pi.Print("\u0080", 0, 0, color)
 		assertScreenEqual(t, "internal/testimage/print/special.png")
 	})
 
 	t.Run("should print 2 special characters", func(t *testing.T) {
 		pi.MustBoot()
-		pi.Print("\u0080\u0081", color)
+		pi.Print("\u0080\u0081", 0, 0, color)
 		assertScreenEqual(t, "internal/testimage/print/special-2chars.png")
 	})
 
 	t.Run("should go to next line", func(t *testing.T) {
 		pi.MustBoot()
-		pi.Print("0L", color)
-		pi.Print("1L", color)
+		pi.Print("0L\n1L", 0, 0, color)
 		assertScreenEqual(t, "internal/testimage/print/two-lines.png")
 	})
 
-	t.Run("should print at cursor position", func(t *testing.T) {
+	t.Run("should print at position", func(t *testing.T) {
 		tests := map[string]struct {
 			x, y int
 			file string
@@ -69,9 +69,7 @@ func TestPrint(t *testing.T) {
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
 				pi.MustBoot()
-				pi.Cursor(test.x, test.y)
-				pi.Print("0L", color)
-				pi.Print("1L", color)
+				pi.Print("0L\n1L", test.x, test.y, color)
 				assertScreenEqual(t, test.file)
 			})
 		}
@@ -80,30 +78,29 @@ func TestPrint(t *testing.T) {
 	t.Run("should print moved by camera position", func(t *testing.T) {
 		pi.MustBoot()
 		pi.Camera(-1, -2)
-		pi.Print("0L", color)
-		pi.Print("1L", color)
+		pi.Print("0L\n1L", 0, 0, color)
 		assertScreenEqual(t, "internal/testimage/print/two-lines-at-1.2.png")
 	})
 
 	t.Run("should clip text", func(t *testing.T) {
 		tests := map[string]struct {
 			x, y, w, h       int
-			cursorX, cursorY int
+			posX, posY       int
 			cameraX, cameraY int
 			file             string
 		}{
-			"clip left":                {x: 1, y: 0, w: 16, h: 16, file: "clip-left.png"},
-			"clip right":               {x: 0, y: 0, w: 6, h: 16, file: "clip-right.png"},
-			"clip top":                 {x: 0, y: 1, w: 16, h: 16, file: "clip-top.png"},
-			"clip bottom":              {x: 0, y: 0, w: 16, h: 4, file: "clip-bottom.png"},
-			"clip left, cursorX set":   {x: 2, y: 0, w: 16, h: 16, cursorX: 1, file: "clip-left-cursorx.png"},
-			"clip right, cursorX set":  {x: 0, y: 0, w: color, h: 16, cursorX: 1, file: "clip-right-cursorx.png"},
-			"clip top, cursorY set":    {x: 0, y: 2, w: 16, h: 16, cursorY: 1, file: "clip-top-cursory.png"},
-			"clip bottom, cursorY set": {x: 0, y: 0, w: 16, h: 5, cursorY: 1, file: "clip-bottom-cursory.png"},
-			"camerax, clip left":       {x: 2, y: 0, w: 16, h: 16, cameraX: -1, file: "clip-left-cursorx.png"},
-			"camerax, clip right":      {x: 0, y: 0, w: color, h: 16, cameraX: -1, file: "clip-right-cursorx.png"},
-			"cameray, clip top":        {x: 0, y: 2, w: 16, h: 16, cameraY: -1, file: "clip-top-cursory.png"},
-			"cameray, clip bottom":     {x: 0, y: 0, w: 16, h: 5, cameraY: -1, file: "clip-bottom-cursory.png"},
+			"clip left":             {x: 1, y: 0, w: 16, h: 16, file: "clip-left.png"},
+			"clip right":            {x: 0, y: 0, w: 6, h: 16, file: "clip-right.png"},
+			"clip top":              {x: 0, y: 1, w: 16, h: 16, file: "clip-top.png"},
+			"clip bottom":           {x: 0, y: 0, w: 16, h: 4, file: "clip-bottom.png"},
+			"clip left, posX set":   {x: 2, y: 0, w: 16, h: 16, posX: 1, file: "clip-left-posx.png"},
+			"clip right, posX set":  {x: 0, y: 0, w: 7, h: 16, posX: 1, file: "clip-right-posx.png"},
+			"clip top, posY set":    {x: 0, y: 2, w: 16, h: 16, posY: 1, file: "clip-top-posy.png"},
+			"clip bottom, posY set": {x: 0, y: 0, w: 16, h: 5, posY: 1, file: "clip-bottom-posy.png"},
+			"camerax, clip left":    {x: 2, y: 0, w: 16, h: 16, cameraX: -1, file: "clip-left-posx.png"},
+			"camerax, clip right":   {x: 0, y: 0, w: 7, h: 16, cameraX: -1, file: "clip-right-posx.png"},
+			"cameray, clip top":     {x: 0, y: 2, w: 16, h: 16, cameraY: -1, file: "clip-top-posy.png"},
+			"cameray, clip bottom":  {x: 0, y: 0, w: 16, h: 5, cameraY: -1, file: "clip-bottom-posy.png"},
 		}
 
 		for name, test := range tests {
@@ -111,125 +108,8 @@ func TestPrint(t *testing.T) {
 				pi.MustBoot()
 				pi.Camera(test.cameraX, test.cameraY)
 				pi.Clip(test.x, test.y, test.w, test.h)
-				pi.Cursor(test.cursorX, test.cursorY)
-				pi.Print("\u0080", color)
+				pi.Print("\u0080", test.posX, test.posY, color)
 				assertScreenEqual(t, "internal/testimage/print/"+test.file)
-			})
-		}
-	})
-
-	t.Run("should reset cursor", func(t *testing.T) {
-		tests := map[string]func(){
-			"Cls()":         func() { pi.Cls() },
-			"ClsCol(0)":     func() { pi.ClsCol(0) },
-			"CursorReset()": func() { pi.CursorReset() },
-			"Cursor(0,0)":   func() { pi.Cursor(0, 0) },
-		}
-		for name, function := range tests {
-			t.Run(name, func(t *testing.T) {
-				pi.MustBoot()
-				pi.Cursor(20, 20)
-				// when
-				function()
-				pi.Print("\u0080", color)
-				// then
-				assertScreenEqual(t, "internal/testimage/print/special.png")
-			})
-		}
-	})
-
-	t.Run("should scroll screen when there is no space", func(t *testing.T) {
-		const charHeight = 6
-
-		tests := map[string]struct {
-			cursorX      int
-			cursorY      int
-			expectedFile string
-		}{
-			"no scrolling": {
-				cursorY:      pi.ScreenHeight - charHeight*2,
-				expectedFile: "internal/testimage/print/no-scrolling.png",
-			},
-			"print, then scroll 1": {
-				cursorY:      pi.ScreenHeight - charHeight,
-				expectedFile: "internal/testimage/print/print-then-scroll.png",
-			},
-			"print, then scroll 2": {
-				cursorY:      pi.ScreenHeight - charHeight - 1,
-				expectedFile: "internal/testimage/print/print-then-scroll2.png",
-			},
-			"scroll, print and scroll": {
-				cursorY:      pi.ScreenHeight - charHeight + 1,
-				expectedFile: "internal/testimage/print/scroll-print-scroll.png",
-			},
-			"scroll entire screen": {
-				cursorY:      2 * pi.ScreenHeight,
-				expectedFile: "internal/testimage/print/scroll-entire-screen.png",
-			},
-			"scroll entire screen 2": {
-				cursorY:      2*pi.ScreenHeight - charHeight,
-				expectedFile: "internal/testimage/print/scroll-entire-screen.png",
-			},
-			"scroll entire screen while cursor x is set": {
-				cursorX:      1,
-				cursorY:      2 * pi.ScreenHeight,
-				expectedFile: "internal/testimage/print/scroll-entire-screen-x-is-set.png",
-			},
-		}
-		for name, test := range tests {
-			t.Run(name, func(t *testing.T) {
-				pi.MustBoot()
-				pi.ClsCol(3)
-				pi.Cursor(test.cursorX, test.cursorY)
-				// when
-				pi.Print("\u0080", color)
-				// then
-				assertScreenEqual(t, test.expectedFile)
-			})
-		}
-	})
-
-	t.Run("should scroll screen (clipping)", func(t *testing.T) {
-		const charHeight = 6
-
-		tests := map[string]struct {
-			cursorY      int
-			clipY, clipH int
-			clipX, clipW int
-			expectedFile string
-		}{
-			"clip h, print, then scroll": {
-				clipH:        pi.ScreenHeight - 1,
-				clipW:        pi.ScreenWidth,
-				cursorY:      pi.ScreenHeight - charHeight,
-				expectedFile: "internal/testimage/print/clip-print-then-scroll.png",
-			},
-			"clip yh, print, then scroll": {
-				clipY:        1,
-				clipH:        pi.ScreenHeight - 2,
-				clipW:        pi.ScreenWidth,
-				cursorY:      pi.ScreenHeight - charHeight,
-				expectedFile: "internal/testimage/print/clipyh-print-then-scroll.png",
-			},
-			"clip all, print, then scroll": {
-				clipX:        1,
-				clipY:        1,
-				clipW:        5,
-				clipH:        pi.ScreenHeight - 2,
-				cursorY:      pi.ScreenHeight - charHeight,
-				expectedFile: "internal/testimage/print/clipall-print-then-scroll.png",
-			},
-		}
-		for name, test := range tests {
-			t.Run(name, func(t *testing.T) {
-				pi.MustBoot()
-				pi.ScreenData = decodePNG(t, "internal/testimage/print/multicolor.png").Pixels
-				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
-				pi.Cursor(0, test.cursorY)
-				// when
-				pi.Print("\u0080", color)
-				// then
-				assertScreenEqual(t, test.expectedFile)
 			})
 		}
 	})
@@ -250,7 +130,7 @@ func TestPrint(t *testing.T) {
 			t.Run(name, func(t *testing.T) {
 				pi.MustBoot()
 				// when
-				x := pi.Print(test.text, color)
+				x := pi.Print(test.text, 0, 0, color)
 				assert.Equal(t, test.expectedX, x)
 			})
 		}
@@ -264,42 +144,4 @@ func assertScreenEqual(t *testing.T, file string) {
 		require.NoError(t, err)
 		fmt.Println("Screenshot taken", screenshot)
 	}
-}
-
-func TestCursor(t *testing.T) {
-	t.Run("should return default cursor position", func(t *testing.T) {
-		pi.MustBoot()
-		x, y := pi.Cursor(1, 1)
-		assert.Zero(t, x)
-		assert.Zero(t, y)
-	})
-
-	t.Run("should return previous cursor position", func(t *testing.T) {
-		pi.MustBoot()
-		prevX, prevY := 1, 2
-		pi.Cursor(prevX, prevY)
-		// when
-		x, y := pi.Cursor(3, 4)
-		assert.Equal(t, prevX, x)
-		assert.Equal(t, prevY, y)
-	})
-}
-
-func TestCursorReset(t *testing.T) {
-	t.Run("should return default cursor position", func(t *testing.T) {
-		pi.MustBoot()
-		x, y := pi.CursorReset()
-		assert.Zero(t, x)
-		assert.Zero(t, y)
-	})
-
-	t.Run("should return previous cursor position", func(t *testing.T) {
-		pi.MustBoot()
-		prevX, prevY := 1, 2
-		pi.Cursor(prevX, prevY)
-		// when
-		x, y := pi.CursorReset()
-		assert.Equal(t, prevX, x)
-		assert.Equal(t, prevY, y)
-	})
 }

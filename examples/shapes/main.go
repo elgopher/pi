@@ -23,31 +23,35 @@ var drawFunctions = []func(x0, y0, x1, y1 int){
 	func(x0, y0, x1, y1 int) {
 		pi.Rect(x0, y0, x1, y1, shapeColor)
 		command := fmt.Sprintf("Rect(%d,%d,%d,%d,%d)", x0, y0, x1, y1, shapeColor)
-		pi.Print(command, textColor)
+		printCmd(command)
 	},
 	func(x0, y0, x1, y1 int) {
 		pi.RectFill(x0, y0, x1, y1, shapeColor)
 		command := fmt.Sprintf("RectFill(%d,%d,%d,%d,%d)", x0, y0, x1, y1, shapeColor)
-		pi.Print(command, textColor)
+		printCmd(command)
 	},
 	func(x0, y0, x1, y1 int) {
 		pi.Line(x0, y0, x1, y1, shapeColor)
 		command := fmt.Sprintf("Line(%d,%d,%d,%d,%d)", x0, y0, x1, y1, shapeColor)
-		pi.Print(command, textColor)
+		printCmd(command)
 	},
 	func(x0, y0, x1, y1 int) {
 		r := radius(x0, y0, x1, y1)
 		pi.Circ(x0, y0, r, shapeColor)
 
 		command := fmt.Sprintf("Circ(%d,%d,%d,%d)", x0, y0, r, shapeColor)
-		pi.Print(command, textColor)
+		printCmd(command)
 	},
 	func(x0, y0, x1, y1 int) {
 		r := radius(x0, y0, x1, y1)
 		pi.CircFill(x0, y0, r, shapeColor)
 		command := fmt.Sprintf("CircFill(%d,%d,%d,%d)", x0, y0, r, shapeColor)
-		pi.Print(command, textColor)
+		printCmd(command)
 	},
+}
+
+func printCmd(command string) {
+	pi.Print(command, 8, 128-6-6, textColor)
 }
 
 var current = 0
@@ -73,8 +77,6 @@ func main() {
 			drawShape = drawFunctions[current]
 
 		}
-
-		pi.Cursor(8, 128-6-6)
 
 		// set coordinates during dragging
 		if drawShape != nil {

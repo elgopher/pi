@@ -14,8 +14,7 @@ func main() {
 	pi.MustBoot()
 
 	// once boot is executed all drawing functions are available:
-	pi.Cursor(0, 18)
-	pi.Print("TINY SCREEN", 7) // print text on the screen before game loop
+	pi.Print("TINY SCREEN", 0, 18, 7) // print text on the screen before game loop
 
 	// Run the game loop.
 	pi.MustRun()
