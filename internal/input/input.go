@@ -3,7 +3,7 @@
 
 package input
 
-func IsPressedRepeatably(duration int) bool {
+func IsPressedRepeatably(duration uint) bool {
 	const (
 		pressDuration = 15 // make it configurable
 		pressInterval = 4  // make it configurable

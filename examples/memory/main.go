@@ -6,13 +6,14 @@ import (
 	"math/rand"
 
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/vm"
 )
 
 func main() {
 	pi.Draw = func() {
-		for i := 0; i < len(pi.ScreenData); i++ {
+		for i := 0; i < len(vm.ScreenData); i++ {
 			randomColor := byte(rand.Intn(16))
-			pi.ScreenData[i] = randomColor // put a random color to each pixel
+			vm.ScreenData[i] = randomColor // put a random color to each pixel
 		}
 	}
 

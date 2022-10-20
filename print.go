@@ -12,36 +12,14 @@ import (
 
 	"github.com/elgopher/pi/image"
 	"github.com/elgopher/pi/internal/font"
+	"github.com/elgopher/pi/vm"
 )
-
-var systemFont = Font{
-	Width:        4,
-	WidthSpecial: 8,
-	Height:       6,
-}
-
-var CustomFont = Font{
-	Width:        4,
-	WidthSpecial: 8,
-	Height:       6,
-}
 
 //go:embed internal/system-font.png
 var systemFontPNG []byte
 
-// Font contains all information about loaded font.
-type Font struct {
-	// Data contains all 256 characters sorted by their ascii-like number.
-	// Each character is 8 subsequent bytes, starting from the top.
-	// Left-most pixel in a line is bit 0. Right-most pixel in a line is bit 7.
-	Data [8 * 256]byte
-	// Width in pixels for all characters below 128
-	Width int
-	// WidthSpecial is a with of all special characters (code>=128)
-	WidthSpecial int
-	// Height of line
-	Height int
-}
+// Font contains all information about loaded font and provides method to Print the text.
+type Font vm.Font
 
 // Print prints text on the screen at given coordinates. It takes into account
 // clipping region and camera position.
@@ -75,24 +53,24 @@ func (f Font) printRune(r rune, sx, sy int, color byte) int {
 	index := int(r) * 8
 
 	for y := 0; y < 8; y++ {
-		if clippingRegion.y > sy+y-camera.y {
+		if vm.ClippingRegion.Y > sy+y-vm.Camera.Y {
 			continue
 		}
-		if clippingRegion.y+clippingRegion.h <= sy+y-camera.y {
+		if vm.ClippingRegion.Y+vm.ClippingRegion.H <= sy+y-vm.Camera.Y {
 			continue
 		}
 
-		offset := scrWidth*y + sx + sy*scrWidth - camera.y*scrWidth - camera.x
+		offset := vm.ScreenWidth*y + sx + sy*vm.ScreenWidth - vm.Camera.Y*vm.ScreenWidth - vm.Camera.X
 		line := f.Data[index+y]
 		for bit := 0; bit < 8; bit++ {
-			if clippingRegion.x > sx+bit-camera.x {
+			if vm.ClippingRegion.X > sx+bit-vm.Camera.X {
 				continue
 			}
-			if clippingRegion.x+clippingRegion.w <= sx+bit-camera.x {
+			if vm.ClippingRegion.X+vm.ClippingRegion.W <= sx+bit-vm.Camera.X {
 				continue
 			}
 			if line&(1<<bit) == 1<<bit {
-				ScreenData[offset+bit] = color
+				vm.ScreenData[offset+bit] = color
 			}
 		}
 	}
@@ -135,7 +113,7 @@ func loadCustomFont(resources fs.ReadFileFS) error {
 		return fmt.Errorf("error loading custom-font.png file: %w", err)
 	}
 
-	return LoadFontData(fileContents, CustomFont.Data[:])
+	return LoadFontData(fileContents, vm.CustomFont.Data[:])
 }
 
 // Print prints text on the screen using system font. It takes into consideration
@@ -147,5 +125,11 @@ func loadCustomFont(resources fs.ReadFileFS) error {
 //
 // Print returns the right-most x position that occurred while printing.
 func Print(text string, x, y int, color byte) (rightMostX int) {
-	return systemFont.Print(text, x, y, color)
+	return Font(vm.SystemFont).Print(text, x, y, color)
+}
+
+// PrintCustom prints text in the same way as Print, but using custom font.
+func PrintCustom(text string, x, y int, color byte) (rightMostX int) {
+	// FIXME Probably escape character should be used to switch the font instead
+	return Font(vm.CustomFont).Print(text, x, y, color)
 }

@@ -10,6 +10,8 @@ import (
 	"image/color"
 	"image/png"
 	"io"
+
+	"github.com/elgopher/pi/vm"
 )
 
 // DecodePNG decodes PNG with indexed color mode. Such image must have at most 256 colors.
@@ -39,11 +41,11 @@ func DecodePNG(reader io.Reader) (Image, error) {
 	}, nil
 }
 
-func convertPaletteToRGB(palette color.Palette) [256]RGB {
-	var p [256]RGB
+func convertPaletteToRGB(palette color.Palette) [256]vm.RGB {
+	var p [256]vm.RGB
 	for i, col := range palette {
 		r, g, b, _ := col.RGBA()
-		p[i] = RGB{R: uint8(r), G: uint8(g), B: uint8(b)}
+		p[i] = vm.RGB{R: uint8(r), G: uint8(g), B: uint8(b)}
 	}
 	return p
 }

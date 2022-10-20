@@ -4,24 +4,17 @@
 package pi
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
-
 	"github.com/elgopher/pi/internal/input"
+	"github.com/elgopher/pi/vm"
 )
 
 type MouseButton int
 
 const (
-	MouseLeft   MouseButton = 0
-	MouseMiddle MouseButton = 1
-	MouseRight  MouseButton = 2
+	MouseLeft   MouseButton = vm.MouseLeft
+	MouseMiddle MouseButton = vm.MouseMiddle
+	MouseRight  MouseButton = vm.MouseRight
 )
-
-var mapping = []ebiten.MouseButton{
-	ebiten.MouseButtonLeft,
-	ebiten.MouseButtonMiddle,
-	ebiten.MouseButtonRight,
-}
 
 // MouseBtn returns true if the mouse button is being pressed at this moment.
 func MouseBtn(b MouseButton) bool {
@@ -29,7 +22,7 @@ func MouseBtn(b MouseButton) bool {
 		return false
 	}
 
-	return ebiten.IsMouseButtonPressed(mapping[b])
+	return vm.MouseBtnDuration[b] > 0
 }
 
 // MouseBtnp returns true when the mouse button has just been pressed.
@@ -40,24 +33,10 @@ func MouseBtnp(b MouseButton) bool {
 		return false
 	}
 
-	return input.IsPressedRepeatably(mouseButtonDuration[b])
+	return input.IsPressedRepeatably(vm.MouseBtnDuration[b])
 }
 
 // MousePos returns the position of mouse in screen coordinates.
 func MousePos() (x, y int) {
-	x, y = ebiten.CursorPosition()
-	return
-}
-
-var mouseButtonDuration [3]int // left, middle, right
-
-func updateMouse() {
-	for i := 0; i < len(mapping); i++ {
-		button := mapping[i]
-		if ebiten.IsMouseButtonPressed(button) {
-			mouseButtonDuration[i] += 1
-		} else {
-			mouseButtonDuration[i] = 0
-		}
-	}
+	return vm.MousePos.X, vm.MousePos.Y
 }

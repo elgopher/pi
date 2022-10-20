@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elgopher/pi"
-	"github.com/elgopher/pi/image"
+	"github.com/elgopher/pi/vm"
 )
 
 func TestBoot(t *testing.T) {
@@ -76,22 +76,22 @@ func TestBoot(t *testing.T) {
 		err := pi.Boot()
 		// then
 		require.NoError(t, err)
-		assert.Equal(t, make([]byte, 6), pi.ScreenData)
+		assert.Equal(t, make([]byte, 6), vm.ScreenData)
 	})
 
 	t.Run("should use custom size sprite sheet when sprite-sheet.png was not found in resources", func(t *testing.T) {
 		pi.Reset()
 		pi.SpriteSheetWidth = 16
 		pi.SpriteSheetHeight = 8
-		allBlacks := [256]image.RGB{}
+		allBlacks := [256]vm.RGB{}
 		pi.Palette = allBlacks
 		// when
 		err := pi.Boot()
 		// then
 		require.NoError(t, err)
 		expectedSpriteSheetData := make([]byte, 16*8)
-		assert.Equal(t, expectedSpriteSheetData, pi.SpriteSheetData)
-		assert.Equal(t, allBlacks, pi.Palette)
+		assert.Equal(t, expectedSpriteSheetData, vm.SpriteSheetData)
+		assert.Equal(t, allBlacks, vm.Palette)
 	})
 
 	t.Run("should load sprite-sheet.png", func(t *testing.T) {
@@ -106,8 +106,8 @@ func TestBoot(t *testing.T) {
 		assert.Equal(t, 16, pi.SpriteSheetWidth)
 		assert.Equal(t, 16, pi.SpriteSheetHeight)
 		img := decodePNG(t, "internal/testimage/sprite-sheet-16x16.png")
-		assert.Equal(t, img.Pixels, pi.SpriteSheetData)
-		assert.Equal(t, img.Palette, pi.Palette)
+		assert.Equal(t, img.Pixels, vm.SpriteSheetData)
+		assert.Equal(t, img.Palette, vm.Palette)
 	})
 
 	t.Run("should load custom-font.png", func(t *testing.T) {
@@ -119,7 +119,7 @@ func TestBoot(t *testing.T) {
 		err := pi.Boot()
 		// then
 		require.NoError(t, err)
-		assert.Equal(t, uint8(0xf), pi.CustomFont.Data[0])
+		assert.Equal(t, uint8(0xf), vm.CustomFont.Data[0])
 	})
 
 	t.Run("should reset draw state", func(t *testing.T) {

@@ -21,87 +21,85 @@ import (
 	"strconv"
 	"unicode"
 
-	"github.com/hajimehoshi/ebiten/v2"
-
-	"github.com/elgopher/pi/internal/gameloop"
 	"github.com/elgopher/pi/internal/input"
+	"github.com/elgopher/pi/vm"
 )
 
 type Button int
 
 const (
-	Shift        Button = 1
-	Ctrl         Button = 3
-	Alt          Button = 5 // Please note that on some keyboard layouts on Windows the right alt is a combination of Ctrl+Alt
-	Cap          Button = 7
-	Back         Button = '\b' // 8
-	Tab          Button = '\t' // 9
-	Enter        Button = '\n' // 10
-	F1           Button = 11
-	F2           Button = 12
-	F3           Button = 13
-	F4           Button = 14
-	F5           Button = 15
-	F6           Button = 16
-	F7           Button = 17
-	F8           Button = 18
-	F9           Button = 19
-	F10          Button = 20
-	F11          Button = 21
-	F12          Button = 22
-	Left         Button = 23
-	Right        Button = 24
-	Up           Button = 25
-	Down         Button = 26
-	Esc          Button = 27
-	Space        Button = ' '  // 32
-	Apostrophe   Button = '\'' // 39
-	Comma        Button = ','  // 44
-	Minus        Button = '-'  // 45
-	Period       Button = '.'  // 46
-	Slash        Button = '/'  // 47
-	Digit0       Button = '0'  // 48
-	Digit1       Button = '1'  // 49
-	Digit2       Button = '2'  // 50
-	Digit3       Button = '3'  // 51
-	Digit4       Button = '4'  // 52
-	Digit5       Button = '5'  // 53
-	Digit6       Button = '6'  // 54
-	Digit7       Button = '7'  // 55
-	Digit8       Button = '8'  // 56
-	Digit9       Button = '9'  // 57
-	Semicolon    Button = ';'  // 59
-	Equal        Button = '='  // 61
-	A            Button = 'A'  // 65
-	B            Button = 'B'  // 66
-	C            Button = 'C'  // 67
-	D            Button = 'D'  // 68
-	E            Button = 'E'  // 69
-	F            Button = 'F'  // 70
-	G            Button = 'G'  // 71
-	H            Button = 'H'  // 72
-	I            Button = 'I'  // 73
-	J            Button = 'J'  // 74
-	K            Button = 'K'  // 75
-	L            Button = 'L'  // 76
-	M            Button = 'M'  // 77
-	N            Button = 'N'  // 78
-	O            Button = 'O'  // 79
-	P            Button = 'P'  // 80
-	Q            Button = 'Q'  // 81
-	R            Button = 'R'  // 82
-	S            Button = 'S'  // 83
-	T            Button = 'T'  // 84
-	U            Button = 'U'  // 85
-	V            Button = 'V'  // 86
-	W            Button = 'W'  // 87
-	X            Button = 'X'  // 88
-	Y            Button = 'Y'  // 89
-	Z            Button = 'Z'  // 90
-	BracketLeft  Button = '['  // 91
-	Backslash    Button = '\\' // 92
-	BracketRight Button = ']'  // 93
-	Backquote    Button = '`'  // 96
+	Shift        Button = vm.KeyShift
+	Ctrl         Button = vm.KeyCtrl
+	Alt          Button = vm.KeyAlt // Please note that on some keyboard layouts on Windows the right alt is a combination of Ctrl+Alt
+	Cap          Button = vm.KeyCap
+	Back         Button = vm.KeyBack
+	Tab          Button = vm.KeyTab
+	Enter        Button = vm.KeyEnter
+	F1           Button = vm.KeyF1
+	F2           Button = vm.KeyF2
+	F3           Button = vm.KeyF3
+	F4           Button = vm.KeyF4
+	F5           Button = vm.KeyF5
+	F6           Button = vm.KeyF6
+	F7           Button = vm.KeyF7
+	F8           Button = vm.KeyF8
+	F9           Button = vm.KeyF9
+	F10          Button = vm.KeyF10
+	F11          Button = vm.KeyF11
+	F12          Button = vm.KeyF12
+	Left         Button = vm.KeyLeft
+	Right        Button = vm.KeyRight
+	Up           Button = vm.KeyUp
+	Down         Button = vm.KeyDown
+	Esc          Button = vm.KeyEsc
+	Space        Button = vm.KeySpace
+	Apostrophe   Button = vm.KeyApostrophe
+	Comma        Button = vm.KeyComma
+	Minus        Button = vm.KeyMinus
+	Period       Button = vm.KeyPeriod
+	Slash        Button = vm.KeySlash
+	Digit0       Button = vm.KeyDigit0
+	Digit1       Button = vm.KeyDigit1
+	Digit2       Button = vm.KeyDigit2
+	Digit3       Button = vm.KeyDigit3
+	Digit4       Button = vm.KeyDigit4
+	Digit5       Button = vm.KeyDigit5
+	Digit6       Button = vm.KeyDigit6
+	Digit7       Button = vm.KeyDigit7
+	Digit8       Button = vm.KeyDigit8
+	Digit9       Button = vm.KeyDigit9
+	Semicolon    Button = vm.KeySemicolon
+	Equal        Button = vm.KeyEqual
+	A            Button = vm.KeyA
+	B            Button = vm.KeyB
+	C            Button = vm.KeyC
+	D            Button = vm.KeyD
+	E            Button = vm.KeyE
+	F            Button = vm.KeyF
+	G            Button = vm.KeyG
+	H            Button = vm.KeyH
+	I            Button = vm.KeyI
+	J            Button = vm.KeyJ
+	K            Button = vm.KeyK
+	L            Button = vm.KeyL
+	M            Button = vm.KeyM
+	N            Button = vm.KeyN
+	O            Button = vm.KeyO
+	P            Button = vm.KeyP
+	Q            Button = vm.KeyQ
+	R            Button = vm.KeyR
+	S            Button = vm.KeyS
+	T            Button = vm.KeyT
+	U            Button = vm.KeyU
+	V            Button = vm.KeyV
+	W            Button = vm.KeyW
+	X            Button = vm.KeyX
+	Y            Button = vm.KeyY
+	Z            Button = vm.KeyZ
+	BracketLeft  Button = vm.KeyBracketLeft
+	Backslash    Button = vm.KeyBackslash
+	BracketRight Button = vm.KeyBracketRight
+	Backquote    Button = vm.KeyBackquote
 )
 
 // Btn returns true if the keyboard button is being pressed at this moment.
@@ -115,13 +113,13 @@ const (
 //
 // All these calls have same effect.
 func Btn(b Button) bool {
-	return ebiten.IsKeyPressed(piToEbitengineMapping[adjustedButton(b)])
+	return vm.KeyDuration[adjustedButton(b)] > 0
 }
 
 // Btnp returns true when the keyboard button has just been pressed.
 // It also returns true after the next 15 frames, and then every 4 frames.
 func Btnp(b Button) bool {
-	return input.IsPressedRepeatably(buttonDurations[adjustedButton(b)])
+	return input.IsPressedRepeatably(vm.KeyDuration[adjustedButton(b)])
 }
 
 var specialChars = map[Button]string{
@@ -161,95 +159,4 @@ func adjustedButton(k Button) Button {
 	}
 
 	return k
-}
-
-var buttonDurations [97]int
-
-var piToEbitengineMapping = map[Button]ebiten.Key{
-	Shift:        ebiten.KeyShift,
-	Ctrl:         ebiten.KeyControl,
-	Alt:          ebiten.KeyAlt,
-	Cap:          ebiten.KeyCapsLock,
-	Back:         ebiten.KeyBackspace,
-	Tab:          ebiten.KeyTab,
-	Enter:        ebiten.KeyEnter,
-	F1:           ebiten.KeyF1,
-	F2:           ebiten.KeyF2,
-	F3:           ebiten.KeyF3,
-	F4:           ebiten.KeyF4,
-	F5:           ebiten.KeyF5,
-	F6:           ebiten.KeyF6,
-	F7:           ebiten.KeyF7,
-	F8:           ebiten.KeyF8,
-	F9:           ebiten.KeyF9,
-	F10:          ebiten.KeyF10,
-	F11:          ebiten.KeyF11,
-	F12:          ebiten.KeyF12,
-	Left:         ebiten.KeyArrowLeft,
-	Right:        ebiten.KeyArrowRight,
-	Up:           ebiten.KeyArrowUp,
-	Down:         ebiten.KeyArrowDown,
-	Esc:          ebiten.KeyEscape,
-	Space:        ebiten.KeySpace,
-	Apostrophe:   ebiten.KeyApostrophe,
-	Comma:        ebiten.KeyComma,
-	Minus:        ebiten.KeyMinus,
-	Period:       ebiten.KeyPeriod,
-	Slash:        ebiten.KeySlash,
-	Digit0:       ebiten.KeyDigit0,
-	Digit1:       ebiten.KeyDigit1,
-	Digit2:       ebiten.KeyDigit2,
-	Digit3:       ebiten.KeyDigit3,
-	Digit4:       ebiten.KeyDigit4,
-	Digit5:       ebiten.KeyDigit5,
-	Digit6:       ebiten.KeyDigit6,
-	Digit7:       ebiten.KeyDigit7,
-	Digit8:       ebiten.KeyDigit8,
-	Digit9:       ebiten.KeyDigit9,
-	Semicolon:    ebiten.KeySemicolon,
-	Equal:        ebiten.KeyEqual,
-	A:            ebiten.KeyA,
-	B:            ebiten.KeyB,
-	C:            ebiten.KeyC,
-	D:            ebiten.KeyD,
-	E:            ebiten.KeyE,
-	F:            ebiten.KeyF,
-	G:            ebiten.KeyG,
-	H:            ebiten.KeyH,
-	I:            ebiten.KeyI,
-	J:            ebiten.KeyJ,
-	K:            ebiten.KeyK,
-	L:            ebiten.KeyL,
-	M:            ebiten.KeyM,
-	N:            ebiten.KeyN,
-	O:            ebiten.KeyO,
-	P:            ebiten.KeyP,
-	Q:            ebiten.KeyQ,
-	R:            ebiten.KeyR,
-	S:            ebiten.KeyS,
-	T:            ebiten.KeyT,
-	U:            ebiten.KeyU,
-	V:            ebiten.KeyV,
-	W:            ebiten.KeyW,
-	X:            ebiten.KeyX,
-	Y:            ebiten.KeyY,
-	Z:            ebiten.KeyZ,
-	BracketLeft:  ebiten.KeyBracketLeft,
-	Backslash:    ebiten.KeyBackslash,
-	BracketRight: ebiten.KeyBracketRight,
-	Backquote:    ebiten.KeyBackquote,
-}
-
-func init() {
-	gameloop.UpdateFunctions = append(gameloop.UpdateFunctions, update)
-}
-
-func update() {
-	for button, key := range piToEbitengineMapping {
-		if ebiten.IsKeyPressed(key) {
-			buttonDurations[button]++
-		} else {
-			buttonDurations[button] = 0
-		}
-	}
 }

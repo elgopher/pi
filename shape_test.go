@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/vm"
 )
 
 func TestRectFill(t *testing.T) {
@@ -165,8 +166,8 @@ func testRect(t *testing.T, rect func(x0, y0, x1, y1 int, color byte), dir strin
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
 				rect(test.x0, test.y0, test.x1, test.y1, white)
 				// then
-				emptyScreen := make([]byte, len(pi.ScreenData))
-				assert.Equal(t, emptyScreen, pi.ScreenData)
+				emptyScreen := make([]byte, len(vm.ScreenData))
+				assert.Equal(t, emptyScreen, vm.ScreenData)
 			})
 		}
 	})
@@ -305,8 +306,8 @@ func TestLine(t *testing.T) {
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
 				pi.Line(test.x0, test.y0, test.x1, test.y1, white)
 				// then
-				emptyScreen := make([]byte, len(pi.ScreenData))
-				assert.Equal(t, emptyScreen, pi.ScreenData)
+				emptyScreen := make([]byte, len(vm.ScreenData))
+				assert.Equal(t, emptyScreen, vm.ScreenData)
 			})
 		}
 	})

@@ -15,14 +15,7 @@ import (
 	"io/fs"
 	"time"
 
-	"github.com/elgopher/pi/image"
-)
-
-const (
-	defaultSpriteSheetWidth  = 128
-	defaultSpriteSheetHeight = 128
-	defaultScreenWidth       = 128
-	defaultScreenHeight      = 128
+	"github.com/elgopher/pi/vm"
 )
 
 // User parameters. Will be used during Boot (and Run).
@@ -39,26 +32,27 @@ var (
 	// The purpose of this function is to draw on screen.
 	Draw func()
 
-	Resources fs.ReadFileFS // Resources contains files like sprite-sheet.png
-
+	// SpriteSheetWidth will be used if sprite-sheet.png was not found.
+	SpriteSheetWidth = defaultSpriteSheetWidth
+	// SpriteSheetHeight will be used if sprite-sheet.png was not found.
+	SpriteSheetHeight = defaultSpriteSheetHeight
 	// Palette has all colors available in the game. Up to 256.
 	// Palette is taken from loaded sprite sheet (which must be
 	// a PNG file with indexed color mode). If sprite-sheet.png was not
 	// found, then default 16 color palette is used.
 	//
 	// Can be freely read and updated. Changes will be visible immediately.
-	Palette [256]image.RGB = defaultPalette
-
-	// SpriteSheetWidth will be used if sprite-sheet.png was not found.
-	SpriteSheetWidth = defaultSpriteSheetWidth
-	// SpriteSheetHeight will be used if sprite-sheet.png was not found.
-	SpriteSheetHeight = defaultSpriteSheetHeight
+	Palette = defaultPalette
 
 	// ScreenWidth specifies the width of the screen (in pixels).
 	ScreenWidth = defaultScreenWidth
 	// ScreenHeight specifies the height of the screen (in pixels).
 	ScreenHeight = defaultScreenHeight
+
+	Resources fs.ReadFileFS // Resources contains files like sprite-sheet.png
 )
+
+var booted bool
 
 // Run boots the game, opens the window and run the game loop. It must be
 // called from the main thread.
@@ -75,7 +69,7 @@ func Run() error {
 		}
 	}
 
-	timeStarted = time.Now()
+	lastTime = time.Now()
 
 	return run()
 }
@@ -94,14 +88,12 @@ func Reset() {
 	Update = nil
 	Draw = nil
 	Resources = nil
-	SpriteSheetWidth = defaultSpriteSheetWidth
-	SpriteSheetHeight = defaultSpriteSheetHeight
 	ScreenWidth = defaultScreenWidth
 	ScreenHeight = defaultScreenHeight
+	SpriteSheetWidth = defaultSpriteSheetWidth
+	SpriteSheetHeight = defaultSpriteSheetHeight
 	Palette = defaultPalette
 }
-
-var booted bool
 
 // Boot initializes the engine based on user parameters such as ScreenWidth and ScreenHeight.
 // It loads the resources like sprite-sheet.png.
@@ -117,7 +109,7 @@ func Boot() error {
 		return err
 	}
 
-	if err := LoadFontData(systemFontPNG, systemFont.Data[:]); err != nil {
+	if err := LoadFontData(systemFontPNG, vm.SystemFont.Data[:]); err != nil {
 		return err
 	}
 
@@ -129,23 +121,24 @@ func Boot() error {
 		return err
 	}
 
-	ssWidth = SpriteSheetWidth
-	ssHeight = SpriteSheetHeight
-	numberOfSprites = (ssWidth * ssHeight) / (SpriteWidth * SpriteHeight)
+	numberOfSprites = (vm.SpriteSheetWidth * vm.SpriteSheetHeight) / (SpriteWidth * SpriteHeight)
 
-	spritesInLine = ssWidth / SpriteWidth
+	spritesInLine = vm.SpriteSheetWidth / SpriteWidth
 
-	scrWidth = ScreenWidth
-	scrHeight = ScreenHeight
-	screenSize := scrWidth * scrHeight
-	ScreenData = make([]byte, screenSize)
+	vm.ScreenWidth = ScreenWidth
+	vm.ScreenHeight = ScreenHeight
+	screenSize := vm.ScreenWidth * vm.ScreenHeight
+	vm.ScreenData = make([]byte, screenSize)
 	zeroScreenData = make([]byte, screenSize)
-	lineOfScreenWidth = make([]byte, scrWidth)
+	lineOfScreenWidth = make([]byte, vm.ScreenWidth)
 
 	ClipReset()
 	CameraReset()
 	PaltReset()
 	PalReset()
+
+	vm.Update = Update
+	vm.Draw = Draw
 
 	booted = true
 
@@ -164,7 +157,7 @@ func validateUserParameters() error {
 		return fmt.Errorf("screen width %d is not greather than 0", ScreenWidth)
 	}
 	if ScreenHeight <= 0 {
-		return fmt.Errorf("screen height %d is not greather than 0", ScreenWidth)
+		return fmt.Errorf("screen height %d is not greather than 0", ScreenHeight)
 	}
 
 	return nil
@@ -191,11 +184,16 @@ func MustBoot() {
 	}
 }
 
-var gameLoopStopped bool
-
 // Stop will stop the game loop after Update is finished, but before Draw.
 // For now the entire app will be closed, but later it will show a dev console instead,
 // where developer will be able to resume the game.
 func Stop() {
-	gameLoopStopped = true
+	vm.GameLoopStopped = true
+}
+
+// Time returns the amount of time since game was run, as a (fractional) number of seconds.
+//
+// Calling Time() multiple times in the same frame will always return the same result.
+func Time() float64 {
+	return vm.TimeSeconds
 }
