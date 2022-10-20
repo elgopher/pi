@@ -110,6 +110,18 @@ func TestBoot(t *testing.T) {
 		assert.Equal(t, img.Palette, pi.Palette)
 	})
 
+	t.Run("should load custom-font.png", func(t *testing.T) {
+		pi.Reset()
+		pi.Resources = fstest.MapFS{
+			"custom-font.png": &fstest.MapFile{Data: customFontPng},
+		}
+		// when
+		err := pi.Boot()
+		// then
+		require.NoError(t, err)
+		assert.Equal(t, uint8(0xf), pi.CustomFont.Data[0])
+	})
+
 	t.Run("should reset draw state", func(t *testing.T) {
 		pi.Reset()
 		require.NoError(t, pi.Boot())

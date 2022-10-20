@@ -117,7 +117,7 @@ func Boot() error {
 		return err
 	}
 
-	if err := loadFontData(systemFontPNG, systemFont.Data[:]); err != nil {
+	if err := LoadFontData(systemFontPNG, systemFont.Data[:]); err != nil {
 		return err
 	}
 
@@ -172,6 +172,10 @@ func validateUserParameters() error {
 
 func loadResources(resources fs.ReadFileFS) error {
 	if err := loadSpriteSheet(resources); err != nil {
+		return err
+	}
+
+	if err := loadCustomFont(resources); err != nil {
 		return err
 	}
 
