@@ -5,6 +5,7 @@ import (
 	"embed"
 
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/ebitengine"
 	"github.com/elgopher/pi/vm"
 )
 
@@ -18,5 +19,5 @@ func main() {
 		pi.Print("HELLO,\nMY NAME IS", 45, 58, 9) // print two lines of yellow text using system font
 		pi.PrintCustom("PI\u0082", 45, 70, 12)    // print blue text with special character using custom font
 	}
-	pi.MustRun()
+	pi.MustRun(ebitengine.Backend)
 }

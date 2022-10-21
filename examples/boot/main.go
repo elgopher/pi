@@ -3,10 +3,11 @@ package main
 
 import (
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/ebitengine"
 )
 
 func main() {
-	// set low-level stuff, such as screen resolution:
+	// set screen resolution:
 	pi.ScreenWidth = 44
 	pi.ScreenHeight = 44
 
@@ -17,6 +18,6 @@ func main() {
 	pi.Print("TINY SCREEN", 0, 18, 7) // print text on the screen before game loop
 
 	// Run the game loop.
-	pi.MustRun()
-	// Update and Draw functions were not set therefore screen will be fixed.
+	pi.MustRun(ebitengine.Backend)
+	// Update and Draw functions were not set therefore screen will not be changed.
 }

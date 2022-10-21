@@ -13,7 +13,6 @@ import (
 	_ "embed"
 	"fmt"
 	"io/fs"
-	"time"
 
 	"github.com/elgopher/pi/vm"
 )
@@ -54,31 +53,31 @@ var (
 
 var booted bool
 
-// Run boots the game, opens the window and run the game loop. It must be
-// called from the main thread.
+// Run boots the game and runs the game loop using specified backend. For ebitengine
+// backend it must be called from the main thread, for example:
+//
+//	err := Run(ebitengine.Backend)
 //
 // Run does not boot the game once the game has been booted. Thanks to this,
 // the user can call Boot directly and draw to the screen
 // before the game loop starts.
 //
 // It returns error when something terrible happened during initialization.
-func Run() error {
+func Run(runBackend func() error) error {
 	if !booted {
 		if err := Boot(); err != nil {
 			return fmt.Errorf("booting game failed: %w", err)
 		}
 	}
 
-	lastTime = time.Now()
-
-	return run()
+	return runBackend()
 }
 
 // MustRun does the same as Run, but panics instead of returning an error.
 //
 // Useful for writing unit tests and quick and dirty prototypes. Do not use on production ;)
-func MustRun() {
-	if err := Run(); err != nil {
+func MustRun(runBackend func() error) {
+	if err := Run(runBackend); err != nil {
 		panic(fmt.Sprintf("Something terrible happened! Pi cannot be run: %v\n", err))
 	}
 }

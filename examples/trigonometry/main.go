@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/ebitengine"
 )
 
 var start float64
@@ -20,7 +21,7 @@ func main() {
 		draw(96, 11, pi.Cos)
 
 	}
-	pi.MustRun()
+	pi.MustRun(ebitengine.Backend)
 }
 
 func draw(line int, color byte, f func(x float64) float64) {
