@@ -1,7 +1,7 @@
 // (c) 2022 Jacek Olszak
 // This code is licensed under MIT license (see LICENSE for details)
 
-package pi_test
+package state_test
 
 import (
 	"errors"
@@ -11,17 +11,17 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elgopher/pi"
-	"github.com/elgopher/pi/internal/state"
+	"github.com/elgopher/pi/state"
+	"github.com/elgopher/pi/state/internal"
 )
 
 const stateName = "stateName"
 
 func TestStateSave(t *testing.T) {
-	t.Cleanup(state.Cleanup)
+	t.Cleanup(internal.Cleanup)
 
 	testStateName(t, func(name string) error {
-		return pi.StateSave(name, "")
+		return state.Save(name, "")
 	})
 
 	t.Run("should store data", func(t *testing.T) {
@@ -33,15 +33,15 @@ func TestStateSave(t *testing.T) {
 	})
 
 	t.Run("should not panic when trying to store 10MB", func(t *testing.T) {
-		t.Cleanup(state.Cleanup)
+		t.Cleanup(internal.Cleanup)
 		assert.NotPanics(t, func() {
-			_ = pi.StateSave("too-big", strings.Repeat(" ", 10*1024*1024))
+			_ = state.Save("too-big", strings.Repeat(" ", 10*1024*1024))
 		})
 	})
 
 	t.Run("should return error when trying to save unmarshalable struct", func(t *testing.T) {
-		err := pi.StateSave("unmarshalable", unmarshalableStruct{})
-		assert.ErrorIs(t, err, pi.ErrStateMarshalFailed)
+		err := state.Save("unmarshalable", unmarshalableStruct{})
+		assert.ErrorIs(t, err, state.ErrStateMarshalFailed)
 	})
 }
 
@@ -54,92 +54,92 @@ func (s unmarshalableStruct) MarshalJSON() ([]byte, error) {
 func testStateSave[T any](t *testing.T, testName string, expected T) {
 	t.Run(testName, func(t *testing.T) {
 		// when
-		require.NoError(t, pi.StateSave(stateName, expected))
+		require.NoError(t, state.Save(stateName, expected))
 		// then
 		var actual T
-		require.NoError(t, pi.StateLoad(stateName, &actual))
+		require.NoError(t, state.Load(stateName, &actual))
 		assert.Equal(t, expected, actual)
 	})
 }
 
 func TestStateDelete(t *testing.T) {
-	t.Cleanup(state.Cleanup)
+	t.Cleanup(internal.Cleanup)
 
-	testStateName(t, pi.StateDelete)
+	testStateName(t, state.Delete)
 
 	t.Run("should permanently delete state", func(t *testing.T) {
-		require.NoError(t, pi.StateSave(stateName, "value"))
+		require.NoError(t, state.Save(stateName, "value"))
 		// when
-		err := pi.StateDelete(stateName)
+		err := state.Delete(stateName)
 		// then
 		require.NoError(t, err)
 		var out string
-		err = pi.StateLoad(stateName, &out)
-		assert.ErrorIs(t, err, pi.ErrStateNotFound)
+		err = state.Load(stateName, &out)
+		assert.ErrorIs(t, err, state.ErrNotFound)
 	})
 
 	t.Run("should not return error when state is not found", func(t *testing.T) {
-		err := pi.StateDelete("missing")
+		err := state.Delete("missing")
 		assert.NoError(t, err)
 	})
 }
 
 func TestStateLoad(t *testing.T) {
-	t.Cleanup(state.Cleanup)
+	t.Cleanup(internal.Cleanup)
 
 	testStateName(t, func(name string) error {
-		_ = pi.StateSave(name, "")
+		_ = state.Save(name, "")
 		var out string
-		return pi.StateLoad(name, &out)
+		return state.Load(name, &out)
 	})
 
 	t.Run("should return error when state does not exist", func(t *testing.T) {
 		var out string
-		err := pi.StateLoad("missing", &out)
-		assert.ErrorIs(t, err, pi.ErrStateNotFound)
+		err := state.Load("missing", &out)
+		assert.ErrorIs(t, err, state.ErrNotFound)
 	})
 
 	t.Run("should return error when out is nil", func(t *testing.T) {
-		require.NoError(t, pi.StateSave(stateName, ""))
+		require.NoError(t, state.Save(stateName, ""))
 		var nilOut *string
-		err := pi.StateLoad(stateName, nilOut)
-		assert.ErrorIs(t, err, pi.ErrNilStateOutput)
+		err := state.Load(stateName, nilOut)
+		assert.ErrorIs(t, err, state.ErrNilStateOutput)
 	})
 
 	t.Run("should return error for incompatible types", func(t *testing.T) {
 		str := ""
-		require.NoError(t, pi.StateSave(stateName, str))
+		require.NoError(t, state.Save(stateName, str))
 		var number int
-		err := pi.StateLoad(stateName, &number)
-		assert.ErrorIs(t, err, pi.ErrStateUnmarshalFailed)
+		err := state.Load(stateName, &number)
+		assert.ErrorIs(t, err, state.ErrStateUnmarshalFailed)
 	})
 
 	t.Run("should not return error when types are different but compatible", func(t *testing.T) {
 		float := 1.0
-		require.NoError(t, pi.StateSave(stateName, float))
+		require.NoError(t, state.Save(stateName, float))
 		var integer int
-		err := pi.StateLoad(stateName, &integer)
+		err := state.Load(stateName, &integer)
 		require.NoError(t, err)
 		assert.Equal(t, 1, integer)
 	})
 }
 
 func TestStates(t *testing.T) {
-	t.Cleanup(state.Cleanup)
+	t.Cleanup(internal.Cleanup)
 
 	t.Run("should return empty states", func(t *testing.T) {
-		state.Cleanup()
+		internal.Cleanup()
 
-		states, err := pi.States()
+		states, err := state.All()
 		require.NoError(t, err)
 
 		assert.Empty(t, states)
 	})
 
 	t.Run("should return previously stored states", func(t *testing.T) {
-		require.NoError(t, pi.StateSave("state1", "1"))
-		require.NoError(t, pi.StateSave("state2", "2"))
-		states, err := pi.States()
+		require.NoError(t, state.Save("state1", "1"))
+		require.NoError(t, state.Save("state2", "2"))
+		states, err := state.All()
 		require.NoError(t, err)
 		assert.ElementsMatch(t, states, []string{"state1", "state2"})
 	})
@@ -151,7 +151,7 @@ func testStateName(t *testing.T, f func(name string) error) {
 		for _, name := range invalidNames {
 			t.Run(name, func(t *testing.T) {
 				err := f(name)
-				assert.ErrorIs(t, err, pi.ErrInvalidStateName)
+				assert.ErrorIs(t, err, state.ErrInvalidStateName)
 			})
 		}
 	})
