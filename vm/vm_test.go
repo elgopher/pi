@@ -14,8 +14,10 @@ import (
 func TestRGB_String(t *testing.T) {
 	tests := map[string]vm.RGB{
 		"#000000": {},
-		"#010203": {1, 2, 3},
-		"#102030": {0x10, 0x20, 0x30},
+		"#FFFFFF": {0xFF, 0xFF, 0xFF},
+		"#012345": {0x01, 0x23, 0x45},
+		"#6789AB": {0x67, 0x89, 0xAB},
+		"#CDEF01": {0xCD, 0xEF, 0x01},
 	}
 
 	for expected, rgb := range tests {

@@ -3,10 +3,6 @@
 
 package vm
 
-import (
-	"fmt"
-)
-
 var (
 	// Palette has all colors available in the game. Up to 256.
 	// Palette is taken from loaded sprite sheet (which must be
@@ -26,6 +22,23 @@ var (
 type RGB struct{ R, G, B byte }
 
 func (r RGB) String() string {
-	var rgb = int(r.R)<<16 + int(r.G)<<8 + int(r.B)
-	return fmt.Sprintf("#%.6x", rgb) // avoid dependency on fmt inside the entire package
+	out := make([]byte, 7)
+	out[0] = '#'
+	writeByteAsHex(r.R, out[1:3])
+	writeByteAsHex(r.G, out[3:5])
+	writeByteAsHex(r.B, out[5:7])
+	return string(out)
+}
+
+func writeByteAsHex(number byte, out []byte) {
+	out[0] = ascii(number / 16)
+	out[1] = ascii(number % 16)
+}
+
+func ascii(digit byte) byte {
+	const asciiA, ascii0 = 65, 48
+	if digit > 9 {
+		return asciiA + digit - 10
+	}
+	return ascii0 + digit
 }
