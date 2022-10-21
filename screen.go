@@ -4,13 +4,6 @@
 package pi
 
 import (
-	"fmt"
-	"image"
-	stdcolor "image/color"
-	"image/png"
-	"os"
-	"runtime"
-
 	"github.com/elgopher/pi/vm"
 )
 
@@ -288,40 +281,4 @@ func init() {
 func PalReset() {
 	vm.DrawPalette = notSwappedPalette
 	vm.DisplayPalette = notSwappedPalette
-}
-
-// Snap takes a screenshot and saves it to temp dir.
-//
-// Snap returns a filename. If something went wrong error is returned.
-func Snap() (string, error) {
-	if runtime.GOOS == "js" {
-		return "", fmt.Errorf("storing files does not work on js")
-	}
-
-	var palette stdcolor.Palette
-	for _, col := range vm.DisplayPalette {
-		rgb := vm.Palette[col]
-		rgba := &stdcolor.NRGBA{R: rgb.R, G: rgb.G, B: rgb.B, A: 255}
-		palette = append(palette, rgba)
-	}
-
-	size := image.Rectangle{Max: image.Point{X: vm.ScreenWidth, Y: vm.ScreenHeight}}
-	img := image.NewPaletted(size, palette)
-
-	copy(img.Pix, vm.ScreenData)
-
-	file, err := os.CreateTemp("", "pi-screenshot")
-	if err != nil {
-		return "", fmt.Errorf("error creating temp file for screenshot: %w", err)
-	}
-
-	if err = png.Encode(file, img); err != nil {
-		return "", fmt.Errorf("error encoding screenshot into PNG file: %w", err)
-	}
-
-	if err = file.Close(); err != nil {
-		return "", fmt.Errorf("error closing file: %w", err)
-	}
-
-	return file.Name(), nil
 }
