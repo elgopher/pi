@@ -6,6 +6,7 @@ import (
 	"math/rand"
 
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/ebitengine"
 	"github.com/elgopher/pi/vm"
 )
 
@@ -17,5 +18,5 @@ func main() {
 		}
 	}
 
-	pi.MustRun()
+	pi.MustRun(ebitengine.Backend)
 }

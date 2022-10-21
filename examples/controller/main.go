@@ -5,6 +5,7 @@ import (
 	"embed"
 
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/ebitengine"
 )
 
 //go:embed sprite-sheet.png
@@ -34,7 +35,7 @@ func main() {
 		drawPlayerController(2, 67, 20)
 		drawPlayerController(3, 67, 70)
 	}
-	pi.MustRun()
+	pi.MustRun(ebitengine.Backend)
 }
 
 func drawPlayerController(player, x, y int) {

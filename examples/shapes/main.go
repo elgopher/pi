@@ -7,6 +7,7 @@ import (
 	"math"
 
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/ebitengine"
 )
 
 //go:embed sprite-sheet.png
@@ -91,7 +92,7 @@ func main() {
 		drawMousePointer()
 	}
 
-	pi.MustRun()
+	pi.MustRun(ebitengine.Backend)
 }
 
 func drawMousePointer() {

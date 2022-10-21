@@ -4,6 +4,7 @@ package main
 
 import (
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/ebitengine"
 	"github.com/elgopher/pi/key"
 )
 
@@ -12,7 +13,7 @@ func main() {
 		pi.Cls()
 		drawKeyboard(6, 34)
 	}
-	pi.MustRun()
+	pi.MustRun(ebitengine.Backend)
 }
 
 func drawKeyboard(x, y int) {

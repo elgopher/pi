@@ -6,6 +6,7 @@ import (
 	"embed"
 
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/ebitengine"
 )
 
 //go:embed sprite-sheet.png
@@ -58,5 +59,5 @@ func draw() {
 func main() {
 	pi.Resources = resources
 	pi.Draw = draw
-	pi.MustRun()
+	pi.MustRun(ebitengine.Backend)
 }
