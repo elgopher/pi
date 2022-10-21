@@ -3,7 +3,7 @@
 
 //go:build !js
 
-package state
+package internal
 
 import (
 	"errors"

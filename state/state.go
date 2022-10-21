@@ -1,7 +1,7 @@
 // (c) 2022 Jacek Olszak
 // This code is licensed under MIT license (see LICENSE for details)
 
-package pi
+package state
 
 import (
 	"encoding/json"
@@ -9,28 +9,28 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elgopher/pi/internal/state"
+	"github.com/elgopher/pi/state/internal"
 )
 
 var (
-	ErrStateNotFound        = errors.New("state not found")    // ErrStateNotFound is an expected error which is returned when state is not stored.
+	ErrNotFound             = errors.New("state not found")    // ErrNotFound is an expected error which is returned when state is not stored.
 	ErrInvalidStateName     = errors.New("invalid state name") // ErrInvalidStateName is a programmer error which is returned when state name is invalid.
 	ErrNilStateOutput       = errors.New("nil state output")   // ErrNilStateOutput is a programmer error which is returned when output is nil.
 	ErrStateUnmarshalFailed = errors.New("state unmarshal failed")
 	ErrStateMarshalFailed   = errors.New("state marshal failed")
 )
 
-// StateLoad reads the persistent game data with specified name. Data will be stored in out param.
-// The type of out should be compatible with type used during StateSave. For example, trying to load
+// Load reads the persistent game data with specified name. Data will be stored in out param.
+// The type of out should be compatible with type used during Save. For example, trying to load
 // stored string into an int will return the ErrStateUnmarshalFailed.
 //
-// ErrStateNotFound error is returned when state does not exist. Please check the error with
+// ErrNotFound error is returned when state does not exist. Please check the error with
 // following code:
 //
-//	if errors.Is(err, pi.ErrStateNotFound) { ... }
+//	if errors.Is(err, pi.ErrNotFound) { ... }
 //
 // ErrNilStateOutput is returned when out is nil.
-func StateLoad[T any](name string, out *T) error {
+func Load[T any](name string, out *T) error {
 	if err := validateStateName(name); err != nil {
 		return err
 	}
@@ -39,10 +39,10 @@ func StateLoad[T any](name string, out *T) error {
 		return ErrNilStateOutput
 	}
 
-	str, err := state.Load(name)
+	str, err := internal.Load(name)
 	if err != nil {
-		if errors.Is(err, state.ErrNotFound) {
-			return ErrStateNotFound
+		if errors.Is(err, internal.ErrNotFound) {
+			return ErrNotFound
 		}
 		return fmt.Errorf("error loading persistent data for name %s: %w", name, err)
 	}
@@ -55,7 +55,7 @@ func StateLoad[T any](name string, out *T) error {
 	return nil
 }
 
-// StateSave permanently stores the data with given name. Data could be loaded using StateLoad after restarting the game.
+// Save permanently stores the data with given name. Data could be loaded using Load after restarting the game.
 // Data can be of any type: string, int, time.Time, slice, map or a struct. Only struct public fields will be stored.
 //
 // Please note that on some platforms there are limits for how much data could be stored.
@@ -73,7 +73,7 @@ func StateLoad[T any](name string, out *T) error {
 // in case the game/OS crashes or during power loss.
 //
 // Name cannot be empty, have characters "/", "\", or by longer than 32 characters
-func StateSave(name string, data any) error {
+func Save(name string, data any) error {
 	if err := validateStateName(name); err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func StateSave(name string, data any) error {
 		return fmt.Errorf("%w for state %s: %s", ErrStateMarshalFailed, name, err.Error())
 	}
 
-	if err = state.Save(name, string(bytes)); err != nil {
+	if err = internal.Save(name, string(bytes)); err != nil {
 		return fmt.Errorf("error saving state for %s: %w", name, err)
 	}
 
@@ -107,16 +107,16 @@ func validateStateName(name string) error {
 	return nil
 }
 
-// StateDelete permanently deletes data with given name.
-func StateDelete(name string) error {
+// Delete permanently deletes data with given name.
+func Delete(name string) error {
 	if err := validateStateName(name); err != nil {
 		return err
 	}
 
-	return state.Delete(name)
+	return internal.Delete(name)
 }
 
-// States returns names of all states.
-func States() ([]string, error) {
-	return state.Names()
+// All returns names of all states.
+func All() ([]string, error) {
+	return internal.Names()
 }
