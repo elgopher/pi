@@ -19,7 +19,7 @@ It's a game that resembles old 8-bit/16-bit games. This usually means:
 * (extremely) Low resolution (like 128x128 pixels)
 * Limited number of colors (like 16)
 * Very small number of assets (like 256 sprites, map having up to 8K tiles)
-* Simple rules (opposite to Paradox grand strategy games)
+* Small number lines of code (thousands rather than millions)
 * Sound effects and music made using predefined synth instruments and effects 
 
 ### What similarities does Pi have with Pico-8?
