@@ -9,18 +9,6 @@ import (
 	"github.com/elgopher/pi/state"
 )
 
-// Savegame is a struct which will be stored permanently.
-// Please note that all fields to be stored must be public.
-type Savegame struct {
-	// headers
-	Version int
-	Date    time.Time
-
-	// payload
-	PlayerPosX int
-	PlayerPosY int
-}
-
 func main() {
 	var err error
 	var lang string
@@ -72,4 +60,16 @@ func main() {
 			panic(err)
 		}
 	}
+}
+
+// Savegame is a struct which will be stored permanently.
+// Please note that all fields to be stored must be public.
+type Savegame struct {
+	// headers
+	Version int
+	Date    time.Time
+
+	// payload
+	PlayerPosX int
+	PlayerPosY int
 }

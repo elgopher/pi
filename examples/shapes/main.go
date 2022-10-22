@@ -10,54 +10,52 @@ import (
 	"github.com/elgopher/pi/ebitengine"
 )
 
-//go:embed sprite-sheet.png
-var resources embed.FS
-
-var drawShape func(x0, y0, x1, y1 int)
-
 const (
 	shapeColor = 15
 	textColor  = 2
 )
 
-var drawFunctions = []func(x0, y0, x1, y1 int){
-	func(x0, y0, x1, y1 int) {
-		pi.Rect(x0, y0, x1, y1, shapeColor)
-		command := fmt.Sprintf("Rect(%d,%d,%d,%d,%d)", x0, y0, x1, y1, shapeColor)
-		printCmd(command)
-	},
-	func(x0, y0, x1, y1 int) {
-		pi.RectFill(x0, y0, x1, y1, shapeColor)
-		command := fmt.Sprintf("RectFill(%d,%d,%d,%d,%d)", x0, y0, x1, y1, shapeColor)
-		printCmd(command)
-	},
-	func(x0, y0, x1, y1 int) {
-		pi.Line(x0, y0, x1, y1, shapeColor)
-		command := fmt.Sprintf("Line(%d,%d,%d,%d,%d)", x0, y0, x1, y1, shapeColor)
-		printCmd(command)
-	},
-	func(x0, y0, x1, y1 int) {
-		r := radius(x0, y0, x1, y1)
-		pi.Circ(x0, y0, r, shapeColor)
+var (
+	//go:embed sprite-sheet.png
+	resources embed.FS
 
-		command := fmt.Sprintf("Circ(%d,%d,%d,%d)", x0, y0, r, shapeColor)
-		printCmd(command)
-	},
-	func(x0, y0, x1, y1 int) {
-		r := radius(x0, y0, x1, y1)
-		pi.CircFill(x0, y0, r, shapeColor)
-		command := fmt.Sprintf("CircFill(%d,%d,%d,%d)", x0, y0, r, shapeColor)
-		printCmd(command)
-	},
-}
+	drawShape func(x0, y0, x1, y1 int)
 
-func printCmd(command string) {
-	pi.Print(command, 8, 128-6-6, textColor)
-}
+	drawFunctions = []func(x0, y0, x1, y1 int){
+		func(x0, y0, x1, y1 int) {
+			pi.Rect(x0, y0, x1, y1, shapeColor)
+			command := fmt.Sprintf("Rect(%d,%d,%d,%d,%d)", x0, y0, x1, y1, shapeColor)
+			printCmd(command)
+		},
+		func(x0, y0, x1, y1 int) {
+			pi.RectFill(x0, y0, x1, y1, shapeColor)
+			command := fmt.Sprintf("RectFill(%d,%d,%d,%d,%d)", x0, y0, x1, y1, shapeColor)
+			printCmd(command)
+		},
+		func(x0, y0, x1, y1 int) {
+			pi.Line(x0, y0, x1, y1, shapeColor)
+			command := fmt.Sprintf("Line(%d,%d,%d,%d,%d)", x0, y0, x1, y1, shapeColor)
+			printCmd(command)
+		},
+		func(x0, y0, x1, y1 int) {
+			r := radius(x0, y0, x1, y1)
+			pi.Circ(x0, y0, r, shapeColor)
 
-var current = 0
+			command := fmt.Sprintf("Circ(%d,%d,%d,%d)", x0, y0, r, shapeColor)
+			printCmd(command)
+		},
+		func(x0, y0, x1, y1 int) {
+			r := radius(x0, y0, x1, y1)
+			pi.CircFill(x0, y0, r, shapeColor)
+			command := fmt.Sprintf("CircFill(%d,%d,%d,%d)", x0, y0, r, shapeColor)
+			printCmd(command)
+		},
+	}
 
-var x0, y0 int
+	current = 0
+
+	x0, y0 int
+)
 
 func main() {
 	pi.Resources = resources
@@ -104,4 +102,8 @@ func radius(x0, y0, x1, y1 int) int {
 	dx := math.Abs(float64(x0 - x1))
 	dy := math.Abs(float64(y0 - y1))
 	return int(math.Max(dx, dy))
+}
+
+func printCmd(command string) {
+	pi.Print(command, 8, 128-6-6, textColor)
 }
