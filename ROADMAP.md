@@ -42,7 +42,7 @@
 * [ ] Documentation
     * [ ] Go docs
 * [ ] Support for different platforms
-  * [x] Windows, Linux, MacOS
+  * [x] Windows, Linux, macOS
   * [x] Web browsers (WASM)
   * [ ] Android, IOS, Switch
 * [ ] Examples
