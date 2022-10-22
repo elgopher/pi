@@ -10,7 +10,7 @@ The retro game development engine for Go, inspired by [Pico-8](https://www.lexal
 
 ### Is this a new fantasy console?
 
-No, it's not. It's rather a game development library with some additional tools (like a console) which make it simple (and fun!) to write retro games in Go.
+No, it's not. It's rather a game development library with dev-tools which make it simple (and fun!) to write retro games in Go.
 
 ### What is a retro game?
 

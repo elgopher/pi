@@ -49,7 +49,7 @@ var (
 	// ScreenHeight specifies the height of the screen (in pixels).
 	ScreenHeight = defaultScreenHeight
 
-	Resources fs.ReadFileFS // Resources contains files like sprite-sheet.png
+	Resources fs.ReadFileFS // Resources contains files like sprite-sheet.png, custom-font.png
 )
 
 var booted bool
@@ -184,9 +184,9 @@ func MustBoot() {
 	}
 }
 
-// Stop will stop the game loop after Update is finished, but before Draw.
-// For now the entire app will be closed, but later it will show a dev console instead,
-// where developer will be able to resume the game.
+// Stop will stop the game loop after Update or Draw is finished.
+// If you are using devtools, the game will be paused. Otherwise, the game
+// will be closed.
 func Stop() {
 	vm.GameLoopStopped = true
 }
