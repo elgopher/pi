@@ -4,18 +4,40 @@
 package font
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/elgopher/pi/image"
 )
 
-// Load gets non-zero pixels from the font sheet and converts them to font data understood by π.
-// The result is inserted into fontData slice.
+// Load loads font-sheet (png image) and converts
+// it to font data. Image must be 128x128. Each char is 8x8.
+// Char 0 is in the top-left corner. Char 1 to the right.
 //
-// Img must be 128x128. Each char is 8x8. Char 0 is in the top-left corner. Char 1 to the right.
+// This function can be used if you want to use 3rd font:
 //
-// fontData must have length of 2048.
-func Load(img image.Image, fontData []byte) error {
+// myFont := pi.Font{Width:4, WidthSpecial:8, Height: 8}
+// pi.Load(png, myFont.Data[:])
+//
+// Color with index 0 is treated as background. Any other color
+// as foreground.
+//
+// The result is inserted into fontData slice. The size of slice must
+// be 2048.
+func Load(png []byte, fontData []byte) error {
+	img, err := image.DecodePNG(bytes.NewReader(png))
+	if err != nil {
+		return fmt.Errorf("decoding font failed: %w", err)
+	}
+
+	if err = load(img, fontData[:]); err != nil {
+		return fmt.Errorf("error system font: %w", err)
+	}
+
+	return nil
+}
+
+func load(img image.Image, fontData []byte) error {
 	const (
 		charWidth, charHeight  = 8, 8   // in pixels
 		rows, cells            = 16, 16 // number of rows and cells in font sheet

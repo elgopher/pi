@@ -4,25 +4,40 @@
 package font_test
 
 import (
-	"bytes"
 	_ "embed"
 	"testing"
 
-	"github.com/elgopher/pi/image"
-	"github.com/elgopher/pi/internal/font"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elgopher/pi/font"
 )
 
-//go:embed font_test.png
-var testFont []byte
+var (
+	//go:embed internal/invalid-width.png
+	invalidWidthImage []byte
+
+	//go:embed internal/invalid-height.png
+	invalidHeightImage []byte
+
+	//go:embed internal/valid.png
+	validImage []byte
+
+	//go:embed internal/empty.png
+	emptyImage []byte
+)
 
 func TestLoadImageInto(t *testing.T) {
-	t.Run("should return error for invalid image", func(t *testing.T) {
-		tests := map[string]image.Image{
-			"width not 128":            {Width: 1, Height: 128, Pixels: make([]byte, 128)},
-			"height not 128":           {Width: 128, Height: 1, Pixels: make([]byte, 128)},
-			"invalid number of pixels": {Width: 128, Height: 128, Pixels: make([]byte, 128)},
+	t.Run("should return error when font png is invalid", func(t *testing.T) {
+		var out [2048]byte
+		err := font.Load(make([]byte, 0), out[:])
+		require.Error(t, err)
+	})
+
+	t.Run("should return error for invalid image size", func(t *testing.T) {
+		tests := map[string][]byte{
+			"width not 128":  invalidWidthImage,
+			"height not 128": invalidHeightImage,
 		}
 		for name, img := range tests {
 			t.Run(name, func(t *testing.T) {
@@ -34,15 +49,13 @@ func TestLoadImageInto(t *testing.T) {
 	})
 
 	t.Run("should return error for invalid fontData", func(t *testing.T) {
-		img := image.Image{Width: 128, Height: 128, Pixels: make([]byte, 128*128)}
 		var out [1]byte
-		err := font.Load(img, out[:])
+		err := font.Load(validImage, out[:])
 		assert.Error(t, err)
 	})
 
 	t.Run("should override existing data", func(t *testing.T) {
 		out := makeNotZeroSlice(2048, 1)
-		emptyImage := image.Image{Width: 128, Height: 128, Pixels: make([]byte, 128*128)}
 		// when
 		err := font.Load(emptyImage, out)
 		require.NoError(t, err)
@@ -51,10 +64,8 @@ func TestLoadImageInto(t *testing.T) {
 
 	t.Run("should load pixels", func(t *testing.T) {
 		out := make([]byte, 2048)
-		img, err := image.DecodePNG(bytes.NewReader(testFont))
-		require.NoError(t, err)
 		// when
-		err = font.Load(img, out)
+		err := font.Load(validImage, out)
 		// then
 		require.NoError(t, err)
 		expectedChar0 := []byte{1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80}
