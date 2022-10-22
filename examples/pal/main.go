@@ -9,22 +9,28 @@ import (
 	"github.com/elgopher/pi/ebitengine"
 )
 
-//go:embed sprite-sheet.png
-var resources embed.FS
-
-var (
-	eyeColors   = [...]byte{0, 1, 3, 4, 12}
-	skinColors  = [...]byte{7, 5, 15}
-	hairColors  = [...]byte{0, 4, 5, 6, 7, 9, 10}
-	mouthColors = [...]byte{2, 8}
-)
-
 const (
 	eyes  = 1 // color number of eyes in sprite-sheet
 	skin  = 7
 	mouth = 8
 	hair  = 5
 )
+
+var (
+	//go:embed sprite-sheet.png
+	resources embed.FS
+
+	eyeColors   = [...]byte{0, 1, 3, 4, 12}
+	skinColors  = [...]byte{7, 5, 15}
+	hairColors  = [...]byte{0, 4, 5, 6, 7, 9, 10}
+	mouthColors = [...]byte{2, 8}
+)
+
+func main() {
+	pi.Resources = resources
+	pi.Draw = draw
+	pi.MustRun(ebitengine.Backend)
+}
 
 func draw() {
 	pi.Cls()
@@ -54,10 +60,4 @@ func draw() {
 			}
 		}
 	}
-}
-
-func main() {
-	pi.Resources = resources
-	pi.Draw = draw
-	pi.MustRun(ebitengine.Backend)
 }

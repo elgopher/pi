@@ -8,9 +8,6 @@ import (
 	"github.com/elgopher/pi/ebitengine"
 )
 
-//go:embed sprite-sheet.png
-var resources embed.FS
-
 // colors
 const (
 	left           = 10
@@ -25,6 +22,9 @@ const (
 
 	yellow = 10
 )
+
+//go:embed sprite-sheet.png
+var resources embed.FS
 
 func main() {
 	pi.Resources = resources
