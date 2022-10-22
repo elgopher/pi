@@ -12,7 +12,8 @@
     * [x] palette swapping
     * [ ] printing text on the screen
         * [x] system font
-        * [ ] custom font and additional features: escape characters, offsets
+        * [x] custom font 
+        * [ ] additional features: escape characters, offsets
     * [ ] drawing shapes
         * [x] rectangles, lines, circles
         * [ ] fill patterns
