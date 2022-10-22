@@ -15,6 +15,24 @@ import (
 	"github.com/elgopher/pi/vm"
 )
 
+// Print prints text on the screen using system font. It takes into consideration
+// clipping region and camera position.
+//
+// Only unicode characters with code < 256 are supported. Unsupported chars
+// are printed as question mark. The entire table of available chars can be
+// found here: https://github.com/elgopher/pi/blob/master/internal/system-font.png
+//
+// Print returns the right-most x position that occurred while printing.
+func Print(text string, x, y int, color byte) (rightMostX int) {
+	return Font(vm.SystemFont).Print(text, x, y, color)
+}
+
+// PrintCustom prints text in the same way as Print, but using custom font.
+func PrintCustom(text string, x, y int, color byte) (rightMostX int) {
+	// FIXME Probably escape character should be used to switch the font instead
+	return Font(vm.CustomFont).Print(text, x, y, color)
+}
+
 //go:embed internal/system-font.png
 var systemFontPNG []byte
 
@@ -114,22 +132,4 @@ func loadCustomFont(resources fs.ReadFileFS) error {
 	}
 
 	return LoadFontData(fileContents, vm.CustomFont.Data[:])
-}
-
-// Print prints text on the screen using system font. It takes into consideration
-// clipping region and camera position.
-//
-// Only unicode characters with code < 256 are supported. Unsupported chars
-// are printed as question mark. The entire table of available chars can be
-// found here: https://github.com/elgopher/pi/blob/master/internal/system-font.png
-//
-// Print returns the right-most x position that occurred while printing.
-func Print(text string, x, y int, color byte) (rightMostX int) {
-	return Font(vm.SystemFont).Print(text, x, y, color)
-}
-
-// PrintCustom prints text in the same way as Print, but using custom font.
-func PrintCustom(text string, x, y int, color byte) (rightMostX int) {
-	// FIXME Probably escape character should be used to switch the font instead
-	return Font(vm.CustomFont).Print(text, x, y, color)
 }
