@@ -4,14 +4,12 @@
 package pi
 
 import (
-	"bytes"
 	_ "embed"
 	"errors"
 	"fmt"
 	"io/fs"
 
-	"github.com/elgopher/pi/image"
-	"github.com/elgopher/pi/internal/font"
+	"github.com/elgopher/pi/font"
 	"github.com/elgopher/pi/vm"
 )
 
@@ -100,27 +98,6 @@ func (f Font) printRune(r rune, sx, sy int, color byte) int {
 	}
 }
 
-// LoadFontData loads font-sheet (png image) and converts
-// it to font data. Image must be 128x128. Each char is 8x8.
-// Char 0 is in the top-left corner. Char 1 to the right.
-//
-// This function can be used if you want to use 3rd font:
-//
-// myFont := pi.Font{Width:4, WidthSpecial:8,Height: 8}
-// pi.LoadFontData(png, myFont.Data[:])
-func LoadFontData(png []byte, out []byte) error {
-	img, err := image.DecodePNG(bytes.NewReader(png))
-	if err != nil {
-		return fmt.Errorf("decoding font failed: %w", err)
-	}
-
-	if err = font.Load(img, out[:]); err != nil {
-		return fmt.Errorf("error system font: %w", err)
-	}
-
-	return nil
-}
-
 func loadCustomFont(resources fs.ReadFileFS) error {
 	fileContents, err := resources.ReadFile("custom-font.png")
 	if errors.Is(err, fs.ErrNotExist) {
@@ -131,5 +108,5 @@ func loadCustomFont(resources fs.ReadFileFS) error {
 		return fmt.Errorf("error loading custom-font.png file: %w", err)
 	}
 
-	return LoadFontData(fileContents, vm.CustomFont.Data[:])
+	return font.Load(fileContents, vm.CustomFont.Data[:])
 }

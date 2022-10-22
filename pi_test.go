@@ -4,6 +4,7 @@
 package pi_test
 
 import (
+	_ "embed"
 	"strconv"
 	"testing"
 	"testing/fstest"
@@ -14,6 +15,9 @@ import (
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/vm"
 )
+
+//go:embed internal/testimage/custom-font.png
+var customFont []byte
 
 func TestBoot(t *testing.T) {
 	const color = 7
@@ -113,7 +117,7 @@ func TestBoot(t *testing.T) {
 	t.Run("should load custom-font.png", func(t *testing.T) {
 		pi.Reset()
 		pi.Resources = fstest.MapFS{
-			"custom-font.png": &fstest.MapFile{Data: customFontPng},
+			"custom-font.png": &fstest.MapFile{Data: customFont},
 		}
 		// when
 		err := pi.Boot()

@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"io/fs"
 
+	"github.com/elgopher/pi/font"
 	"github.com/elgopher/pi/vm"
 )
 
@@ -108,7 +109,7 @@ func Boot() error {
 		return err
 	}
 
-	if err := LoadFontData(systemFontPNG, vm.SystemFont.Data[:]); err != nil {
+	if err := font.Load(systemFontPNG, vm.SystemFont.Data[:]); err != nil {
 		return err
 	}
 
@@ -116,7 +117,7 @@ func Boot() error {
 		Resources = embed.FS{}
 	}
 
-	if err := loadResources(Resources); err != nil {
+	if err := loadGameResources(Resources); err != nil {
 		return err
 	}
 
@@ -162,7 +163,7 @@ func validateUserParameters() error {
 	return nil
 }
 
-func loadResources(resources fs.ReadFileFS) error {
+func loadGameResources(resources fs.ReadFileFS) error {
 	if err := loadSpriteSheet(resources); err != nil {
 		return err
 	}
