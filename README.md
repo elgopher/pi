@@ -38,9 +38,9 @@ Pi is under development. Only limited functionality is provided. API is not stab
 
 ## How to get started?
 
-1. Install dependencies
-  * [Go 1.18+](https://go.dev/dl/)
-  * If not on Windows, please install additional dependencies for [Linux](docs/install-linux.md) or [macOS](docs/install-macos.md)
-2. Create a new game using provided [Github template](https://github.com/elgopher/pi-template). 
-
-See also [examples](examples) directory and [documentation](https://pkg.go.dev/github.com/elgopher/pi).
+1. Install dependencies 
+   * [Go 1.18+](https://go.dev/dl/)
+   * If not on Windows, please install additional dependencies for [Linux](docs/install-linux.md) or [macOS](docs/install-macos.md).
+2. Try examples from [examples](examples) directory.
+3. Create a new game using provided [Github template](https://github.com/elgopher/pi-template).
+4. Read the [documentation](https://pkg.go.dev/github.com/elgopher/pi).
