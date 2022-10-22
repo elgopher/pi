@@ -7,8 +7,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elgopher/pi"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elgopher/pi"
 )
 
 const delta = 0.000000000000001
@@ -92,16 +93,16 @@ func TestCos(t *testing.T) {
 func TestAtan2(t *testing.T) {
 	type params struct{ dx, dy float64 }
 	tests := map[params]float64{
-		params{0, 0}:         0.75, // TODO In Pico-8 this is 0.25
-		params{0.001, 0.001}: 0.875,
-		params{0, 1}:         0.75,
-		params{1, 0}:         0,
-		params{1, 1}:         0.875,
-		params{-1, -1}:       0.375,
-		params{-1, 1}:        0.625,
-		params{1, -1}:        0.125,
-		params{1, 2}:         0.8237918088252166,
-		params{1, -0.3}:      0.04638678953887121,
+		{0, 0}:         0.75, // TODO In Pico-8 this is 0.25
+		{0.001, 0.001}: 0.875,
+		{0, 1}:         0.75,
+		{1, 0}:         0,
+		{1, 1}:         0.875,
+		{-1, -1}:       0.375,
+		{-1, 1}:        0.625,
+		{1, -1}:        0.125,
+		{1, 2}:         0.8237918088252166,
+		{1, -0.3}:      0.04638678953887121,
 	}
 	for p, expected := range tests {
 		name := fmt.Sprintf("%+v", p)
