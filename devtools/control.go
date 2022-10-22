@@ -22,4 +22,5 @@ func pauseGame() {
 func resumeGame() {
 	paused = false
 	vm.TimeSeconds = timeWhenPaused
+	snapshot.Draw()
 }
