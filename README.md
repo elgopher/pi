@@ -34,7 +34,7 @@ Because it's the easiest way to write a game in Go. IMHO ;)
 
 ### Is Pi ready to use?
 
-Pi is under development. Only limited functionality is provided. API is not stable. See [roadmap](ROADMAP.md) for details.
+Pi is under development. Only limited functionality is provided. API is not stable. See [ROADMAP](docs/ROADMAP.md) for details.
 
 ## How to get started?
 
