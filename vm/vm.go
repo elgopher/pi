@@ -3,7 +3,7 @@
 
 // Package vm is low-level package for directly accessing virtual machine data,
 // such as screen pixels, sprite-sheet, fonts or buttons state.
-// This data can be manipulated by backend, console, utility functions, or
+// This data can be manipulated by backend, devtools, utility functions, or
 // a game itself. It is very useful for writing custom tools, new backends or
 // even entire new API to be used by games. Code using vm package directly
 // could be very fast, because it can use low-level Go functions such as copy.
