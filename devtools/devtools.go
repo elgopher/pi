@@ -5,6 +5,7 @@ package devtools
 
 import (
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/devtools/internal/inspector"
 	"github.com/elgopher/pi/vm"
 )
 
@@ -22,6 +23,8 @@ var (
 func MustRun(runBackend func() error) {
 	update := pi.Update
 	draw := pi.Draw
+
+	inspector.BgColor, inspector.FgColor = BgColor, FgColor
 
 	pi.Update = func() {
 		updateDevTools()
