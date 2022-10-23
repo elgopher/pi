@@ -38,6 +38,6 @@ func Update() {
 	} else if !pi.MouseBtn(pi.MouseLeft) && distance.measuring {
 		distance.measuring = false
 		dist, width, height := calcDistance()
-		fmt.Printf("Measuring stopped at (%d, %d). Distance is: %f, width: %d, height %d\n", x, y, dist, width, height)
+		fmt.Printf("Measuring stopped at (%d, %d). Distance is: %f, width: %d, height: %d.\n", x, y, dist, width, height)
 	}
 }
