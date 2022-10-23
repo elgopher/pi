@@ -4,6 +4,8 @@
 package devtools
 
 import (
+	"fmt"
+
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/devtools/internal/inspector"
 	"github.com/elgopher/pi/vm"
@@ -25,6 +27,7 @@ func MustRun(runBackend func() error) {
 	draw := pi.Draw
 
 	inspector.BgColor, inspector.FgColor = BgColor, FgColor
+	fmt.Println("Press F12 to pause the game and show devtools")
 
 	pi.Update = func() {
 		updateDevTools()
