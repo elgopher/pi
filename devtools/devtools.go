@@ -26,14 +26,14 @@ func MustRun(runBackend func() error) {
 	pi.Update = func() {
 		updateDevTools()
 
-		if !paused && update != nil {
+		if !gamePaused && update != nil {
 			update()
 			handleStoppedGame()
 		}
 	}
 
 	pi.Draw = func() {
-		if !paused && draw != nil {
+		if !gamePaused && draw != nil {
 			draw()
 			handleStoppedGame()
 		} else {
