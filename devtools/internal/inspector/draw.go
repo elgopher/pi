@@ -15,18 +15,16 @@ import (
 
 var BgColor, FgColor byte
 
+var pixelColorAtMouseCoords byte
+
 func Draw() {
 	snapshot.Draw()
-
-	// I check the input in Draw function because only during Draw operation
-	// I have access to screen restored from snapshot
-	if pi.MouseBtnp(pi.MouseLeft) {
-		x, y := pi.MousePos()
-		fmt.Printf("Screen pixel (%d, %d) with color %d selected\n", x, y, pi.Pget(x, y))
-	}
-
+	pixelColorAtMouseCoords = pi.Pget(pi.MousePos())
 	moveBarIfNeeded()
 	drawBar()
+
+	drawDistanceLine()
+
 	drawPointer()
 }
 
@@ -39,9 +37,15 @@ func drawBar() {
 
 	pi.RectFill(0, barY, vm.ScreenWidth, barY+6, BgColor)
 
-	mostX := printCoords(mouseX, mouseY, 1, barY+1)
-	color := pi.Pget(mouseX, mouseY)
-	printPixelColor(color, mostX+4, barY+1)
+	textX := 1
+	textY := barY + 1
+
+	if distance.measuring {
+		printDistance(textX, textY)
+	} else {
+		mostX := printCoords(mouseX, mouseY, textX, textY)
+		printPixelColor(pixelColorAtMouseCoords, mostX+4, textY)
+	}
 }
 
 func printCoords(mouseX int, mouseY int, x, y int) int {
@@ -60,10 +64,27 @@ func drawPointer() {
 }
 
 func choosePointerColor(x, y int) byte {
-	c := pi.Pget(x, y)
+	c := pixelColorAtMouseCoords
 	if rgb.BrightnessDelta(vm.Palette[FgColor], vm.Palette[c]) >= rgb.BrightnessDelta(vm.Palette[BgColor], vm.Palette[c]) {
 		return FgColor
 	}
 
 	return BgColor
+}
+
+func drawDistanceLine() {
+	if distance.measuring {
+		x, y := pi.MousePos()
+		pi.Line(distance.startX, distance.startY, x, y, BgColor)
+	}
+}
+
+func printDistance(x, y int) int {
+	if distance.measuring {
+		dist, width, height := calcDistance()
+		text := fmt.Sprintf("D: %.1f W: %d H: %d", dist, width, height)
+		return pi.Print(text, x, y, FgColor)
+	}
+
+	return x
 }
