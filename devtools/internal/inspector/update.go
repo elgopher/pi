@@ -28,7 +28,14 @@ func calcDistance() (dist float64, width, height int) {
 	return
 }
 
+var helpShown bool
+
 func Update() {
+	if !helpShown {
+		helpShown = true
+		fmt.Println("Press P to take screenshot.")
+	}
+
 	x, y := pi.MousePos()
 
 	if pi.MouseBtn(pi.MouseLeft) && !distance.measuring {

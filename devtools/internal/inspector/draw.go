@@ -10,6 +10,8 @@ import (
 	"github.com/elgopher/pi/devtools/internal/icons"
 	"github.com/elgopher/pi/devtools/internal/rgb"
 	"github.com/elgopher/pi/devtools/internal/snapshot"
+	"github.com/elgopher/pi/key"
+	"github.com/elgopher/pi/snap"
 	"github.com/elgopher/pi/vm"
 )
 
@@ -20,6 +22,8 @@ var pixelColorAtMouseCoords byte
 func Draw() {
 	snapshot.Draw()
 	pixelColorAtMouseCoords = pi.Pget(pi.MousePos())
+	handleScreenshot()
+
 	moveBarIfNeeded()
 	drawBar()
 
@@ -87,4 +91,15 @@ func printDistance(x, y int) int {
 	}
 
 	return x
+}
+
+func handleScreenshot() {
+	if key.Btnp(key.P) {
+		path, err := snap.Take()
+		if err != nil {
+			fmt.Println("Problem taking screenshot:", err)
+			return
+		}
+		fmt.Println("Screenshot taken and stored to: " + path)
+	}
 }
