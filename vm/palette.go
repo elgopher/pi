@@ -12,9 +12,21 @@ var (
 	// Can be freely read and updated. Changes will be visible immediately.
 	Palette [256]RGB
 
-	DrawPalette    [256]byte
+	// DrawPalette contains mapping of colors used to replace color with
+	// another one for all subsequent drawings.
+	//
+	// The index of array is original color, the value is color replacement.
+	DrawPalette [256]byte
+
+	// DisplayPalette contains mapping of colors used to replace color with
+	// another one for the entire screen, at the end of a frame
+	//
+	// The index of array is original color, the value is color replacement.
 	DisplayPalette [256]byte
 
+	// ColorTransparency contains information whether given color is transparent.
+	//
+	// The index of array is a color number.
 	ColorTransparency [256]bool
 )
 
