@@ -8,6 +8,7 @@ import (
 
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/devtools/internal/icons"
+	"github.com/elgopher/pi/devtools/internal/rgb"
 	"github.com/elgopher/pi/devtools/internal/snapshot"
 	"github.com/elgopher/pi/vm"
 )
@@ -55,5 +56,14 @@ func printPixelColor(color byte, x int, y int) int {
 
 func drawPointer() {
 	x, y := pi.MousePos()
-	icons.Draw(icons.Pointer, x, y, FgColor)
+	icons.Draw(icons.Pointer, x, y, choosePointerColor(x, y))
+}
+
+func choosePointerColor(x, y int) byte {
+	c := pi.Pget(x, y)
+	if rgb.BrightnessDelta(vm.Palette[FgColor], vm.Palette[c]) >= rgb.BrightnessDelta(vm.Palette[BgColor], vm.Palette[c]) {
+		return FgColor
+	}
+
+	return BgColor
 }
