@@ -9,18 +9,18 @@ import (
 )
 
 var (
-	paused         bool
+	gamePaused     bool
 	timeWhenPaused float64
 )
 
 func pauseGame() {
-	paused = true
+	gamePaused = true
 	timeWhenPaused = vm.TimeSeconds
 	snapshot.Take()
 }
 
 func resumeGame() {
-	paused = false
+	gamePaused = false
 	vm.TimeSeconds = timeWhenPaused
 	snapshot.Draw()
 }

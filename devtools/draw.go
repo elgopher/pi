@@ -14,6 +14,14 @@ import (
 
 func drawDevTools() {
 	snapshot.Draw()
+
+	// I check the input in Draw function because only during Draw operation
+	// I have access to screen restored from snapshot
+	if pi.MouseBtnp(pi.MouseLeft) {
+		x, y := pi.MousePos()
+		fmt.Printf("Screen pixel (%d, %d) with color %d selected\n", x, y, pi.Pget(x, y))
+	}
+
 	moveBarIfNeeded()
 	drawBar()
 	drawPointer()

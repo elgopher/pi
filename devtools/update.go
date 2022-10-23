@@ -7,7 +7,7 @@ import "github.com/elgopher/pi/key"
 
 func updateDevTools() {
 	if key.Btnp(key.F12) {
-		if !paused {
+		if !gamePaused {
 			pauseGame()
 		} else {
 			resumeGame()
