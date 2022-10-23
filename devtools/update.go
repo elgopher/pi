@@ -3,7 +3,10 @@
 
 package devtools
 
-import "github.com/elgopher/pi/key"
+import (
+	"github.com/elgopher/pi/devtools/internal/inspector"
+	"github.com/elgopher/pi/key"
+)
 
 func updateDevTools() {
 	if key.Btnp(key.F12) {
@@ -12,5 +15,9 @@ func updateDevTools() {
 		} else {
 			resumeGame()
 		}
+	}
+
+	if gamePaused {
+		inspector.Update()
 	}
 }
