@@ -14,15 +14,28 @@ import (
 
 func drawDevTools() {
 	snapshot.Draw()
+	moveBarIfNeeded()
 	drawBar()
 	drawPointer()
 }
 
+var isBarOnTop bool
+
+func moveBarIfNeeded() {
+	_, mouseY := pi.MousePos()
+	switch {
+	case isBarOnTop && mouseY <= 12:
+		isBarOnTop = false
+	case !isBarOnTop && mouseY >= vm.ScreenHeight-12:
+		isBarOnTop = true
+	}
+}
+
 func drawBar() {
 	mouseX, mouseY := pi.MousePos()
-	barY := vm.ScreenHeight - 7
-	if mouseY > vm.ScreenHeight/2 {
-		barY = 0
+	var barY int
+	if !isBarOnTop {
+		barY = vm.ScreenHeight - 7
 	}
 
 	pi.RectFill(0, barY, vm.ScreenWidth, barY+6, BgColor)
