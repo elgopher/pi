@@ -35,7 +35,7 @@ func Take() (string, error) {
 
 	copy(img.Pix, vm.ScreenData)
 
-	file, err := os.CreateTemp("", "pi-screenshot")
+	file, err := os.CreateTemp("", "screenshot-*.png")
 	if err != nil {
 		return "", fmt.Errorf("error creating temp file for screenshot: %w", err)
 	}
