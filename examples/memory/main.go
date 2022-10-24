@@ -7,14 +7,14 @@ import (
 
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/ebitengine"
-	"github.com/elgopher/pi/vm"
+	"github.com/elgopher/pi/mem"
 )
 
 func main() {
 	pi.Draw = func() {
-		for i := 0; i < len(vm.ScreenData); i++ {
+		for i := 0; i < len(mem.ScreenData); i++ {
 			randomColor := byte(rand.Intn(16))
-			vm.ScreenData[i] = randomColor // put a random color to each pixel
+			mem.ScreenData[i] = randomColor // put a random color to each pixel
 		}
 	}
 

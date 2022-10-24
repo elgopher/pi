@@ -1,7 +1,7 @@
 // (c) 2022 Jacek Olszak
 // This code is licensed under MIT license (see LICENSE for details)
 
-package vm
+package mem
 
 var Controllers [8]Controller // 0th element is for Player 0, 1st for Player 1 etc.
 

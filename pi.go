@@ -15,7 +15,7 @@ import (
 	"io/fs"
 
 	"github.com/elgopher/pi/font"
-	"github.com/elgopher/pi/vm"
+	"github.com/elgopher/pi/mem"
 )
 
 // User parameters. Will be used during Boot (and Run).
@@ -109,7 +109,7 @@ func Boot() error {
 		return err
 	}
 
-	if err := font.Load(systemFontPNG, vm.SystemFont.Data[:]); err != nil {
+	if err := font.Load(systemFontPNG, mem.SystemFont.Data[:]); err != nil {
 		return err
 	}
 
@@ -121,24 +121,24 @@ func Boot() error {
 		return err
 	}
 
-	numberOfSprites = (vm.SpriteSheetWidth * vm.SpriteSheetHeight) / (SpriteWidth * SpriteHeight)
+	numberOfSprites = (mem.SpriteSheetWidth * mem.SpriteSheetHeight) / (SpriteWidth * SpriteHeight)
 
-	spritesInLine = vm.SpriteSheetWidth / SpriteWidth
+	spritesInLine = mem.SpriteSheetWidth / SpriteWidth
 
-	vm.ScreenWidth = ScreenWidth
-	vm.ScreenHeight = ScreenHeight
-	screenSize := vm.ScreenWidth * vm.ScreenHeight
-	vm.ScreenData = make([]byte, screenSize)
+	mem.ScreenWidth = ScreenWidth
+	mem.ScreenHeight = ScreenHeight
+	screenSize := mem.ScreenWidth * mem.ScreenHeight
+	mem.ScreenData = make([]byte, screenSize)
 	zeroScreenData = make([]byte, screenSize)
-	lineOfScreenWidth = make([]byte, vm.ScreenWidth)
+	lineOfScreenWidth = make([]byte, mem.ScreenWidth)
 
 	ClipReset()
 	CameraReset()
 	PaltReset()
 	PalReset()
 
-	vm.Update = Update
-	vm.Draw = Draw
+	mem.Update = Update
+	mem.Draw = Draw
 
 	booted = true
 
@@ -188,12 +188,12 @@ func MustBoot() {
 // If you are using devtools, the game will be paused. Otherwise, the game
 // will be closed.
 func Stop() {
-	vm.GameLoopStopped = true
+	mem.GameLoopStopped = true
 }
 
 // Time returns the amount of time since game was run, as a (fractional) number of seconds.
 //
 // Calling Time() multiple times in the same frame will always return the same result.
 func Time() float64 {
-	return vm.TimeSeconds
+	return mem.TimeSeconds
 }

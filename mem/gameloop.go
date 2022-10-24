@@ -1,7 +1,7 @@
 // (c) 2022 Jacek Olszak
 // This code is licensed under MIT license (see LICENSE for details)
 
-package vm
+package mem
 
 var (
 	// Update is a user provided function executed each frame (30 times per second).

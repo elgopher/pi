@@ -11,7 +11,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 
-	"github.com/elgopher/pi/vm"
+	"github.com/elgopher/pi/mem"
 )
 
 var gameStoppedErr = errors.New("game stopped")
@@ -27,8 +27,8 @@ func Backend() error {
 	ebiten.SetScreenClearedEveryFrame(false)
 	ebiten.SetRunnableOnUnfocused(true)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
-	ebiten.SetWindowSize(vm.ScreenWidth*scale(), vm.ScreenHeight*scale())
-	ebiten.SetWindowSizeLimits(vm.ScreenWidth, vm.ScreenHeight, -1, -1)
+	ebiten.SetWindowSize(mem.ScreenWidth*scale(), mem.ScreenHeight*scale())
+	ebiten.SetWindowSizeLimits(mem.ScreenWidth, mem.ScreenHeight, -1, -1)
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	ebiten.SetWindowTitle("Pi Game")
 

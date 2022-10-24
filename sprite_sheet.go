@@ -10,7 +10,7 @@ import (
 	"io/fs"
 
 	"github.com/elgopher/pi/image"
-	"github.com/elgopher/pi/vm"
+	"github.com/elgopher/pi/mem"
 )
 
 const (
@@ -31,14 +31,14 @@ func Sset(x, y int, color byte) {
 	if y < 0 {
 		return
 	}
-	if x >= vm.SpriteSheetWidth {
+	if x >= mem.SpriteSheetWidth {
 		return
 	}
-	if y >= vm.SpriteSheetHeight {
+	if y >= mem.SpriteSheetHeight {
 		return
 	}
 
-	vm.SpriteSheetData[y*vm.SpriteSheetWidth+x] = color
+	mem.SpriteSheetData[y*mem.SpriteSheetWidth+x] = color
 }
 
 // Sget gets the pixel color on the sprite sheet.
@@ -49,14 +49,14 @@ func Sget(x, y int) byte {
 	if y < 0 {
 		return 0
 	}
-	if x >= vm.SpriteSheetWidth {
+	if x >= mem.SpriteSheetWidth {
 		return 0
 	}
-	if y >= vm.SpriteSheetHeight {
+	if y >= mem.SpriteSheetHeight {
 		return 0
 	}
 
-	return vm.SpriteSheetData[y*vm.SpriteSheetWidth+x]
+	return mem.SpriteSheetData[y*mem.SpriteSheetWidth+x]
 }
 
 func loadSpriteSheet(resources fs.ReadFileFS) error {
@@ -74,15 +74,15 @@ func loadSpriteSheet(resources fs.ReadFileFS) error {
 }
 
 func useEmptySpriteSheet() {
-	vm.SpriteSheetWidth = SpriteSheetWidth
-	vm.SpriteSheetHeight = SpriteSheetHeight
-	vm.Palette = Palette
+	mem.SpriteSheetWidth = SpriteSheetWidth
+	mem.SpriteSheetHeight = SpriteSheetHeight
+	mem.Palette = Palette
 
 	fmt.Printf("sprite-sheet.png file not found. Using empty sprite sheet %dx%d\n",
-		vm.SpriteSheetWidth, vm.SpriteSheetHeight)
+		mem.SpriteSheetWidth, mem.SpriteSheetHeight)
 
-	size := vm.SpriteSheetWidth * vm.SpriteSheetHeight
-	vm.SpriteSheetData = make([]byte, size)
+	size := mem.SpriteSheetWidth * mem.SpriteSheetHeight
+	mem.SpriteSheetData = make([]byte, size)
 }
 
 func useSpriteSheet(b []byte) error {
@@ -91,11 +91,11 @@ func useSpriteSheet(b []byte) error {
 		return fmt.Errorf("error decoding file: %w", err)
 	}
 
-	vm.SpriteSheetData = img.Pixels
-	vm.Palette = img.Palette
+	mem.SpriteSheetData = img.Pixels
+	mem.Palette = img.Palette
 	SpriteSheetWidth = img.Width
 	SpriteSheetHeight = img.Height
-	vm.SpriteSheetWidth = img.Width
-	vm.SpriteSheetHeight = img.Height
+	mem.SpriteSheetWidth = img.Width
+	mem.SpriteSheetHeight = img.Height
 	return nil
 }

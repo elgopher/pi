@@ -12,7 +12,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/elgopher/pi/vm"
+	"github.com/elgopher/pi/mem"
 )
 
 // Take takes a screenshot and saves it to temp dir.
@@ -24,16 +24,16 @@ func Take() (string, error) {
 	}
 
 	var palette color.Palette
-	for _, col := range vm.DisplayPalette {
-		rgb := vm.Palette[col]
+	for _, col := range mem.DisplayPalette {
+		rgb := mem.Palette[col]
 		rgba := &color.NRGBA{R: rgb.R, G: rgb.G, B: rgb.B, A: 255}
 		palette = append(palette, rgba)
 	}
 
-	size := image.Rectangle{Max: image.Point{X: vm.ScreenWidth, Y: vm.ScreenHeight}}
+	size := image.Rectangle{Max: image.Point{X: mem.ScreenWidth, Y: mem.ScreenHeight}}
 	img := image.NewPaletted(size, palette)
 
-	copy(img.Pix, vm.ScreenData)
+	copy(img.Pix, mem.ScreenData)
 
 	file, err := os.CreateTemp("", "screenshot-*.png")
 	if err != nil {

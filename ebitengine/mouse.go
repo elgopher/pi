@@ -6,7 +6,7 @@ package ebitengine
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 
-	"github.com/elgopher/pi/vm"
+	"github.com/elgopher/pi/mem"
 )
 
 var mouseMapping = []ebiten.MouseButton{
@@ -19,13 +19,13 @@ func updateMouse() {
 	for i := 0; i < len(mouseMapping); i++ {
 		button := mouseMapping[i]
 		if ebiten.IsMouseButtonPressed(button) {
-			vm.MouseBtnDuration[i] += 1
+			mem.MouseBtnDuration[i] += 1
 		} else {
-			vm.MouseBtnDuration[i] = 0
+			mem.MouseBtnDuration[i] = 0
 		}
 	}
 
 	x, y := ebiten.CursorPosition()
-	vm.MousePos.X = x
-	vm.MousePos.Y = y
+	mem.MousePos.X = x
+	mem.MousePos.Y = y
 }

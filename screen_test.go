@@ -16,7 +16,7 @@ import (
 
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/image"
-	"github.com/elgopher/pi/vm"
+	"github.com/elgopher/pi/mem"
 )
 
 var (
@@ -33,11 +33,11 @@ func TestCls(t *testing.T) {
 
 	t.Run("should clean screen using color 0", func(t *testing.T) {
 		pi.MustBoot()
-		vm.ScreenData = []byte{1, 2, 3, 4}
+		mem.ScreenData = []byte{1, 2, 3, 4}
 		// when
 		pi.Cls()
 		// then
-		assert.Equal(t, []byte{0, 0, 0, 0}, vm.ScreenData)
+		assert.Equal(t, []byte{0, 0, 0, 0}, mem.ScreenData)
 	})
 
 	testCls(t, pi.Cls)
@@ -63,11 +63,11 @@ func TestClsCol(t *testing.T) {
 		pi.ScreenWidth = 2
 		pi.ScreenHeight = 2
 		pi.MustBoot()
-		vm.ScreenData = []byte{1, 2, 3, 4}
+		mem.ScreenData = []byte{1, 2, 3, 4}
 		// when
 		pi.ClsCol(7)
 		// then
-		assert.Equal(t, []byte{7, 7, 7, 7}, vm.ScreenData)
+		assert.Equal(t, []byte{7, 7, 7, 7}, mem.ScreenData)
 	})
 
 	testCls(t, func() {
@@ -85,7 +85,7 @@ func TestPset(t *testing.T) {
 		// when
 		pi.Pset(1, 1, col)
 		// then
-		assert.Equal(t, col, vm.ScreenData[3])
+		assert.Equal(t, col, mem.ScreenData[3])
 	})
 
 	t.Run("should not set pixel outside the screen", func(t *testing.T) {
@@ -93,7 +93,7 @@ func TestPset(t *testing.T) {
 		pi.ScreenHeight = 2
 		pi.MustBoot()
 
-		emptyScreen := make([]byte, len(vm.ScreenData))
+		emptyScreen := make([]byte, len(mem.ScreenData))
 
 		tests := []struct{ X, Y int }{
 			{-1, 0},
@@ -107,7 +107,7 @@ func TestPset(t *testing.T) {
 				// when
 				pi.Pset(coords.X, coords.Y, col)
 				// then
-				assert.Equal(t, emptyScreen, vm.ScreenData)
+				assert.Equal(t, emptyScreen, mem.ScreenData)
 			})
 		}
 	})
@@ -130,7 +130,7 @@ func TestPset(t *testing.T) {
 				// when
 				pi.Pset(coords.X, coords.Y, col)
 				// then
-				assert.Equal(t, emptyScreen, vm.ScreenData)
+				assert.Equal(t, emptyScreen, mem.ScreenData)
 			})
 		}
 	})
@@ -153,7 +153,7 @@ func TestPset(t *testing.T) {
 				// when
 				pi.Pset(coords.X, coords.Y, col)
 				// then
-				assert.Equal(t, emptyScreen, vm.ScreenData)
+				assert.Equal(t, emptyScreen, mem.ScreenData)
 			})
 		}
 	})
@@ -167,7 +167,7 @@ func TestPset(t *testing.T) {
 		// when
 		pi.Pset(2, 3, col)
 		// then
-		assert.NotEqual(t, emptyScreen, vm.ScreenData)
+		assert.NotEqual(t, emptyScreen, mem.ScreenData)
 	})
 
 	t.Run("should set pixel taking camera position into consideration", func(t *testing.T) {
@@ -180,7 +180,7 @@ func TestPset(t *testing.T) {
 		// then
 		expected := make([]byte, 4)
 		expected[0] = 8
-		assert.Equal(t, expected, vm.ScreenData)
+		assert.Equal(t, expected, mem.ScreenData)
 	})
 
 	t.Run("should not set pixel outside the screen when camera is set", func(t *testing.T) {
@@ -209,7 +209,7 @@ func TestPset(t *testing.T) {
 				pi.Camera(1, 1)
 				pi.Pset(coords.X, coords.Y, col)
 				// then
-				assert.Equal(t, emptyScreen, vm.ScreenData)
+				assert.Equal(t, emptyScreen, mem.ScreenData)
 			})
 		}
 	})
@@ -222,7 +222,7 @@ func TestPset(t *testing.T) {
 		// when
 		pi.Pset(0, 0, 1)
 		// then
-		assert.Equal(t, []byte{2}, vm.ScreenData)
+		assert.Equal(t, []byte{2}, mem.ScreenData)
 	})
 
 	t.Run("should draw original color after PalReset", func(t *testing.T) {
@@ -234,7 +234,7 @@ func TestPset(t *testing.T) {
 		// when
 		pi.Pset(0, 0, 1)
 		// then
-		assert.Equal(t, []byte{1}, vm.ScreenData)
+		assert.Equal(t, []byte{1}, mem.ScreenData)
 	})
 }
 
@@ -488,11 +488,11 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 				pi.SpriteSheetHeight = 16
 				pi.MustBoot()
 				pi.ClsCol(7)
-				snapshot := clone(vm.ScreenData)
+				snapshot := clone(mem.ScreenData)
 				// when
 				spr(spriteNo, 0, 0)
 				// then
-				assert.Equal(t, snapshot, vm.ScreenData)
+				assert.Equal(t, snapshot, mem.ScreenData)
 			})
 		}
 	})
@@ -528,7 +528,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 				pi.Camera(test.cameraX, test.cameraY)
 				spr(test.spriteNo, test.x, test.y)
 				// then
-				assert.Equal(t, expectedScreen.Pixels, vm.ScreenData)
+				assert.Equal(t, expectedScreen.Pixels, mem.ScreenData)
 			})
 		}
 	})
@@ -553,7 +553,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
 				spr(0, 0, 0)
 				// then
-				assert.Equal(t, expectedScreen.Pixels, vm.ScreenData)
+				assert.Equal(t, expectedScreen.Pixels, mem.ScreenData)
 			})
 		}
 	})
@@ -565,7 +565,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 		spr(1, 0, 0)
 		// then
 		expectedScreen := decodePNG(t, "internal/testimage/spr/spr_1_on_top_of_2_trans_0.png")
-		assert.Equal(t, expectedScreen.Pixels, vm.ScreenData)
+		assert.Equal(t, expectedScreen.Pixels, mem.ScreenData)
 	})
 
 	t.Run("should not draw color 0 after PaltReset", func(t *testing.T) {
@@ -577,7 +577,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 		spr(1, 0, 0)
 		// then
 		expectedScreen := decodePNG(t, "internal/testimage/spr/spr_1_on_top_of_2_trans_0.png")
-		assert.Equal(t, expectedScreen.Pixels, vm.ScreenData)
+		assert.Equal(t, expectedScreen.Pixels, mem.ScreenData)
 	})
 
 	t.Run("should not draw transparent colors", func(t *testing.T) {
@@ -589,7 +589,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 		spr(1, 0, 0)
 		// then
 		expectedScreen := decodePNG(t, "internal/testimage/spr/spr_1_on_top_of_2_trans_50.png")
-		assert.Equal(t, expectedScreen.Pixels, vm.ScreenData)
+		assert.Equal(t, expectedScreen.Pixels, mem.ScreenData)
 	})
 
 	t.Run("should swap color", func(t *testing.T) {
@@ -616,7 +616,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 		pi.PalReset()
 		spr(0, 0, 0)
 		// then
-		assert.Equal(t, expectedScreen.Pixels, vm.ScreenData)
+		assert.Equal(t, expectedScreen.Pixels, mem.ScreenData)
 	})
 }
 
@@ -647,11 +647,11 @@ func testSprSize(t *testing.T, sprSize func(spriteNo int, x, y int, w, h float64
 				pi.SpriteSheetHeight = 16
 				pi.MustBoot()
 				pi.ClsCol(7)
-				snapshot := clone(vm.ScreenData)
+				snapshot := clone(mem.ScreenData)
 				// when
 				sprSize(0, 0, 0, test.w, test.h)
 				// then
-				assert.Equal(t, snapshot, vm.ScreenData)
+				assert.Equal(t, snapshot, mem.ScreenData)
 			})
 		}
 	})
@@ -685,7 +685,7 @@ func testSprSize(t *testing.T, sprSize func(spriteNo int, x, y int, w, h float64
 				// when
 				sprSize(test.spriteNo, test.x, test.y, test.w, test.h)
 				// then
-				assert.Equal(t, expectedScreen.Pixels, vm.ScreenData)
+				assert.Equal(t, expectedScreen.Pixels, mem.ScreenData)
 			})
 		}
 	})
@@ -715,7 +715,7 @@ func TestSprSizeFlip(t *testing.T) {
 				// when
 				pi.SprSizeFlip(0, 0, 0, 1.0, test.h, test.flipX, test.flipY)
 				// then
-				assert.Equal(t, expectedScreen.Pixels, vm.ScreenData)
+				assert.Equal(t, expectedScreen.Pixels, mem.ScreenData)
 			})
 		}
 	})
@@ -729,7 +729,7 @@ func TestSprSizeFlip(t *testing.T) {
 		pi.SprSizeFlip(1, 0, 0, 1.0, 1.0, true, false)
 		// then
 		expectedScreen := decodePNG(t, "internal/testimage/spr/spr_1_on_top_of_2_trans_50_flipx.png")
-		assert.Equal(t, expectedScreen.Pixels, vm.ScreenData)
+		assert.Equal(t, expectedScreen.Pixels, mem.ScreenData)
 	})
 }
 

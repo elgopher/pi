@@ -8,7 +8,7 @@ import (
 
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/devtools/internal/inspector"
-	"github.com/elgopher/pi/vm"
+	"github.com/elgopher/pi/mem"
 )
 
 var (
@@ -51,8 +51,8 @@ func MustRun(runBackend func() error) {
 }
 
 func handleStoppedGame() {
-	if vm.GameLoopStopped {
+	if mem.GameLoopStopped {
 		pauseGame()
-		vm.GameLoopStopped = false
+		mem.GameLoopStopped = false
 	}
 }

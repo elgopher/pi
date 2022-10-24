@@ -5,15 +5,15 @@ package pi
 
 import (
 	"github.com/elgopher/pi/internal/input"
-	"github.com/elgopher/pi/vm"
+	"github.com/elgopher/pi/mem"
 )
 
 type MouseButton int
 
 const (
-	MouseLeft   MouseButton = vm.MouseLeft
-	MouseMiddle MouseButton = vm.MouseMiddle
-	MouseRight  MouseButton = vm.MouseRight
+	MouseLeft   MouseButton = mem.MouseLeft
+	MouseMiddle MouseButton = mem.MouseMiddle
+	MouseRight  MouseButton = mem.MouseRight
 )
 
 // MouseBtn returns true if the mouse button is being pressed at this moment.
@@ -22,7 +22,7 @@ func MouseBtn(b MouseButton) bool {
 		return false
 	}
 
-	return vm.MouseBtnDuration[b] > 0
+	return mem.MouseBtnDuration[b] > 0
 }
 
 // MouseBtnp returns true when the mouse button has just been pressed.
@@ -33,10 +33,10 @@ func MouseBtnp(b MouseButton) bool {
 		return false
 	}
 
-	return input.IsPressedRepeatably(vm.MouseBtnDuration[b])
+	return input.IsPressedRepeatably(mem.MouseBtnDuration[b])
 }
 
 // MousePos returns the position of mouse in screen coordinates.
 func MousePos() (x, y int) {
-	return vm.MousePos.X, vm.MousePos.Y
+	return mem.MousePos.X, mem.MousePos.Y
 }

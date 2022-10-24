@@ -5,7 +5,7 @@ package devtools
 
 import (
 	"github.com/elgopher/pi/devtools/internal/snapshot"
-	"github.com/elgopher/pi/vm"
+	"github.com/elgopher/pi/mem"
 )
 
 var (
@@ -15,12 +15,12 @@ var (
 
 func pauseGame() {
 	gamePaused = true
-	timeWhenPaused = vm.TimeSeconds
+	timeWhenPaused = mem.TimeSeconds
 	snapshot.Take()
 }
 
 func resumeGame() {
 	gamePaused = false
-	vm.TimeSeconds = timeWhenPaused
+	mem.TimeSeconds = timeWhenPaused
 	snapshot.Draw()
 }

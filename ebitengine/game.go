@@ -8,7 +8,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 
-	"github.com/elgopher/pi/vm"
+	"github.com/elgopher/pi/mem"
 )
 
 type game struct {
@@ -25,23 +25,23 @@ func (e *game) Update() error {
 	updateMouse()
 	updateKeyDuration()
 
-	if vm.Update != nil {
-		vm.Update()
+	if mem.Update != nil {
+		mem.Update()
 	}
 
-	if vm.GameLoopStopped {
+	if mem.GameLoopStopped {
 		return gameStoppedErr
 	}
 
 	// Ebitengine treats Draw differently than π. In π Draw must be executed at most 30 times per second.
 	// That's why π runs Draw() from inside Ebitengine's Update().
-	if vm.Draw != nil {
+	if mem.Draw != nil {
 		if e.shouldSkipNextDraw {
 			e.shouldSkipNextDraw = false
 			return nil
 		}
 
-		vm.Draw()
+		mem.Draw()
 
 		elapsed := time.Since(updateStartedTime)
 		if elapsed.Seconds() > 1/float64(tps) {
@@ -66,13 +66,13 @@ func (e *game) Draw(screen *ebiten.Image) {
 }
 
 func (e *game) writeScreenPixels(screen *ebiten.Image) {
-	if e.screenDataRGBA == nil || len(e.screenDataRGBA)/4 != len(vm.ScreenData) {
-		e.screenDataRGBA = make([]byte, len(vm.ScreenData)*4)
+	if e.screenDataRGBA == nil || len(e.screenDataRGBA)/4 != len(mem.ScreenData) {
+		e.screenDataRGBA = make([]byte, len(mem.ScreenData)*4)
 	}
 
 	offset := 0
-	for _, col := range vm.ScreenData {
-		rgb := vm.Palette[vm.DisplayPalette[col]]
+	for _, col := range mem.ScreenData {
+		rgb := mem.Palette[mem.DisplayPalette[col]]
 		e.screenDataRGBA[offset] = rgb.R
 		e.screenDataRGBA[offset+1] = rgb.G
 		e.screenDataRGBA[offset+2] = rgb.B
@@ -84,5 +84,5 @@ func (e *game) writeScreenPixels(screen *ebiten.Image) {
 }
 
 func (e *game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return vm.ScreenWidth, vm.ScreenHeight
+	return mem.ScreenWidth, mem.ScreenHeight
 }

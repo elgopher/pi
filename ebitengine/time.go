@@ -6,7 +6,7 @@ package ebitengine
 import (
 	"time"
 
-	"github.com/elgopher/pi/vm"
+	"github.com/elgopher/pi/mem"
 )
 
 var lastTime time.Time
@@ -15,5 +15,5 @@ func updateTime() {
 	now := time.Now()
 	timePassed := now.Sub(lastTime)
 	lastTime = now
-	vm.TimeSeconds += float64(timePassed) / float64(time.Second)
+	mem.TimeSeconds += float64(timePassed) / float64(time.Second)
 }
