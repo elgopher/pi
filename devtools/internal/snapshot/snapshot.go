@@ -4,18 +4,18 @@
 package snapshot
 
 import (
-	"github.com/elgopher/pi/vm"
+	"github.com/elgopher/pi/mem"
 )
 
 var snapshot []byte
 
 func Take() {
 	if snapshot == nil {
-		snapshot = make([]byte, len(vm.ScreenData))
+		snapshot = make([]byte, len(mem.ScreenData))
 	}
-	copy(snapshot, vm.ScreenData)
+	copy(snapshot, mem.ScreenData)
 }
 
 func Draw() {
-	copy(vm.ScreenData, snapshot)
+	copy(mem.ScreenData, snapshot)
 }

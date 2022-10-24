@@ -1,7 +1,7 @@
 // (c) 2022 Jacek Olszak
 // This code is licensed under MIT license (see LICENSE for details)
 
-package vm
+package mem
 
 // KeyDuration has info how many frames in a row a keyboard button was pressed:
 // Index of array is equal to key button constant, for example

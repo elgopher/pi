@@ -10,7 +10,7 @@ import (
 	"io/fs"
 
 	"github.com/elgopher/pi/font"
-	"github.com/elgopher/pi/vm"
+	"github.com/elgopher/pi/mem"
 )
 
 // Print prints text on the screen using system font. It takes into consideration
@@ -22,20 +22,20 @@ import (
 //
 // Print returns the right-most x position that occurred while printing.
 func Print(text string, x, y int, color byte) (rightMostX int) {
-	return Font(vm.SystemFont).Print(text, x, y, color)
+	return Font(mem.SystemFont).Print(text, x, y, color)
 }
 
 // PrintCustom prints text in the same way as Print, but using custom font.
 func PrintCustom(text string, x, y int, color byte) (rightMostX int) {
 	// FIXME Probably escape character should be used to switch the font instead
-	return Font(vm.CustomFont).Print(text, x, y, color)
+	return Font(mem.CustomFont).Print(text, x, y, color)
 }
 
 //go:embed internal/system-font.png
 var systemFontPNG []byte
 
 // Font contains all information about loaded font and provides method to Print the text.
-type Font vm.Font
+type Font mem.Font
 
 // Print prints text on the screen at given coordinates. It takes into account
 // clipping region and camera position.
@@ -69,24 +69,24 @@ func (f Font) printRune(r rune, sx, sy int, color byte) int {
 	index := int(r) * 8
 
 	for y := 0; y < 8; y++ {
-		if vm.ClippingRegion.Y > sy+y-vm.Camera.Y {
+		if mem.ClippingRegion.Y > sy+y-mem.Camera.Y {
 			continue
 		}
-		if vm.ClippingRegion.Y+vm.ClippingRegion.H <= sy+y-vm.Camera.Y {
+		if mem.ClippingRegion.Y+mem.ClippingRegion.H <= sy+y-mem.Camera.Y {
 			continue
 		}
 
-		offset := vm.ScreenWidth*y + sx + sy*vm.ScreenWidth - vm.Camera.Y*vm.ScreenWidth - vm.Camera.X
+		offset := mem.ScreenWidth*y + sx + sy*mem.ScreenWidth - mem.Camera.Y*mem.ScreenWidth - mem.Camera.X
 		line := f.Data[index+y]
 		for bit := 0; bit < 8; bit++ {
-			if vm.ClippingRegion.X > sx+bit-vm.Camera.X {
+			if mem.ClippingRegion.X > sx+bit-mem.Camera.X {
 				continue
 			}
-			if vm.ClippingRegion.X+vm.ClippingRegion.W <= sx+bit-vm.Camera.X {
+			if mem.ClippingRegion.X+mem.ClippingRegion.W <= sx+bit-mem.Camera.X {
 				continue
 			}
 			if line&(1<<bit) == 1<<bit {
-				vm.ScreenData[offset+bit] = color
+				mem.ScreenData[offset+bit] = color
 			}
 		}
 	}
@@ -108,5 +108,5 @@ func loadCustomFont(resources fs.ReadFileFS) error {
 		return fmt.Errorf("error loading custom-font.png file: %w", err)
 	}
 
-	return font.Load(fileContents, vm.CustomFont.Data[:])
+	return font.Load(fileContents, mem.CustomFont.Data[:])
 }

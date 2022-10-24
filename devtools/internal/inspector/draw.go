@@ -11,8 +11,8 @@ import (
 	"github.com/elgopher/pi/devtools/internal/rgb"
 	"github.com/elgopher/pi/devtools/internal/snapshot"
 	"github.com/elgopher/pi/key"
+	"github.com/elgopher/pi/mem"
 	"github.com/elgopher/pi/snap"
-	"github.com/elgopher/pi/vm"
 )
 
 var BgColor, FgColor byte
@@ -36,10 +36,10 @@ func drawBar() {
 	mouseX, mouseY := pi.MousePos()
 	var barY int
 	if !isBarOnTop {
-		barY = vm.ScreenHeight - 7
+		barY = mem.ScreenHeight - 7
 	}
 
-	pi.RectFill(0, barY, vm.ScreenWidth, barY+6, BgColor)
+	pi.RectFill(0, barY, mem.ScreenWidth, barY+6, BgColor)
 
 	textX := 1
 	textY := barY + 1
@@ -69,7 +69,7 @@ func drawPointer() {
 
 func choosePointerColor(x, y int) byte {
 	c := pixelColorAtMouseCoords
-	if rgb.BrightnessDelta(vm.Palette[FgColor], vm.Palette[c]) >= rgb.BrightnessDelta(vm.Palette[BgColor], vm.Palette[c]) {
+	if rgb.BrightnessDelta(mem.Palette[FgColor], mem.Palette[c]) >= rgb.BrightnessDelta(mem.Palette[BgColor], mem.Palette[c]) {
 		return FgColor
 	}
 

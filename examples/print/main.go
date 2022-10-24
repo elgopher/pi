@@ -6,7 +6,7 @@ import (
 
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/ebitengine"
-	"github.com/elgopher/pi/vm"
+	"github.com/elgopher/pi/mem"
 )
 
 //go:embed custom-font.png
@@ -14,7 +14,7 @@ var resources embed.FS
 
 func main() {
 	pi.Resources = resources
-	vm.CustomFont.Width = 6 // set the width of all characters below 128 (ascii)
+	mem.CustomFont.Width = 6 // set the width of all characters below 128 (ascii)
 	pi.Draw = func() {
 		pi.Print("HELLO,\nMY NAME IS", 45, 58, 9) // print two lines of yellow text using system font
 		pi.PrintCustom("PI\u0082", 45, 70, 12)    // print blue text with special character using custom font
