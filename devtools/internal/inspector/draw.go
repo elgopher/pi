@@ -25,11 +25,19 @@ func Draw() {
 	handleScreenshot()
 
 	moveBarIfNeeded()
+
+	if cursorOutOfWindow() {
+		return
+	}
+
 	drawBar()
-
 	drawDistanceLine()
-
 	drawPointer()
+}
+
+func cursorOutOfWindow() bool {
+	x, y := pi.MousePos()
+	return x < 0 || x >= mem.ScreenWidth || y < 0 || y >= mem.ScreenHeight
 }
 
 func drawBar() {
