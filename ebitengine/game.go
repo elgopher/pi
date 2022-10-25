@@ -24,6 +24,7 @@ func (e *game) Update() error {
 	updateController()
 	updateMouse()
 	updateKeyDuration()
+	handleKeyboardShortcuts()
 
 	if mem.Update != nil {
 		mem.Update()
@@ -52,6 +53,14 @@ func (e *game) Update() error {
 	e.screenChanged = true
 
 	return nil
+}
+
+func handleKeyboardShortcuts() {
+	f11 := mem.KeyDuration[mem.KeyF11] == 1
+	altEnter := mem.KeyDuration[mem.KeyEnter] == 1 && mem.KeyDuration[mem.KeyAlt] > 0
+	if f11 || altEnter {
+		ebiten.SetFullscreen(!ebiten.IsFullscreen())
+	}
 }
 
 func (e *game) Draw(screen *ebiten.Image) {
