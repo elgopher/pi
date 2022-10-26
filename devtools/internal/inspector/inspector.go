@@ -5,7 +5,6 @@ package inspector
 
 import (
 	"github.com/elgopher/pi"
-	"github.com/elgopher/pi/mem"
 )
 
 var isBarOnTop bool
@@ -15,7 +14,7 @@ func moveBarIfNeeded() {
 	switch {
 	case isBarOnTop && mouseY <= 12:
 		isBarOnTop = false
-	case !isBarOnTop && mouseY >= mem.ScreenHeight-12:
+	case !isBarOnTop && mouseY >= pi.Scr().H-12:
 		isBarOnTop = true
 	}
 }

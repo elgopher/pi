@@ -20,12 +20,14 @@ var iconsPng []byte
 
 var icons = pi.Font{
 	Width:        4,
-	WidthSpecial: 8,
+	SpecialWidth: 8,
 	Height:       8,
 }
 
 func init() {
-	if err := font.Load(iconsPng, icons.Data[:]); err != nil {
+	var err error
+	icons.Data, err = font.Load(iconsPng)
+	if err != nil {
 		panic(fmt.Sprintf("problem loading devtools icons %s", err))
 	}
 }

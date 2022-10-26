@@ -58,7 +58,7 @@ var (
 )
 
 func main() {
-	pi.Resources = resources
+	pi.Load(resources)
 	pi.Draw = func() {
 		pi.Cls()
 
@@ -90,7 +90,7 @@ func main() {
 		drawMousePointer()
 	}
 
-	pi.MustRun(ebitengine.Backend)
+	ebitengine.MustRun()
 }
 
 func drawMousePointer() {

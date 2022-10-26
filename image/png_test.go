@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elgopher/pi/image"
-	"github.com/elgopher/pi/mem"
 )
 
 //go:embed not-indexed.png
@@ -51,7 +50,7 @@ func TestDecodePNG(t *testing.T) {
 		assert.Equal(t, 1, img.Height)
 		assert.Equal(t,
 			//nolint:govet
-			[256]mem.RGB{{0, 0, 0}, {0xff, 0xd4, 0x53}, {0xed, 0x45, 0x9c}, {0x6b, 0xd4, 0x7f}},
+			[256]image.RGB{{0, 0, 0}, {0xff, 0xd4, 0x53}, {0xed, 0x45, 0x9c}, {0x6b, 0xd4, 0x7f}},
 			img.Palette)
 		assert.Equal(t, []byte{0, 1, 2, 3}, img.Pixels)
 	})

@@ -22,15 +22,11 @@ var (
 
 	//go:embed internal/valid.png
 	validImage []byte
-
-	//go:embed internal/empty.png
-	emptyImage []byte
 )
 
 func TestLoadImageInto(t *testing.T) {
 	t.Run("should return error when font png is invalid", func(t *testing.T) {
-		var out [2048]byte
-		err := font.Load(make([]byte, 0), out[:])
+		_, err := font.Load(make([]byte, 0))
 		require.Error(t, err)
 	})
 
@@ -41,31 +37,15 @@ func TestLoadImageInto(t *testing.T) {
 		}
 		for name, img := range tests {
 			t.Run(name, func(t *testing.T) {
-				var out [2048]byte
-				err := font.Load(img, out[:])
+				_, err := font.Load(img)
 				assert.Error(t, err)
 			})
 		}
 	})
 
-	t.Run("should return error for invalid fontData", func(t *testing.T) {
-		var out [1]byte
-		err := font.Load(validImage, out[:])
-		assert.Error(t, err)
-	})
-
-	t.Run("should override existing data", func(t *testing.T) {
-		out := makeNotZeroSlice(2048, 1)
-		// when
-		err := font.Load(emptyImage, out)
-		require.NoError(t, err)
-		assert.Equal(t, make([]byte, 2048), out)
-	})
-
 	t.Run("should load pixels", func(t *testing.T) {
-		out := make([]byte, 2048)
 		// when
-		err := font.Load(validImage, out)
+		out, err := font.Load(validImage)
 		// then
 		require.NoError(t, err)
 		expectedChar0 := []byte{1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80}
@@ -81,12 +61,4 @@ func TestLoadImageInto(t *testing.T) {
 		expectedChar255 := []byte{0, 0, 0, 0, 0, 0, 0, 0x80}
 		assert.Equal(t, expectedChar255, out[len(out)-8:])
 	})
-}
-
-func makeNotZeroSlice(len int, fillWith byte) []byte {
-	slice := make([]byte, len)
-	for i := 0; i < len; i++ {
-		slice[i] = fillWith
-	}
-	return slice
 }

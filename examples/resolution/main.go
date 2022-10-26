@@ -8,16 +8,12 @@ import (
 
 func main() {
 	// set screen resolution:
-	pi.ScreenWidth = 44
-	pi.ScreenHeight = 44
+	pi.SetScreenSize(44, 44)
 
-	// boot the game with custom screen resolution:
-	pi.MustBoot()
-
-	// once boot is executed all drawing functions are available:
+	// all drawing functions are available before running the game:
 	pi.Print("TINY SCREEN", 0, 18, 7) // print text on the screen before game loop
 
 	// Run the game loop.
-	pi.MustRun(ebitengine.Backend)
-	// Update and Draw functions were not set therefore screen will not be changed.
+	ebitengine.MustRun()
+	// Update and Draw functions were not set therefore screen will not be changed by them
 }

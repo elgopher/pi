@@ -5,7 +5,6 @@ package pi
 
 import (
 	"github.com/elgopher/pi/internal/input"
-	"github.com/elgopher/pi/mem"
 )
 
 // Button is a virtual button on any game controller. The game controller can be a gamepad or a keyboard.
@@ -21,13 +20,21 @@ type Button int
 // First connected gamepad controller is player 0, second player 1 and so on.
 // On XBox controller [O] is A and Y, [X] is B and X.
 const (
-	Left  = mem.ControllerLeft
-	Right = mem.ControllerRight
-	Up    = mem.ControllerUp
-	Down  = mem.ControllerDown
-	O     = mem.ControllerO // O is a first fire button
-	X     = mem.ControllerX // X is a second fire button
+	Left  = 0
+	Right = 1
+	Up    = 2
+	Down  = 3
+	O     = 4 // O is a first fire button
+	X     = 5 // X is a second fire button
 )
+
+var Controllers [8]Controller // 0th element is for Player 0, 1st for Player 1 etc.
+
+type Controller struct {
+	// BtnDuration is how many frames button was pressed:
+	// Index of array is equal to controller button constant.
+	BtnDuration [6]uint
+}
 
 // Btn returns true if a controller button is being pressed at this moment by player 0.
 func Btn(button Button) bool {
@@ -87,7 +94,7 @@ func buttonDuration(player int, button Button) uint {
 		return 0
 	}
 
-	return mem.Controllers[player].BtnDuration[button]
+	return Controllers[player].BtnDuration[button]
 }
 
 func isPressed(duration uint) bool {
@@ -95,7 +102,7 @@ func isPressed(duration uint) bool {
 }
 
 func buttonBits(player int, isSet func(uint) bool) int {
-	c := mem.Controllers[player]
+	c := Controllers[player]
 	var b int
 	for i := 0; i <= X; i++ {
 		if isSet(c.BtnDuration[i]) {

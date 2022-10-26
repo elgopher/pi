@@ -16,7 +16,7 @@ import (
 //
 // This function can be used if you want to use 3rd font:
 //
-// myFont := pi.Font{Width:4, WidthSpecial:8, Height: 8}
+// myFont := pi.Font{Width:4, SpecialWidth:8, Height: 8}
 // pi.Load(png, myFont.Data[:])
 //
 // Color with index 0 is treated as background. Any other color
@@ -24,20 +24,21 @@ import (
 //
 // The result is inserted into fontData slice. The size of slice must
 // be 2048.
-func Load(png []byte, fontData []byte) error {
+func Load(png []byte) ([]byte, error) {
 	img, err := image.DecodePNG(bytes.NewReader(png))
 	if err != nil {
-		return fmt.Errorf("decoding font failed: %w", err)
+		return nil, fmt.Errorf("decoding font failed: %w", err)
 	}
 
-	if err = load(img, fontData[:]); err != nil {
-		return fmt.Errorf("error system font: %w", err)
+	data, err := load(img)
+	if err != nil {
+		return nil, fmt.Errorf("error system font: %w", err)
 	}
 
-	return nil
+	return data, nil
 }
 
-func load(img image.Image, fontData []byte) error {
+func load(img image.Image) ([]byte, error) {
 	const (
 		charWidth, charHeight  = 8, 8   // in pixels
 		rows, cells            = 16, 16 // number of rows and cells in font sheet
@@ -45,20 +46,16 @@ func load(img image.Image, fontData []byte) error {
 		expectedNumberOfPixels = imgWidth * imgHeight
 		charBytes              = 8 // how many bytes a single char occupies in fontData
 		numberOfChars          = 256
-		expectedFontDataLen    = numberOfChars * charBytes
 	)
 
 	if img.Width != imgWidth || img.Height != imgHeight {
-		return fmt.Errorf("invalid font image size: must be %dx%d", imgWidth, imgHeight)
+		return nil, fmt.Errorf("invalid font image size: must be %dx%d", imgWidth, imgHeight)
 	}
 	if len(img.Pixels) != expectedNumberOfPixels {
-		return fmt.Errorf("invalid font image pixels slice len: must be %d", expectedNumberOfPixels)
-	}
-	if len(fontData) != expectedFontDataLen {
-		return fmt.Errorf("invalid fontData len: must be %d", expectedFontDataLen)
+		return nil, fmt.Errorf("invalid font image pixels slice len: must be %d", expectedNumberOfPixels)
 	}
 
-	clear(fontData)
+	fontData := make([]byte, 8*256)
 
 	for row := 0; row < rows; row++ {
 		for cell := 0; cell < cells; cell++ {
@@ -77,10 +74,5 @@ func load(img image.Image, fontData []byte) error {
 		}
 	}
 
-	return nil
-}
-
-func clear(data []byte) {
-	zeroData := make([]byte, len(data))
-	copy(data, zeroData)
+	return fontData, nil
 }

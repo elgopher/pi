@@ -13,7 +13,6 @@ import (
 
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/image"
-	"github.com/elgopher/pi/mem"
 	"github.com/elgopher/pi/snap"
 )
 
@@ -25,25 +24,25 @@ func TestSnap(t *testing.T) {
 
 	t.Run("should take screenshot and store it to temp file", func(t *testing.T) {
 		pi.Reset()
-		pi.MustBoot()
-		for i := 0; i < len(mem.ScreenData); i++ {
-			mem.ScreenData[i] = byte(i % 16) // 16 colors by default
+		screen := pi.Scr()
+		pix := screen.Pix
+		for i := 0; i < len(pix); i++ {
+			pix[i] = byte(i % 16) // 16 colors by default
 		}
 		// when
 		screenshot, err := snap.Take()
 		// then
 		require.NoError(t, err)
 		img := decodeScreenshot(t, screenshot)
-		assert.Equal(t, pi.ScreenWidth, img.Width)
-		assert.Equal(t, pi.ScreenHeight, img.Height)
-		assert.Equal(t, mem.ScreenData, img.Pixels)
-		assert.Equal(t, mem.Palette, img.Palette)
+		assert.Equal(t, screen.W, img.Width)
+		assert.Equal(t, screen.H, img.Height)
+		assert.Equal(t, pix, img.Pixels)
+		assert.Equal(t, pi.Palette, img.Palette)
 	})
 
 	t.Run("should use display palette", func(t *testing.T) {
 		pi.Reset()
-		pi.ScreenWidth, pi.ScreenHeight = 1, 1
-		pi.MustBoot()
+		pi.SetScreenSize(1, 1)
 		original, replacement := byte(1), byte(2)
 		pi.PalDisplay(original, replacement) // replace 1 by 2
 		pi.Pset(0, 0, original)
@@ -51,8 +50,8 @@ func TestSnap(t *testing.T) {
 		// then
 		require.NoError(t, err)
 		img := decodeScreenshot(t, screenshot)
-		assert.Equal(t, mem.Palette[2], img.Palette[1]) // 1 is replaced by 2
-		assert.Equal(t, mem.ScreenData, img.Pixels)
+		assert.Equal(t, pi.Palette[2], img.Palette[1]) // 1 is replaced by 2
+		assert.Equal(t, pi.Scr().Pix, img.Pixels)
 	})
 }
 

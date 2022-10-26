@@ -13,7 +13,7 @@ func main() {
 		pi.Cls()
 		drawKeyboard(6, 34)
 	}
-	pi.MustRun(ebitengine.Backend)
+	ebitengine.MustRun()
 }
 
 func drawKeyboard(x, y int) {

@@ -27,7 +27,7 @@ const (
 var resources embed.FS
 
 func main() {
-	pi.Resources = resources
+	pi.Load(resources)
 	pi.Draw = func() {
 		pi.Cls()
 		drawPlayerController(0, 2, 20)
@@ -35,7 +35,7 @@ func main() {
 		drawPlayerController(2, 67, 20)
 		drawPlayerController(3, 67, 70)
 	}
-	pi.MustRun(ebitengine.Backend)
+	ebitengine.MustRun()
 }
 
 func drawPlayerController(player, x, y int) {

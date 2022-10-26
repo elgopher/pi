@@ -6,7 +6,7 @@ package ebitengine
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 
-	"github.com/elgopher/pi/mem"
+	"github.com/elgopher/pi"
 )
 
 func updateController() {
@@ -16,12 +16,12 @@ func updateController() {
 }
 
 func getController(player int) *controller {
-	c := controller{&mem.Controllers[player]}
+	c := controller{&pi.Controllers[player]}
 	return &c
 }
 
 type controller struct {
-	*mem.Controller
+	*pi.Controller
 }
 
 func (c *controller) update(player int) {
@@ -37,32 +37,32 @@ func (c *controller) updateDirections(player int) {
 
 	if axisX < -0.5 ||
 		ebiten.IsStandardGamepadButtonPressed(gamepadID, ebiten.StandardGamepadButtonLeftLeft) ||
-		isKeyboardPressed(player, mem.ControllerLeft) {
-		c.BtnDuration[mem.ControllerLeft] += 1
-		c.BtnDuration[mem.ControllerRight] = 0
+		isKeyboardPressed(player, pi.Left) {
+		c.BtnDuration[pi.Left] += 1
+		c.BtnDuration[pi.Right] = 0
 	} else if axisX > 0.5 ||
 		ebiten.IsStandardGamepadButtonPressed(gamepadID, ebiten.StandardGamepadButtonLeftRight) ||
-		isKeyboardPressed(player, mem.ControllerRight) {
-		c.BtnDuration[mem.ControllerRight] += 1
-		c.BtnDuration[mem.ControllerLeft] = 0
+		isKeyboardPressed(player, pi.Right) {
+		c.BtnDuration[pi.Right] += 1
+		c.BtnDuration[pi.Left] = 0
 	} else {
-		c.BtnDuration[mem.ControllerRight] = 0
-		c.BtnDuration[mem.ControllerLeft] = 0
+		c.BtnDuration[pi.Right] = 0
+		c.BtnDuration[pi.Left] = 0
 	}
 
 	if axisY < -0.5 ||
 		ebiten.IsStandardGamepadButtonPressed(gamepadID, ebiten.StandardGamepadButtonLeftTop) ||
-		isKeyboardPressed(player, mem.ControllerUp) {
-		c.BtnDuration[mem.ControllerUp] += 1
-		c.BtnDuration[mem.ControllerDown] = 0
+		isKeyboardPressed(player, pi.Up) {
+		c.BtnDuration[pi.Up] += 1
+		c.BtnDuration[pi.Down] = 0
 	} else if axisY > 0.5 ||
 		ebiten.IsStandardGamepadButtonPressed(gamepadID, ebiten.StandardGamepadButtonLeftBottom) ||
-		isKeyboardPressed(player, mem.ControllerDown) {
-		c.BtnDuration[mem.ControllerDown] += 1
-		c.BtnDuration[mem.ControllerUp] = 0
+		isKeyboardPressed(player, pi.Down) {
+		c.BtnDuration[pi.Down] += 1
+		c.BtnDuration[pi.Up] = 0
 	} else {
-		c.BtnDuration[mem.ControllerUp] = 0
-		c.BtnDuration[mem.ControllerDown] = 0
+		c.BtnDuration[pi.Up] = 0
+		c.BtnDuration[pi.Down] = 0
 	}
 }
 
@@ -71,18 +71,18 @@ func (c *controller) updateFireButtons(player int) {
 
 	if ebiten.IsStandardGamepadButtonPressed(gamepadID, ebiten.StandardGamepadButtonRightBottom) ||
 		ebiten.IsStandardGamepadButtonPressed(gamepadID, ebiten.StandardGamepadButtonRightTop) ||
-		isKeyboardPressed(player, mem.ControllerO) {
-		c.BtnDuration[mem.ControllerO] += 1
+		isKeyboardPressed(player, pi.O) {
+		c.BtnDuration[pi.O] += 1
 	} else {
-		c.BtnDuration[mem.ControllerO] = 0
+		c.BtnDuration[pi.O] = 0
 	}
 
 	if ebiten.IsStandardGamepadButtonPressed(gamepadID, ebiten.StandardGamepadButtonRightRight) ||
 		ebiten.IsStandardGamepadButtonPressed(gamepadID, ebiten.StandardGamepadButtonRightLeft) ||
-		isKeyboardPressed(player, mem.ControllerX) {
-		c.BtnDuration[mem.ControllerX] += 1
+		isKeyboardPressed(player, pi.X) {
+		c.BtnDuration[pi.X] += 1
 	} else {
-		c.BtnDuration[mem.ControllerX] = 0
+		c.BtnDuration[pi.X] = 0
 	}
 }
 

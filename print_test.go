@@ -13,13 +13,46 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elgopher/pi"
-	"github.com/elgopher/pi/mem"
 	"github.com/elgopher/pi/snap"
 )
 
+func TestSetCustomFontWidth(t *testing.T) {
+	tests := map[int]int{
+		-1: 0,
+		0:  0,
+		1:  1,
+		8:  8,
+		9:  8,
+	}
+
+	for width, expectedWidth := range tests {
+		pi.SetCustomFontWidth(width)
+		assert.Equal(t, expectedWidth, pi.CustomFont().Width)
+	}
+
+	for width, expectedWidth := range tests {
+		pi.SetCustomFontSpecialWidth(width)
+		assert.Equal(t, expectedWidth, pi.CustomFont().SpecialWidth)
+	}
+}
+
+func TestSetCustomFontHeight(t *testing.T) {
+	tests := map[int]int{
+		-1: 0,
+		0:  0,
+		1:  1,
+	}
+	for height, expectedHeight := range tests {
+		pi.SetCustomFontHeight(height)
+		assert.Equal(t, expectedHeight, pi.CustomFont().Height)
+	}
+}
+
 func TestPrint(t *testing.T) {
-	pi.ScreenWidth = 16
-	pi.ScreenHeight = 24
+	reset := func() {
+		pi.Reset()
+		pi.SetScreenSize(16, 24)
+	}
 
 	const color = 7
 
@@ -27,7 +60,7 @@ func TestPrint(t *testing.T) {
 		chars := []string{`!`, `A`, `b`, `AB`, `ABCD`}
 		for _, char := range chars {
 			t.Run(char, func(t *testing.T) {
-				pi.MustBoot()
+				reset()
 				// when
 				pi.Print(char, 0, 0, color)
 				// then
@@ -37,25 +70,25 @@ func TestPrint(t *testing.T) {
 	})
 
 	t.Run("should print question mark for characters > 255", func(t *testing.T) {
-		pi.MustBoot()
+		reset()
 		pi.Print("\u0100", 0, 0, color)
 		assertScreenEqual(t, "internal/testimage/print/unknown.png")
 	})
 
 	t.Run("should print special character", func(t *testing.T) {
-		pi.MustBoot()
+		reset()
 		pi.Print("\u0080", 0, 0, color)
 		assertScreenEqual(t, "internal/testimage/print/special.png")
 	})
 
 	t.Run("should print 2 special characters", func(t *testing.T) {
-		pi.MustBoot()
+		reset()
 		pi.Print("\u0080\u0081", 0, 0, color)
 		assertScreenEqual(t, "internal/testimage/print/special-2chars.png")
 	})
 
 	t.Run("should go to next line", func(t *testing.T) {
-		pi.MustBoot()
+		reset()
 		pi.Print("0L\n1L", 0, 0, color)
 		assertScreenEqual(t, "internal/testimage/print/two-lines.png")
 	})
@@ -70,7 +103,7 @@ func TestPrint(t *testing.T) {
 		}
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.MustBoot()
+				reset()
 				pi.Print("0L\n1L", test.x, test.y, color)
 				assertScreenEqual(t, test.file)
 			})
@@ -78,7 +111,7 @@ func TestPrint(t *testing.T) {
 	})
 
 	t.Run("should print moved by camera position", func(t *testing.T) {
-		pi.MustBoot()
+		reset()
 		pi.Camera(-1, -2)
 		pi.Print("0L\n1L", 0, 0, color)
 		assertScreenEqual(t, "internal/testimage/print/two-lines-at-1.2.png")
@@ -107,7 +140,7 @@ func TestPrint(t *testing.T) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.MustBoot()
+				reset()
 				pi.Camera(test.cameraX, test.cameraY)
 				pi.Clip(test.x, test.y, test.w, test.h)
 				pi.Print("\u0080", test.posX, test.posY, color)
@@ -130,7 +163,7 @@ func TestPrint(t *testing.T) {
 		}
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.MustBoot()
+				reset()
 				// when
 				x := pi.Print(test.text, 0, 0, color)
 				assert.Equal(t, test.expectedX, x)
@@ -141,7 +174,7 @@ func TestPrint(t *testing.T) {
 
 func assertScreenEqual(t *testing.T, file string) {
 	expected := decodePNG(t, file).Pixels
-	if !assert.Equal(t, expected, mem.ScreenData) {
+	if !assert.Equal(t, expected, pi.Scr().Pix) {
 		screenshot, err := snap.Take()
 		require.NoError(t, err)
 		fmt.Println("Screenshot taken", screenshot)
