@@ -8,7 +8,6 @@ import (
 
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/devtools/internal/inspector"
-	"github.com/elgopher/pi/mem"
 )
 
 var (
@@ -18,7 +17,7 @@ var (
 	FgColor byte = 7
 )
 
-// MustRun runs the game using backend, similarly to pi.MustRun.
+// MustRun runs the game with devtools.
 //
 // Any time you can pause them game by pressing F12. This will
 // show screen inspector. F12 again resumes the game.
@@ -47,12 +46,14 @@ func MustRun(runBackend func() error) {
 		}
 	}
 
-	pi.MustRun(runBackend)
+	if err := runBackend(); err != nil {
+		panic(fmt.Sprintf("Something terrible happened! Pi cannot be run: %v\n", err))
+	}
 }
 
 func handleStoppedGame() {
-	if mem.GameLoopStopped {
+	if pi.GameLoopStopped {
 		pauseGame()
-		mem.GameLoopStopped = false
+		pi.GameLoopStopped = false
 	}
 }

@@ -9,16 +9,13 @@
 package pi
 
 import (
-	"embed"
 	_ "embed"
-	"fmt"
 	"io/fs"
 
 	"github.com/elgopher/pi/font"
-	"github.com/elgopher/pi/mem"
 )
 
-// User parameters. Will be used during Boot (and Run).
+// User parameters.
 var (
 	// Update is a user provided function executed each frame (30 times per second).
 	//
@@ -32,10 +29,6 @@ var (
 	// The purpose of this function is to draw on screen.
 	Draw func()
 
-	// SpriteSheetWidth will be used if sprite-sheet.png was not found.
-	SpriteSheetWidth = defaultSpriteSheetWidth
-	// SpriteSheetHeight will be used if sprite-sheet.png was not found.
-	SpriteSheetHeight = defaultSpriteSheetHeight
 	// Palette has all colors available in the game. Up to 256.
 	// Palette is taken from loaded sprite sheet (which must be
 	// a PNG file with indexed color mode). If sprite-sheet.png was not
@@ -43,124 +36,56 @@ var (
 	//
 	// Can be freely read and updated. Changes will be visible immediately.
 	Palette = defaultPalette
-
-	// ScreenWidth specifies the width of the screen (in pixels).
-	ScreenWidth = defaultScreenWidth
-	// ScreenHeight specifies the height of the screen (in pixels).
-	ScreenHeight = defaultScreenHeight
-
-	Resources fs.ReadFileFS // Resources contains files like sprite-sheet.png, custom-font.png
 )
 
-var booted bool
+var (
+	// DrawPalette contains mapping of colors used to replace color with
+	// another one for all subsequent drawings.
+	//
+	// The index of array is original color, the value is color replacement.
+	DrawPalette [256]byte
 
-// Run boots the game and runs the game loop using specified backend. For ebitengine
-// backend it must be called from the main thread, for example:
-//
-//	err := Run(ebitengine.Backend)
-//
-// Run does not boot the game once the game has been booted. Thanks to this,
-// the user can call Boot directly and draw to the screen
-// before the game loop starts.
-//
-// It returns error when something terrible happened during initialization.
-func Run(runBackend func() error) error {
-	if !booted {
-		if err := Boot(); err != nil {
-			return fmt.Errorf("booting game failed: %w", err)
-		}
+	// DisplayPalette contains mapping of colors used to replace color with
+	// another one for the entire screen, at the end of a frame
+	//
+	// The index of array is original color, the value is color replacement.
+	DisplayPalette [256]byte
+
+	// ColorTransparency contains information whether given color is transparent.
+	//
+	// The index of array is a color number.
+	ColorTransparency = defaultTransparency
+
+	// TimeSeconds is the number of seconds since game was started
+	TimeSeconds float64
+
+	GameLoopStopped bool
+)
+
+// Load loads files like sprite-sheet.png, custom-font.png
+func Load(resources fs.ReadFileFS) {
+	if resources == nil {
+		return
 	}
 
-	return runBackend()
-}
-
-// MustRun does the same as Run, but panics instead of returning an error.
-//
-// Useful for writing unit tests and quick and dirty prototypes. Do not use on production ;)
-func MustRun(runBackend func() error) {
-	if err := Run(runBackend); err != nil {
-		panic(fmt.Sprintf("Something terrible happened! Pi cannot be run: %v\n", err))
+	if err := loadGameResources(resources); err != nil {
+		panic(err)
 	}
 }
 
-// Reset resets all user parameters to default values. Useful in unit tests.
 func Reset() {
 	Update = nil
 	Draw = nil
-	Resources = nil
-	ScreenWidth = defaultScreenWidth
-	ScreenHeight = defaultScreenHeight
-	SpriteSheetWidth = defaultSpriteSheetWidth
-	SpriteSheetHeight = defaultSpriteSheetHeight
-	Palette = defaultPalette
-}
-
-// Boot initializes the engine based on user parameters such as ScreenWidth and ScreenHeight.
-// It loads the resources like sprite-sheet.png.
-//
-// If sprite-sheet.png was not found in pi.Resources, then empty sprite-sheet is used with
-// the size of pi.SpriteSheetWidth * pi.SpriteSheetHeight.
-//
-// Boot also resets all draw state information like camera position and clipping region.
-//
-// Boot can be run multiple times. This is useful for writing unit tests.
-func Boot() error {
-	if err := validateUserParameters(); err != nil {
-		return err
-	}
-
-	if err := font.Load(systemFontPNG, mem.SystemFont.Data[:]); err != nil {
-		return err
-	}
-
-	if Resources == nil {
-		Resources = embed.FS{}
-	}
-
-	if err := loadGameResources(Resources); err != nil {
-		return err
-	}
-
-	numberOfSprites = (mem.SpriteSheetWidth * mem.SpriteSheetHeight) / (SpriteWidth * SpriteHeight)
-
-	spritesInLine = mem.SpriteSheetWidth / SpriteWidth
-
-	mem.ScreenWidth = ScreenWidth
-	mem.ScreenHeight = ScreenHeight
-	screenSize := mem.ScreenWidth * mem.ScreenHeight
-	mem.ScreenData = make([]byte, screenSize)
-	zeroScreenData = make([]byte, screenSize)
-	lineOfScreenWidth = make([]byte, mem.ScreenWidth)
-
-	ClipReset()
 	CameraReset()
-	PaltReset()
+	ClipReset()
 	PalReset()
-
-	mem.Update = Update
-	mem.Draw = Draw
-
-	booted = true
-
-	return nil
-}
-
-func validateUserParameters() error {
-	if SpriteSheetWidth%8 != 0 || SpriteSheetWidth == 0 {
-		return fmt.Errorf("sprite sheet width %d is not a multiplcation of 8", SpriteSheetWidth)
-	}
-	if SpriteSheetHeight%8 != 0 || SpriteSheetHeight == 0 {
-		return fmt.Errorf("sprite sheet height %d is not a multiplcation of 8", SpriteSheetHeight)
-	}
-
-	if ScreenWidth <= 0 {
-		return fmt.Errorf("screen width %d is not greather than 0", ScreenWidth)
-	}
-	if ScreenHeight <= 0 {
-		return fmt.Errorf("screen height %d is not greather than 0", ScreenHeight)
-	}
-
-	return nil
+	PaltReset()
+	systemFont.Data, _ = font.Load(systemFontPNG)
+	customFont = defaultCustomFont
+	customFont.Data = make([]byte, fontDataSize)
+	screen = newScreen(defaultScreenWidth, defaultScreenHeight)
+	sprSheet = newSpriteSheet(defaultSpriteSheetWidth, defaultSpriteSheetHeight)
+	Palette = defaultPalette
 }
 
 func loadGameResources(resources fs.ReadFileFS) error {
@@ -175,25 +100,16 @@ func loadGameResources(resources fs.ReadFileFS) error {
 	return nil
 }
 
-// MustBoot does the same as Boot, but panics instead of returning an error.
-//
-// Useful for writing unit tests and quick and dirty prototypes. Do not use on production ;)
-func MustBoot() {
-	if err := Boot(); err != nil {
-		panic("init failed " + err.Error())
-	}
-}
-
 // Stop will stop the game loop after Update or Draw is finished.
 // If you are using devtools, the game will be paused. Otherwise, the game
 // will be closed.
 func Stop() {
-	mem.GameLoopStopped = true
+	GameLoopStopped = true
 }
 
 // Time returns the amount of time since game was run, as a (fractional) number of seconds.
 //
 // Calling Time() multiple times in the same frame will always return the same result.
 func Time() float64 {
-	return mem.TimeSeconds
+	return TimeSeconds
 }

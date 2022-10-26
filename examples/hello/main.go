@@ -15,8 +15,8 @@ import (
 var resources embed.FS
 
 func main() {
-	// Tell Pi to use resources embedded inside binary:
-	pi.Resources = resources
+	// Tell Pi to load resources embedded inside binary:
+	pi.Load(resources)
 	// Pi runs the game in a loop. 30 times per second, Pi
 	// asks the game to draw a frame. This callback function
 	// can be set by following code:
@@ -33,6 +33,7 @@ func main() {
 			pi.Spr(i, x, 60+int(y))
 		}
 	}
+
 	// Run game with devtools (Hit F12 to show screen inspector)
-	devtools.MustRun(ebitengine.Backend)
+	devtools.MustRun(ebitengine.Run)
 }

@@ -3,66 +3,62 @@
 
 package pi
 
-import (
-	"math"
-
-	"github.com/elgopher/pi/mem"
-)
+import "math"
 
 // RectFill draws a filled rectangle between points x0,y0 and x1,y1 (inclusive).
 //
 // RectFill takes into account camera position, clipping region and draw palette.
 func RectFill(x0, y0, x1, y1 int, color byte) {
-	xmin, xmax := x0-mem.Camera.X, x1-mem.Camera.X
+	xmin, xmax := x0-screen.Camera.X, x1-screen.Camera.X
 	if xmin > xmax {
 		xmin, xmax = xmax, xmin
 	}
-	ymin, ymax := y0-mem.Camera.Y, y1-mem.Camera.Y
+	ymin, ymax := y0-screen.Camera.Y, y1-screen.Camera.Y
 	if ymin > ymax {
 		ymin, ymax = ymax, ymin
 	}
 
-	if xmin >= mem.ClippingRegion.X+mem.ClippingRegion.W {
+	if xmin >= screen.Clip.X+screen.Clip.W {
 		return
 	}
 
-	if xmax < mem.ClippingRegion.X {
+	if xmax < screen.Clip.X {
 		return
 	}
 
-	if ymin >= mem.ClippingRegion.Y+mem.ClippingRegion.H {
+	if ymin >= screen.Clip.Y+screen.Clip.H {
 		return
 	}
 
-	if ymax < mem.ClippingRegion.Y {
+	if ymax < screen.Clip.Y {
 		return
 	}
 
-	if xmin < mem.ClippingRegion.X {
-		xmin = mem.ClippingRegion.X
+	if xmin < screen.Clip.X {
+		xmin = screen.Clip.X
 	}
 
-	if xmax >= mem.ClippingRegion.X+mem.ClippingRegion.W {
-		xmax = mem.ClippingRegion.X + mem.ClippingRegion.W - 1
+	if xmax >= screen.Clip.X+screen.Clip.W {
+		xmax = screen.Clip.X + screen.Clip.W - 1
 	}
 
-	if ymin < mem.ClippingRegion.Y {
-		ymin = mem.ClippingRegion.Y
+	if ymin < screen.Clip.Y {
+		ymin = screen.Clip.Y
 	}
 
-	if ymax >= mem.ClippingRegion.Y+mem.ClippingRegion.H {
-		ymax = mem.ClippingRegion.Y + mem.ClippingRegion.H - 1
+	if ymax >= screen.Clip.Y+screen.Clip.H {
+		ymax = screen.Clip.Y + screen.Clip.H - 1
 	}
 
 	w := xmax - xmin + 1
-	col := mem.DrawPalette[color]
+	col := DrawPalette[color]
 	for i := 0; i < w; i++ {
-		lineOfScreenWidth[i] = col
+		screen.lineOfScreenWidth[i] = col
 	}
-	line := lineOfScreenWidth[:w]
+	line := screen.lineOfScreenWidth[:w]
 
 	for y := ymin; y <= ymax; y++ {
-		copy(mem.ScreenData[y*mem.ScreenWidth+xmin:], line)
+		copy(screen.Pix[y*screen.W+xmin:], line)
 	}
 }
 
@@ -70,73 +66,73 @@ func RectFill(x0, y0, x1, y1 int, color byte) {
 //
 // Rect takes into account camera position, clipping region and draw palette.
 func Rect(x0, y0, x1, y1 int, color byte) {
-	xmin, xmax := x0-mem.Camera.X, x1-mem.Camera.X
+	xmin, xmax := x0-screen.Camera.X, x1-screen.Camera.X
 	if xmin > xmax {
 		xmin, xmax = xmax, xmin
 	}
-	ymin, ymax := y0-mem.Camera.Y, y1-mem.Camera.Y
+	ymin, ymax := y0-screen.Camera.Y, y1-screen.Camera.Y
 	if ymin > ymax {
 		ymin, ymax = ymax, ymin
 	}
 
-	if xmin >= mem.ClippingRegion.X+mem.ClippingRegion.W {
+	if xmin >= screen.Clip.X+screen.Clip.W {
 		return
 	}
 
-	if xmax < mem.ClippingRegion.X {
+	if xmax < screen.Clip.X {
 		return
 	}
 
-	if ymin >= mem.ClippingRegion.Y+mem.ClippingRegion.H {
+	if ymin >= screen.Clip.Y+screen.Clip.H {
 		return
 	}
 
-	if ymax < mem.ClippingRegion.Y {
+	if ymax < screen.Clip.Y {
 		return
 	}
 
 	drawLeftLine := true
 	drawRightLine := true
 
-	if xmin < mem.ClippingRegion.X {
-		xmin = mem.ClippingRegion.X
+	if xmin < screen.Clip.X {
+		xmin = screen.Clip.X
 		drawLeftLine = false
 	}
 
-	if xmax >= mem.ClippingRegion.X+mem.ClippingRegion.W {
-		xmax = mem.ClippingRegion.X + mem.ClippingRegion.W - 1
+	if xmax >= screen.Clip.X+screen.Clip.W {
+		xmax = screen.Clip.X + screen.Clip.W - 1
 		drawRightLine = false
 	}
 
-	col := mem.DrawPalette[color]
+	col := DrawPalette[color]
 
 	w := xmax - xmin + 1
 	for i := 0; i < w; i++ {
-		lineOfScreenWidth[i] = col
+		screen.lineOfScreenWidth[i] = col
 	}
-	line := lineOfScreenWidth[:w]
+	line := screen.lineOfScreenWidth[:w]
 
-	if ymin < mem.ClippingRegion.Y {
-		ymin = mem.ClippingRegion.Y
+	if ymin < screen.Clip.Y {
+		ymin = screen.Clip.Y
 	} else {
-		copy(mem.ScreenData[ymin*mem.ScreenWidth+xmin:], line)
+		copy(screen.Pix[ymin*screen.W+xmin:], line)
 	}
 
-	if ymax >= mem.ClippingRegion.Y+mem.ClippingRegion.H {
-		ymax = mem.ClippingRegion.Y + mem.ClippingRegion.H - 1
+	if ymax >= screen.Clip.Y+screen.Clip.H {
+		ymax = screen.Clip.Y + screen.Clip.H - 1
 	} else {
-		copy(mem.ScreenData[ymax*mem.ScreenWidth+xmin:], line)
+		copy(screen.Pix[ymax*screen.W+xmin:], line)
 	}
 
 	if drawLeftLine {
 		for y := ymin; y <= ymax; y++ {
-			mem.ScreenData[y*mem.ScreenWidth+xmin] = col
+			screen.Pix[y*screen.W+xmin] = col
 		}
 	}
 
 	if drawRightLine {
 		for y := ymin; y <= ymax; y++ {
-			mem.ScreenData[y*mem.ScreenWidth+xmax] = col
+			screen.Pix[y*screen.W+xmax] = col
 		}
 	}
 }
@@ -145,10 +141,11 @@ func Rect(x0, y0, x1, y1 int, color byte) {
 //
 // Line takes into account camera position, clipping region and draw palette.
 func Line(x0, y0, x1, y1 int, color byte) {
-	x0 -= mem.Camera.X
-	x1 -= mem.Camera.X
-	y0 -= mem.Camera.Y
-	y1 -= mem.Camera.Y
+	camera := screen.Camera
+	x0 -= camera.X
+	x1 -= camera.X
+	y0 -= camera.Y
+	y1 -= camera.Y
 
 	// Bresenham algorithm: https://www.youtube.com/watch?v=IDFB5CDpLDE
 	run := float64(x1 - x0)
@@ -216,34 +213,34 @@ func verticalLine(x, y0, y1 int, color byte) {
 		y0, y1 = y1, y0
 	}
 
-	if x < mem.ClippingRegion.X {
+	if x < screen.Clip.X {
 		return
 	}
 
-	if x >= mem.ClippingRegion.X+mem.ClippingRegion.W {
+	if x >= screen.Clip.X+screen.Clip.W {
 		return
 	}
 
-	if y0 < mem.ClippingRegion.Y {
-		y0 = mem.ClippingRegion.Y
+	if y0 < screen.Clip.Y {
+		y0 = screen.Clip.Y
 	}
 
-	if y1 >= mem.ClippingRegion.Y+mem.ClippingRegion.H {
-		y1 = mem.ClippingRegion.Y + mem.ClippingRegion.H - 1
+	if y1 >= screen.Clip.Y+screen.Clip.H {
+		y1 = screen.Clip.Y + screen.Clip.H - 1
 	}
 
 	for y := y0; y <= y1; y++ {
-		mem.ScreenData[y*mem.ScreenWidth+x] = mem.DrawPalette[color]
+		screen.Pix[y*screen.W+x] = DrawPalette[color]
 	}
 }
 
 // horizontalLine draws a vertical line between x0-x1 inclusive
 func horizontalLine(y, x0, x1 int, color byte) {
-	if y < mem.ClippingRegion.Y {
+	if y < screen.Clip.Y {
 		return
 	}
 
-	if y >= mem.ClippingRegion.Y+mem.ClippingRegion.H {
+	if y >= screen.Clip.Y+screen.Clip.H {
 		return
 	}
 
@@ -251,18 +248,18 @@ func horizontalLine(y, x0, x1 int, color byte) {
 		x0, x1 = x1, x0
 	}
 
-	if x0 < mem.ClippingRegion.X {
-		x0 = mem.ClippingRegion.X
+	if x0 < screen.Clip.X {
+		x0 = screen.Clip.X
 	}
 
-	if x1 >= mem.ClippingRegion.X+mem.ClippingRegion.W {
-		x1 = mem.ClippingRegion.X + mem.ClippingRegion.W - 1
+	if x1 >= screen.Clip.X+screen.Clip.W {
+		x1 = screen.Clip.X + screen.Clip.W - 1
 	}
 
-	offset := y * mem.ScreenWidth
+	offset := y * screen.W
 
 	for x := x0; x <= x1; x++ {
-		mem.ScreenData[offset+x] = mem.DrawPalette[color]
+		screen.Pix[offset+x] = DrawPalette[color]
 	}
 }
 
@@ -270,8 +267,8 @@ func horizontalLine(y, x0, x1 int, color byte) {
 //
 // Circ takes into account camera position, clipping region and draw palette.
 func Circ(centerX, centerY, radius int, color byte) {
-	centerX = centerX - mem.Camera.X
-	centerY = centerY - mem.Camera.Y
+	centerX = centerX - screen.Camera.X
+	centerY = centerY - screen.Camera.Y
 	// Code based on Frédéric Goset work: http://fredericgoset.ovh/mathematiques/courbes/en/bresenham_circle.html
 	x := 0
 	y := radius

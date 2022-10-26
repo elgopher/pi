@@ -22,85 +22,89 @@ import (
 	"unicode"
 
 	"github.com/elgopher/pi/internal/input"
-	"github.com/elgopher/pi/mem"
 )
 
 type Button int
 
 const (
-	Shift        Button = mem.KeyShift
-	Ctrl         Button = mem.KeyCtrl
-	Alt          Button = mem.KeyAlt // Please note that on some keyboard layouts on Windows the right alt is a combination of Ctrl+Alt
-	Cap          Button = mem.KeyCap
-	Back         Button = mem.KeyBack
-	Tab          Button = mem.KeyTab
-	Enter        Button = mem.KeyEnter
-	F1           Button = mem.KeyF1
-	F2           Button = mem.KeyF2
-	F3           Button = mem.KeyF3
-	F4           Button = mem.KeyF4
-	F5           Button = mem.KeyF5
-	F6           Button = mem.KeyF6
-	F7           Button = mem.KeyF7
-	F8           Button = mem.KeyF8
-	F9           Button = mem.KeyF9
-	F10          Button = mem.KeyF10
-	F11          Button = mem.KeyF11
-	F12          Button = mem.KeyF12
-	Left         Button = mem.KeyLeft
-	Right        Button = mem.KeyRight
-	Up           Button = mem.KeyUp
-	Down         Button = mem.KeyDown
-	Esc          Button = mem.KeyEsc
-	Space        Button = mem.KeySpace
-	Apostrophe   Button = mem.KeyApostrophe
-	Comma        Button = mem.KeyComma
-	Minus        Button = mem.KeyMinus
-	Period       Button = mem.KeyPeriod
-	Slash        Button = mem.KeySlash
-	Digit0       Button = mem.KeyDigit0
-	Digit1       Button = mem.KeyDigit1
-	Digit2       Button = mem.KeyDigit2
-	Digit3       Button = mem.KeyDigit3
-	Digit4       Button = mem.KeyDigit4
-	Digit5       Button = mem.KeyDigit5
-	Digit6       Button = mem.KeyDigit6
-	Digit7       Button = mem.KeyDigit7
-	Digit8       Button = mem.KeyDigit8
-	Digit9       Button = mem.KeyDigit9
-	Semicolon    Button = mem.KeySemicolon
-	Equal        Button = mem.KeyEqual
-	A            Button = mem.KeyA
-	B            Button = mem.KeyB
-	C            Button = mem.KeyC
-	D            Button = mem.KeyD
-	E            Button = mem.KeyE
-	F            Button = mem.KeyF
-	G            Button = mem.KeyG
-	H            Button = mem.KeyH
-	I            Button = mem.KeyI
-	J            Button = mem.KeyJ
-	K            Button = mem.KeyK
-	L            Button = mem.KeyL
-	M            Button = mem.KeyM
-	N            Button = mem.KeyN
-	O            Button = mem.KeyO
-	P            Button = mem.KeyP
-	Q            Button = mem.KeyQ
-	R            Button = mem.KeyR
-	S            Button = mem.KeyS
-	T            Button = mem.KeyT
-	U            Button = mem.KeyU
-	V            Button = mem.KeyV
-	W            Button = mem.KeyW
-	X            Button = mem.KeyX
-	Y            Button = mem.KeyY
-	Z            Button = mem.KeyZ
-	BracketLeft  Button = mem.KeyBracketLeft
-	Backslash    Button = mem.KeyBackslash
-	BracketRight Button = mem.KeyBracketRight
-	Backquote    Button = mem.KeyBackquote
+	Shift        = 1
+	Ctrl         = 3
+	Alt          = 5 // Please note that on some keyboard layouts on Windows the right alt is a combination of Ctrl+Alt
+	Cap          = 7
+	Back         = '\b' // 8
+	Tab          = '\t' // 9
+	Enter        = '\n' // 10
+	F1           = 11
+	F2           = 12
+	F3           = 13
+	F4           = 14
+	F5           = 15
+	F6           = 16
+	F7           = 17
+	F8           = 18
+	F9           = 19
+	F10          = 20
+	F11          = 21
+	F12          = 22
+	Left         = 23
+	Right        = 24
+	Up           = 25
+	Down         = 26
+	Esc          = 27
+	Space        = ' '  // 32
+	Apostrophe   = '\'' // 39
+	Comma        = ','  // 44
+	Minus        = '-'  // 45
+	Period       = '.'  // 46
+	Slash        = '/'  // 47
+	Digit0       = '0'  // 48
+	Digit1       = '1'  // 49
+	Digit2       = '2'  // 50
+	Digit3       = '3'  // 51
+	Digit4       = '4'  // 52
+	Digit5       = '5'  // 53
+	Digit6       = '6'  // 54
+	Digit7       = '7'  // 55
+	Digit8       = '8'  // 56
+	Digit9       = '9'  // 57
+	Semicolon    = ';'  // 59
+	Equal        = '='  // 61
+	A            = 'A'  // 65
+	B            = 'B'  // 66
+	C            = 'C'  // 67
+	D            = 'D'  // 68
+	E            = 'E'  // 69
+	F            = 'F'  // 70
+	G            = 'G'  // 71
+	H            = 'H'  // 72
+	I            = 'I'  // 73
+	J            = 'J'  // 74
+	K            = 'K'  // 75
+	L            = 'L'  // 76
+	M            = 'M'  // 77
+	N            = 'N'  // 78
+	O            = 'O'  // 79
+	P            = 'P'  // 80
+	Q            = 'Q'  // 81
+	R            = 'R'  // 82
+	S            = 'S'  // 83
+	T            = 'T'  // 84
+	U            = 'U'  // 85
+	V            = 'V'  // 86
+	W            = 'W'  // 87
+	X            = 'X'  // 88
+	Y            = 'Y'  // 89
+	Z            = 'Z'  // 90
+	BracketLeft  = '['  // 91
+	Backslash    = '\\' // 92
+	BracketRight = ']'  // 93
+	Backquote    = '`'  // 96
 )
+
+// Duration has info how many frames in a row a keyboard button was pressed:
+// Index of array is equal to key button constant, for example
+// Duration[1] has button duration for Shift key.
+var Duration [97]uint
 
 // Btn returns true if the keyboard button is being pressed at this moment.
 //
@@ -113,13 +117,13 @@ const (
 //
 // All these calls have same effect.
 func Btn(b Button) bool {
-	return mem.KeyDuration[adjustedButton(b)] > 0
+	return Duration[adjustedButton(b)] > 0
 }
 
 // Btnp returns true when the keyboard button has just been pressed.
 // It also returns true after the next 15 frames, and then every 4 frames.
 func Btnp(b Button) bool {
-	return input.IsPressedRepeatably(mem.KeyDuration[adjustedButton(b)])
+	return input.IsPressedRepeatably(Duration[adjustedButton(b)])
 }
 
 var specialChars = map[Button]string{

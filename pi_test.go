@@ -10,174 +10,203 @@ import (
 	"testing/fstest"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elgopher/pi"
-	"github.com/elgopher/pi/mem"
+	"github.com/elgopher/pi/image"
 )
 
 //go:embed internal/testimage/custom-font.png
 var customFont []byte
 
-func TestBoot(t *testing.T) {
-	const color = 7
+func TestReset(t *testing.T) {
+	t.Run("should reset sprite sheet", func(t *testing.T) {
+		pi.UseEmptySpriteSheet(8, 8)
+		// when
+		pi.Reset()
+		// then
+		sprSheet := pi.SprSheet()
+		assert.Equal(t, 128, sprSheet.W)
+		assert.Equal(t, 128, sprSheet.H)
+		assert.Equal(t, make([]byte, 16384), sprSheet.Pix)
+	})
 
+	t.Run("should reset screen", func(t *testing.T) {
+		pi.SetScreenSize(256, 256)
+		// when
+		pi.Reset()
+		// then
+		scr := pi.Scr()
+		assert.Equal(t, 128, scr.W)
+		assert.Equal(t, 128, scr.H)
+		assert.Equal(t, make([]byte, 16384), scr.Pix)
+		assert.Zero(t, scr.Camera)
+		assert.Equal(t, pi.Region{W: 128, H: 128}, scr.Clip)
+	})
+
+	t.Run("should reset palette", func(t *testing.T) {
+		color := image.RGB{R: 0xff, G: 0xff, B: 0xff}
+		pi.Palette[0] = color
+		pi.Reset()
+		assert.NotEqual(t, color, pi.Palette[0])
+	})
+
+	t.Run("should reset display palette", func(t *testing.T) {
+		pi.DisplayPalette[0] = 255
+		pi.Reset()
+		assert.NotEqual(t, 255, pi.DisplayPalette[0])
+	})
+
+	t.Run("should reset draw palette", func(t *testing.T) {
+		pi.DrawPalette[0] = 255
+		pi.Reset()
+		assert.NotEqual(t, 255, pi.DrawPalette[0])
+	})
+
+	t.Run("should reset palette transparency", func(t *testing.T) {
+		pi.ColorTransparency[0] = false
+		pi.Reset()
+		assert.True(t, pi.ColorTransparency[0])
+	})
+
+	t.Run("should reset system font", func(t *testing.T) {
+		before := pi.SystemFont().Data[0]
+		after := before + 1
+		pi.SystemFont().Data[0] = after
+		// when
+		pi.Reset()
+		// then
+		assert.Equal(t, before, pi.SystemFont().Data[0])
+	})
+
+	t.Run("should reset custom font", func(t *testing.T) {
+		pi.CustomFont().Data[0] = 1
+		pi.SetCustomFontWidth(0)
+		pi.SetCustomFontSpecialWidth(0)
+		pi.SetCustomFontHeight(0)
+		// when
+		pi.Reset()
+		// then
+		expected := pi.Font{
+			Data:         make([]byte, 8*256),
+			Width:        4,
+			SpecialWidth: 8,
+			Height:       6,
+		}
+		assert.Equal(t, expected, pi.CustomFont())
+	})
+
+	t.Run("should reset callbacks", func(t *testing.T) {
+		pi.Draw = func() {}
+		pi.Update = func() {}
+		pi.Reset()
+		assert.Nil(t, pi.Draw)
+		assert.Nil(t, pi.Update)
+	})
+}
+
+func TestUseEmptySpriteSheet(t *testing.T) {
 	invalidSpriteSheetSizes := [...]int{
-		0, 1, color, 9,
+		0, 1, 7, 9,
 	}
 
-	t.Run("should return error if SpriteSheetWidth is not multiplication of 8", func(t *testing.T) {
+	t.Run("should panic if SpriteSheetWidth is not multiplication of 8", func(t *testing.T) {
 		for _, width := range invalidSpriteSheetSizes {
 			t.Run(strconv.Itoa(width), func(t *testing.T) {
 				pi.Reset()
-				pi.SpriteSheetWidth = width
-				err := pi.Boot()
-				assert.Error(t, err)
+				assert.Panics(t, func() {
+					pi.UseEmptySpriteSheet(width, pi.SprSheet().H)
+				})
 			})
 		}
 	})
 
-	t.Run("should return error if SpriteSheetHeight is not multiplication of 8", func(t *testing.T) {
+	t.Run("should panic if SpriteSheetHeight is not multiplication of 8", func(t *testing.T) {
 		for _, height := range invalidSpriteSheetSizes {
 			t.Run(strconv.Itoa(height), func(t *testing.T) {
 				pi.Reset()
-				pi.SpriteSheetHeight = height
-				err := pi.Boot()
-				assert.Error(t, err)
+				assert.Panics(t, func() {
+					pi.UseEmptySpriteSheet(pi.SprSheet().W, height)
+				})
 			})
 		}
 	})
 
+	t.Run("should use custom size sprite sheet", func(t *testing.T) {
+		pi.Reset()
+		// when
+		pi.UseEmptySpriteSheet(16, 8)
+		// then
+		expectedSpriteSheetData := make([]byte, 16*8)
+		assert.Equal(t, expectedSpriteSheetData, pi.SprSheet().Pix)
+	})
+}
+
+func TestSetScreenSize(t *testing.T) {
 	invalidScreenSizes := [...]int{-2, -1, 0}
 
-	t.Run("should return error when ScreenWidth is not greater than 0", func(t *testing.T) {
+	t.Run("should panic when ScreenWidth is not greater than 0", func(t *testing.T) {
 		for _, size := range invalidScreenSizes {
 			t.Run(strconv.Itoa(size), func(t *testing.T) {
 				pi.Reset()
-				pi.ScreenWidth = size
-				err := pi.Boot()
-				assert.Error(t, err)
+				assert.Panics(t, func() {
+					pi.SetScreenSize(size, pi.Scr().H)
+				})
 			})
 		}
 	})
 
-	t.Run("should return error when ScreenHeight is not greater than 0", func(t *testing.T) {
+	t.Run("should panic when ScreenHeight is not greater than 0", func(t *testing.T) {
 		for _, size := range invalidScreenSizes {
 			t.Run(strconv.Itoa(size), func(t *testing.T) {
 				pi.Reset()
-				pi.ScreenHeight = size
-				err := pi.Boot()
-				assert.Error(t, err)
+				assert.Panics(t, func() {
+					pi.SetScreenSize(pi.Scr().W, size)
+				})
 			})
 		}
 	})
 
 	t.Run("should initialize screen data", func(t *testing.T) {
 		pi.Reset()
-		pi.ScreenWidth = 2
-		pi.ScreenHeight = 3
 		// when
-		err := pi.Boot()
+		pi.SetScreenSize(2, 3)
 		// then
-		require.NoError(t, err)
-		assert.Equal(t, make([]byte, 6), mem.ScreenData)
+		assert.Equal(t, make([]byte, 6), pi.Scr().Pix)
 	})
+}
 
-	t.Run("should use custom size sprite sheet when sprite-sheet.png was not found in resources", func(t *testing.T) {
-		pi.Reset()
-		pi.SpriteSheetWidth = 16
-		pi.SpriteSheetHeight = 8
-		allBlacks := [256]mem.RGB{}
-		pi.Palette = allBlacks
-		// when
-		err := pi.Boot()
-		// then
-		require.NoError(t, err)
-		expectedSpriteSheetData := make([]byte, 16*8)
-		assert.Equal(t, expectedSpriteSheetData, mem.SpriteSheetData)
-		assert.Equal(t, allBlacks, mem.Palette)
-	})
+func TestLoad(t *testing.T) {
+	const color = 7
 
 	t.Run("should load sprite-sheet.png", func(t *testing.T) {
 		pi.Reset()
-		pi.Resources = fstest.MapFS{
-			"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
-		}
 		// when
-		err := pi.Boot()
+		pi.Load(fstest.MapFS{
+			"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
+		})
 		// then
-		require.NoError(t, err)
-		assert.Equal(t, 16, pi.SpriteSheetWidth)
-		assert.Equal(t, 16, pi.SpriteSheetHeight)
+		assert.Equal(t, 16, pi.SprSheet().W)
+		assert.Equal(t, 16, pi.SprSheet().H)
 		img := decodePNG(t, "internal/testimage/sprite-sheet-16x16.png")
-		assert.Equal(t, img.Pixels, mem.SpriteSheetData)
-		assert.Equal(t, img.Palette, mem.Palette)
+		assert.Equal(t, img.Pixels, pi.SprSheet().Pix)
+		assert.Equal(t, img.Palette, pi.Palette)
 	})
 
 	t.Run("should load custom-font.png", func(t *testing.T) {
 		pi.Reset()
-		pi.Resources = fstest.MapFS{
+		// when
+		pi.Load(fstest.MapFS{
 			"custom-font.png": &fstest.MapFile{Data: customFont},
-		}
-		// when
-		err := pi.Boot()
-		// then
-		require.NoError(t, err)
-		assert.Equal(t, uint8(0xf), mem.CustomFont.Data[0])
-	})
-
-	t.Run("should reset draw state", func(t *testing.T) {
-		pi.Reset()
-		require.NoError(t, pi.Boot())
-		pi.Camera(1, 2)
-		pi.Clip(1, 2, 3, 4)
-		// when
-		err := pi.Boot()
-		// then
-		require.NoError(t, err)
-		camX, camY := pi.CameraReset()
-		assert.Zero(t, camX)
-		assert.Zero(t, camY)
-		x, y, w, h := pi.ClipReset()
-		assert.Zero(t, x)
-		assert.Zero(t, y)
-		assert.Equal(t, pi.ScreenWidth, w)
-		assert.Equal(t, pi.ScreenHeight, h)
-	})
-
-	t.Run("changing the user parameters after Boot should not ends up in a panic", func(t *testing.T) {
-		pi.Reset()
-		pi.ScreenWidth = 8
-		pi.ScreenHeight = 8
-		pi.SpriteSheetWidth = 8
-		pi.SpriteSheetHeight = 8
-		pi.MustBoot()
-		// when
-		pi.ScreenWidth = 1
-		pi.ScreenHeight = 1
-		pi.SpriteSheetWidth = 1
-		pi.SpriteSheetHeight = 1
-		// then
-		assert.NotPanics(t, func() {
-			pi.Pset(1, 1, color)
-			pi.Pget(1, 1)
-			pi.Sset(1, 1, color)
-			pi.Sget(1, 1)
-			pi.Spr(1, 1, 1)
-			pi.SprSize(1, 1, 1, 1.0, 1.0)
-			pi.SprSizeFlip(1, 1, 1, 1.0, 1.0, true, true)
-			pi.Cls()
-			pi.ClsCol(color)
 		})
+		// then
+		assert.Equal(t, uint8(0xf), pi.CustomFont().Data[0])
 	})
 
 	t.Run("should use sprite-sheet size loaded from sprite-sheet.png", func(t *testing.T) {
-		pi.SpriteSheetWidth = 32 // 2x times bigger than actual sprite-sheet.png width
-		pi.SpriteSheetHeight = 32
-		pi.Resources = fstest.MapFS{
+		pi.UseEmptySpriteSheet(32, 32) // 2x times bigger than actual sprite-sheet.png width
+		pi.Load(fstest.MapFS{
 			"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
-		}
-		pi.MustBoot()
+		})
 		assert.NotPanics(t, func() {
 			pi.Spr(4, 0, 0) // sprite-sheet.png has only 4 sprites (from 0 to 3)
 			pi.SprSize(4, 0, 0, 1.0, 1.0)

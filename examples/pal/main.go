@@ -27,9 +27,9 @@ var (
 )
 
 func main() {
-	pi.Resources = resources
+	pi.Load(resources)
 	pi.Draw = draw
-	pi.MustRun(ebitengine.Backend)
+	ebitengine.MustRun()
 }
 
 func draw() {

@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elgopher/pi"
-	"github.com/elgopher/pi/mem"
 )
 
 func TestRectFill(t *testing.T) {
@@ -17,9 +16,6 @@ func TestRectFill(t *testing.T) {
 }
 
 func testRect(t *testing.T, rect func(x0, y0, x1, y1 int, color byte), dir string) {
-	pi.ScreenWidth = 16
-	pi.ScreenHeight = 16
-
 	const white = 7
 
 	t.Run("should draw rectangle", func(t *testing.T) {
@@ -59,7 +55,8 @@ func testRect(t *testing.T, rect func(x0, y0, x1, y1 int, color byte), dir strin
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.MustBoot()
+				pi.Reset()
+				pi.SetScreenSize(16, 16)
 				pi.ClsCol(5)
 				rect(test.x0, test.y0, test.x1, test.y1, test.color)
 				assertScreenEqual(t, "internal/testimage/"+dir+"/draw/"+name+".png")
@@ -112,7 +109,8 @@ func testRect(t *testing.T, rect func(x0, y0, x1, y1 int, color byte), dir strin
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.MustBoot()
+				pi.Reset()
+				pi.SetScreenSize(16, 16)
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
 				rect(test.x0, test.y0, test.x1, test.y1, white)
 				assertScreenEqual(t, "internal/testimage/"+dir+"/clip/"+name+".png")
@@ -161,26 +159,30 @@ func testRect(t *testing.T, rect func(x0, y0, x1, y1 int, color byte), dir strin
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.MustBoot()
+				pi.Reset()
+				pi.SetScreenSize(16, 16)
 				// when
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
 				rect(test.x0, test.y0, test.x1, test.y1, white)
 				// then
-				emptyScreen := make([]byte, len(mem.ScreenData))
-				assert.Equal(t, emptyScreen, mem.ScreenData)
+				screen := pi.Scr()
+				emptyScreen := make([]byte, len(screen.Pix))
+				assert.Equal(t, emptyScreen, screen.Pix)
 			})
 		}
 	})
 
 	t.Run("should move by camera position", func(t *testing.T) {
-		pi.MustBoot()
+		pi.Reset()
+		pi.SetScreenSize(16, 16)
 		pi.Camera(-2, -3)
 		rect(0, 1, 2, 4, white)
 		assertScreenEqual(t, "internal/testimage/"+dir+"/camera_0,1,2,4.png")
 	})
 
 	t.Run("should replace color from draw palette", func(t *testing.T) {
-		pi.MustBoot()
+		pi.Reset()
+		pi.SetScreenSize(16, 16)
 		pi.Pal(white, 3)
 		rect(5, 5, 10, 10, white)
 		assertScreenEqual(t, "internal/testimage/"+dir+"/pal_5,5,10,10.png")
@@ -192,8 +194,6 @@ func TestRect(t *testing.T) {
 }
 
 func TestLine(t *testing.T) {
-	pi.ScreenWidth = 16
-	pi.ScreenHeight = 16
 	const white, red = 7, 8
 
 	t.Run("should not draw anything outside clipping region", func(t *testing.T) {
@@ -301,13 +301,15 @@ func TestLine(t *testing.T) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.MustBoot()
+				pi.Reset()
+				pi.SetScreenSize(16, 16)
 				// when
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
 				pi.Line(test.x0, test.y0, test.x1, test.y1, white)
 				// then
-				emptyScreen := make([]byte, len(mem.ScreenData))
-				assert.Equal(t, emptyScreen, mem.ScreenData)
+				screen := pi.Scr()
+				emptyScreen := make([]byte, len(screen.Pix))
+				assert.Equal(t, emptyScreen, screen.Pix)
 			})
 		}
 	})
@@ -338,7 +340,8 @@ func TestLine(t *testing.T) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.MustBoot()
+				pi.Reset()
+				pi.SetScreenSize(16, 16)
 				pi.ClsCol(5)
 				// when
 				pi.Line(test.x0, test.y0, test.x1, test.y1, test.color)
@@ -404,7 +407,8 @@ func TestLine(t *testing.T) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.MustBoot()
+				pi.Reset()
+				pi.SetScreenSize(16, 16)
 				pi.ClsCol(5)
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
 				// when
@@ -434,7 +438,8 @@ func TestLine(t *testing.T) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.MustBoot()
+				pi.Reset()
+				pi.SetScreenSize(16, 16)
 				pi.ClsCol(5)
 				pi.Pal(white, red)
 				// when
@@ -464,7 +469,8 @@ func TestLine(t *testing.T) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.MustBoot()
+				pi.Reset()
+				pi.SetScreenSize(16, 16)
 				pi.ClsCol(5)
 				pi.Camera(-1, -2)
 				// when
@@ -480,8 +486,6 @@ func TestCirc(t *testing.T) {
 }
 
 func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
-	pi.ScreenWidth = 16
-	pi.ScreenHeight = 16
 	const white, red = 7, 8
 
 	t.Run("should draw", func(t *testing.T) {
@@ -503,7 +507,8 @@ func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.MustBoot()
+				pi.Reset()
+				pi.SetScreenSize(16, 16)
 				pi.ClsCol(5)
 				// when
 				circ(test.x, test.y, test.r, test.color)
@@ -513,7 +518,8 @@ func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
 	})
 
 	t.Run("should use draw palette", func(t *testing.T) {
-		pi.MustBoot()
+		pi.Reset()
+		pi.SetScreenSize(16, 16)
 		pi.ClsCol(5)
 		pi.Pal(white, red)
 		// when
@@ -522,7 +528,8 @@ func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
 	})
 
 	t.Run("should move by camera position", func(t *testing.T) {
-		pi.MustBoot()
+		pi.Reset()
+		pi.SetScreenSize(16, 16)
 		pi.ClsCol(5)
 		pi.Camera(2, 1)
 		// when
@@ -555,7 +562,8 @@ func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.MustBoot()
+				pi.Reset()
+				pi.SetScreenSize(16, 16)
 				pi.ClsCol(5)
 				// when
 				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)

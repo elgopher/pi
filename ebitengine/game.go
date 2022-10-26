@@ -8,7 +8,8 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 
-	"github.com/elgopher/pi/mem"
+	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/key"
 )
 
 type game struct {
@@ -26,23 +27,23 @@ func (e *game) Update() error {
 	updateKeyDuration()
 	handleKeyboardShortcuts()
 
-	if mem.Update != nil {
-		mem.Update()
+	if pi.Update != nil {
+		pi.Update()
 	}
 
-	if mem.GameLoopStopped {
+	if pi.GameLoopStopped {
 		return gameStoppedErr
 	}
 
 	// Ebitengine treats Draw differently than π. In π Draw must be executed at most 30 times per second.
 	// That's why π runs Draw() from inside Ebitengine's Update().
-	if mem.Draw != nil {
+	if pi.Draw != nil {
 		if e.shouldSkipNextDraw {
 			e.shouldSkipNextDraw = false
 			return nil
 		}
 
-		mem.Draw()
+		pi.Draw()
 
 		elapsed := time.Since(updateStartedTime)
 		if elapsed.Seconds() > 1/float64(tps) {
@@ -56,8 +57,8 @@ func (e *game) Update() error {
 }
 
 func handleKeyboardShortcuts() {
-	f11 := mem.KeyDuration[mem.KeyF11] == 1
-	altEnter := mem.KeyDuration[mem.KeyEnter] == 1 && mem.KeyDuration[mem.KeyAlt] > 0
+	f11 := key.Duration[key.F11] == 1
+	altEnter := key.Duration[key.Enter] == 1 && key.Duration[key.Alt] > 0
 	if f11 || altEnter {
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
 	}
@@ -75,13 +76,14 @@ func (e *game) Draw(screen *ebiten.Image) {
 }
 
 func (e *game) writeScreenPixels(screen *ebiten.Image) {
-	if e.screenDataRGBA == nil || len(e.screenDataRGBA)/4 != len(mem.ScreenData) {
-		e.screenDataRGBA = make([]byte, len(mem.ScreenData)*4)
+	pix := pi.Scr().Pix
+	if e.screenDataRGBA == nil || len(e.screenDataRGBA)/4 != len(pix) {
+		e.screenDataRGBA = make([]byte, len(pix)*4)
 	}
 
 	offset := 0
-	for _, col := range mem.ScreenData {
-		rgb := mem.Palette[mem.DisplayPalette[col]]
+	for _, col := range pix {
+		rgb := pi.Palette[pi.DisplayPalette[col]]
 		e.screenDataRGBA[offset] = rgb.R
 		e.screenDataRGBA[offset+1] = rgb.G
 		e.screenDataRGBA[offset+2] = rgb.B
@@ -93,5 +95,6 @@ func (e *game) writeScreenPixels(screen *ebiten.Image) {
 }
 
 func (e *game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return mem.ScreenWidth, mem.ScreenHeight
+	scr := pi.Scr()
+	return scr.W, scr.H
 }

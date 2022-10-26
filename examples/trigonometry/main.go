@@ -19,9 +19,9 @@ func main() {
 		pi.Cls()
 		draw(32, 8, pi.Sin)
 		draw(96, 11, pi.Cos)
-
 	}
-	pi.MustRun(ebitengine.Backend)
+
+	ebitengine.MustRun()
 }
 
 func draw(line int, color byte, f func(x float64) float64) {

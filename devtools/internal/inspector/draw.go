@@ -11,7 +11,6 @@ import (
 	"github.com/elgopher/pi/devtools/internal/rgb"
 	"github.com/elgopher/pi/devtools/internal/snapshot"
 	"github.com/elgopher/pi/key"
-	"github.com/elgopher/pi/mem"
 	"github.com/elgopher/pi/snap"
 )
 
@@ -37,17 +36,19 @@ func Draw() {
 
 func cursorOutOfWindow() bool {
 	x, y := pi.MousePos()
-	return x < 0 || x >= mem.ScreenWidth || y < 0 || y >= mem.ScreenHeight
+	screen := pi.Scr()
+	return x < 0 || x >= screen.W || y < 0 || y >= screen.H
 }
 
 func drawBar() {
+	screen := pi.Scr()
 	mouseX, mouseY := pi.MousePos()
 	var barY int
 	if !isBarOnTop {
-		barY = mem.ScreenHeight - 7
+		barY = screen.H - 7
 	}
 
-	pi.RectFill(0, barY, mem.ScreenWidth, barY+6, BgColor)
+	pi.RectFill(0, barY, screen.W, barY+6, BgColor)
 
 	textX := 1
 	textY := barY + 1
@@ -77,7 +78,7 @@ func drawPointer() {
 
 func choosePointerColor(x, y int) byte {
 	c := pixelColorAtMouseCoords
-	if rgb.BrightnessDelta(mem.Palette[FgColor], mem.Palette[c]) >= rgb.BrightnessDelta(mem.Palette[BgColor], mem.Palette[c]) {
+	if rgb.BrightnessDelta(pi.Palette[FgColor], pi.Palette[c]) >= rgb.BrightnessDelta(pi.Palette[BgColor], pi.Palette[c]) {
 		return FgColor
 	}
 

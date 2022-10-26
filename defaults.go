@@ -3,7 +3,9 @@
 
 package pi
 
-import "github.com/elgopher/pi/mem"
+import (
+	"github.com/elgopher/pi/image"
+)
 
 const (
 	defaultSpriteSheetWidth  = 128
@@ -14,7 +16,7 @@ const (
 
 var (
 	//nolint:govet
-	defaultPalette = [256]mem.RGB{
+	defaultPalette = [256]image.RGB{
 		{0, 0, 0},          // 0 - black
 		{0x1D, 0x2B, 0x53}, // 1 - dark blue
 		{0x7E, 0x25, 0x53}, // 2 - dark purple
