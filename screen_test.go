@@ -21,6 +21,10 @@ import (
 var (
 	//go:embed internal/testimage/sprite-sheet-16x16.png
 	spriteSheet16x16 []byte
+	//go:embed internal/testimage/invalid-sheet-width.png
+	invalidSpriteSheetWidth []byte
+	//go:embed internal/testimage/invalid-sheet-height.png
+	invalidSpriteSheetHeight []byte
 	//go:embed internal/testimage/*
 	images embed.FS
 )

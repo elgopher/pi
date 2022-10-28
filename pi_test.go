@@ -104,43 +104,6 @@ func TestReset(t *testing.T) {
 	})
 }
 
-func TestUseEmptySpriteSheet(t *testing.T) {
-	invalidSpriteSheetSizes := [...]int{
-		0, 1, 7, 9,
-	}
-
-	t.Run("should panic if SpriteSheetWidth is not multiplication of 8", func(t *testing.T) {
-		for _, width := range invalidSpriteSheetSizes {
-			t.Run(strconv.Itoa(width), func(t *testing.T) {
-				pi.Reset()
-				assert.Panics(t, func() {
-					pi.UseEmptySpriteSheet(width, pi.SprSheet().H)
-				})
-			})
-		}
-	})
-
-	t.Run("should panic if SpriteSheetHeight is not multiplication of 8", func(t *testing.T) {
-		for _, height := range invalidSpriteSheetSizes {
-			t.Run(strconv.Itoa(height), func(t *testing.T) {
-				pi.Reset()
-				assert.Panics(t, func() {
-					pi.UseEmptySpriteSheet(pi.SprSheet().W, height)
-				})
-			})
-		}
-	})
-
-	t.Run("should use custom size sprite sheet", func(t *testing.T) {
-		pi.Reset()
-		// when
-		pi.UseEmptySpriteSheet(16, 8)
-		// then
-		expectedSpriteSheetData := make([]byte, 16*8)
-		assert.Equal(t, expectedSpriteSheetData, pi.SprSheet().Pix)
-	})
-}
-
 func TestSetScreenSize(t *testing.T) {
 	invalidScreenSizes := [...]int{-2, -1, 0}
 
@@ -213,6 +176,19 @@ func TestLoad(t *testing.T) {
 			pi.SprSizeFlip(4, 0, 0, 1.0, 1.0, false, false)
 			pi.Pset(16, 16, color) // sprite-sheet.png is only 16x16 pixels (0..15)
 			pi.Pget(16, 16)
+		})
+	})
+
+	t.Run("should panic if sprite-sheet size is not multiplication of 8", func(t *testing.T) {
+		assert.Panics(t, func() {
+			pi.Load(fstest.MapFS{
+				"sprite-sheet.png": &fstest.MapFile{Data: invalidSpriteSheetWidth},
+			})
+		})
+		assert.Panics(t, func() {
+			pi.Load(fstest.MapFS{
+				"sprite-sheet.png": &fstest.MapFile{Data: invalidSpriteSheetHeight},
+			})
 		})
 	})
 }
