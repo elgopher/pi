@@ -8,6 +8,8 @@ import (
 	"math"
 
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/devtools/internal/snapshot"
+	"github.com/elgopher/pi/key"
 )
 
 var distance struct {
@@ -36,18 +38,16 @@ var helpShown bool
 func Update() {
 	if !helpShown {
 		helpShown = true
+		fmt.Println("Press right mouse button to show toolbar.")
 		fmt.Println("Press P to take screenshot.")
 	}
 
-	x, y := pi.MousePos()
+	if !toolbar.visible {
+		tool.Update()
+	}
+	toolbar.update()
 
-	if pi.MouseBtn(pi.MouseLeft) && !distance.measuring {
-		distance.measuring = true
-		distance.startX, distance.startY = x, y
-		fmt.Printf("Measuring started at (%d, %d)\n", x, y)
-	} else if !pi.MouseBtn(pi.MouseLeft) && distance.measuring {
-		distance.measuring = false
-		dist, width, height := calcDistance()
-		fmt.Printf("Measuring stopped at (%d, %d). Distance is: %f, width: %d, height: %d.\n", x, y, dist, width, height)
+	if key.Btn(key.Ctrl) && key.Btnp(key.Z) {
+		snapshot.Undo()
 	}
 }

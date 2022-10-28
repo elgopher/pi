@@ -26,7 +26,7 @@ func MustRun(runBackend func() error) {
 	draw := pi.Draw
 
 	inspector.BgColor, inspector.FgColor = BgColor, FgColor
-	fmt.Println("Press F12 to pause the game and show devtools")
+	fmt.Println("Press F12 to pause the game and show devtools.")
 
 	pi.Update = func() {
 		updateDevTools()
