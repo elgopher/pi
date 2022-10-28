@@ -12,11 +12,10 @@ import (
 )
 
 type Shape struct {
-	start    pi.Position
-	started  bool
-	draw     func(x0, y0, x1, y1 int, color byte)
-	function string
-	icon     byte
+	start   pi.Position
+	started bool
+	draw    func(x0, y0, x1, y1 int, color byte) string
+	icon    byte
 }
 
 func (l *Shape) Update() {
@@ -28,8 +27,8 @@ func (l *Shape) Update() {
 		x, y := pi.MousePos()
 		l.started = false
 		snapshot.Draw()
-		l.draw(l.start.X, l.start.Y, x, y, FgColor)
-		fmt.Printf("pi.%s(%d, %d, %d, %d, %d)\n", l.function, l.start.X, l.start.Y, x, y, FgColor)
+		command := l.draw(l.start.X, l.start.Y, x, y, FgColor)
+		fmt.Println(command)
 		snapshot.Take()
 	}
 }
