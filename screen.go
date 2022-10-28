@@ -322,8 +322,8 @@ func newScreen(w, h int) Screen {
 	return Screen{
 		W:                 w,
 		H:                 h,
-		Pix:               make([]byte, screenSize), // TODO TEST THE CAPACITY
-		zeroScreenData:    make([]byte, screenSize), // TODO TEST THE CAPACITY
+		Pix:               make([]byte, screenSize),
+		zeroScreenData:    make([]byte, screenSize),
 		Clip:              Region{W: w, H: h},
 		lineOfScreenWidth: make([]byte, w),
 	}
