@@ -34,12 +34,13 @@
     * [x] controlling the game
         * [x] pausing, resuming
         * [x] add a programmatic way to stop the game
-    * [ ] taking screenshots
+    * [x] taking screenshots
     * [x] screen inspector
       * [x] presenting pixel coords and color
       * [ ] zoom-in, zoom-out
-      * [ ] drawing on the screen using Pi functions such as Pset, shapes, Spr etc.
-        * [ ] storing function calls in the clipboard and history file 
+      * [ ] drawing on the screen using Pi functions
+        * [x] Pset, shapes
+        * [ ] Spr, Print
     * [ ] palette inspector
       * [ ] display, draw palette
     * [ ] sprite-sheet editor
