@@ -8,8 +8,20 @@ import (
 )
 
 var snapshot []byte
+var history [][]byte
+
+const historyLimit = 128
 
 func Take() {
+	if snapshot != nil {
+		s := make([]byte, len(snapshot))
+		copy(s, snapshot)
+		history = append(history, s)
+		if len(history) > historyLimit {
+			history = history[1:]
+		}
+	}
+
 	screen := pi.Scr()
 	if snapshot == nil {
 		snapshot = make([]byte, len(screen.Pix))
@@ -19,4 +31,14 @@ func Take() {
 
 func Draw() {
 	copy(pi.Scr().Pix, snapshot)
+}
+
+func Undo() {
+	if len(history) == 0 {
+		return
+	}
+
+	last := history[len(history)-1]
+	history = history[:len(history)-1]
+	snapshot = last
 }

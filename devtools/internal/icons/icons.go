@@ -12,7 +12,14 @@ import (
 )
 
 const (
-	Pointer = "\u0000"
+	Pointer      = 0
+	MeasureTool  = 1
+	PsetTool     = 2
+	LineTool     = 3
+	RectTool     = 4
+	RectFillTool = 5
+	CircTool     = 6
+	CircFillTool = 7
 )
 
 //go:embed icons.png
@@ -21,7 +28,7 @@ var iconsPng []byte
 var icons = pi.Font{
 	Width:        4,
 	SpecialWidth: 8,
-	Height:       8,
+	Height:       4,
 }
 
 func init() {
@@ -32,6 +39,9 @@ func init() {
 	}
 }
 
-func Draw(icon string, x, y int, color byte) {
-	icons.Print(icon, x, y, color)
+func Draw(x, y int, color byte, icon ...byte) {
+	for _, i := range icon {
+		text := string(rune(i))
+		x = icons.Print(text, x, y, color)
+	}
 }
