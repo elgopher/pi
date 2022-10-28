@@ -108,7 +108,7 @@ func newSpriteSheet(w int, h int) SpriteSheet {
 	return SpriteSheet{
 		W:               w,
 		H:               h,
-		Pix:             make([]byte, size), // TODO TEest capacity
+		Pix:             make([]byte, size),
 		numberOfSprites: size / (SpriteWidth * SpriteHeight),
 		spritesInLine:   w / SpriteWidth,
 	}
