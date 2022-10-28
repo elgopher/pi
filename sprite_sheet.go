@@ -74,7 +74,7 @@ func useSpriteSheet(b []byte) error {
 	}
 
 	Palette = img.Palette
-	sprSheet = newSpriteSheet(img.Width, img.Height) // TODO VALIDATE IF SS HAS CORRECT SIZE!
+	sprSheet = newSpriteSheet(img.Width, img.Height)
 	sprSheet.Pix = img.Pixels
 	return nil
 }
@@ -104,7 +104,15 @@ func SprSheet() SpriteSheet {
 }
 
 func newSpriteSheet(w int, h int) SpriteSheet {
+	if w%8 != 0 || w == 0 {
+		panic(fmt.Sprintf("sprite sheet width %d is not a multiplcation of 8", w))
+	}
+	if h%8 != 0 || h == 0 {
+		panic(fmt.Sprintf("sprite sheet height %d is not a multiplcation of 8", h))
+	}
+
 	size := w * h
+
 	return SpriteSheet{
 		W:               w,
 		H:               h,
@@ -117,11 +125,5 @@ func newSpriteSheet(w int, h int) SpriteSheet {
 // UseEmptySpriteSheet initializes empty sprite-sheet with given size. Could be used
 // when you don't have sprite-sheet.png in resources.
 func UseEmptySpriteSheet(w, h int) {
-	if w%8 != 0 || w == 0 {
-		panic(fmt.Sprintf("sprite sheet width %d is not a multiplcation of 8", w))
-	}
-	if h%8 != 0 || h == 0 {
-		panic(fmt.Sprintf("sprite sheet height %d is not a multiplcation of 8", h))
-	}
 	sprSheet = newSpriteSheet(w, h)
 }
