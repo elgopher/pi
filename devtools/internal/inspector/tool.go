@@ -4,6 +4,7 @@
 package inspector
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/elgopher/pi"
@@ -26,39 +27,42 @@ func selectTool(icon byte) {
 		tool = &Pset{}
 	case icons.LineTool:
 		tool = &Shape{
-			draw:     pi.Line,
-			function: "Line",
-			icon:     icons.LineTool,
+			draw: drawShape("Line", pi.Line),
+			icon: icons.LineTool,
 		}
 	case icons.RectTool:
 		tool = &Shape{
-			draw:     pi.Rect,
-			function: "Rect",
-			icon:     icons.RectTool,
+			draw: drawShape("Rect", pi.Rect),
+			icon: icons.RectTool,
 		}
 	case icons.RectFillTool:
 		tool = &Shape{
-			draw:     pi.RectFill,
-			function: "RectFill",
-			icon:     icons.RectFillTool,
+			draw: drawShape("RectFill", pi.RectFill),
+			icon: icons.RectFillTool,
 		}
 	case icons.CircTool:
 		tool = &Shape{
-			draw:     drawCirc(pi.Circ),
-			function: "Circ",
-			icon:     icons.CircTool,
+			draw: drawCirc("Circ", pi.Circ),
+			icon: icons.CircTool,
 		}
 	case icons.CircFillTool:
 		tool = &Shape{
-			draw:     drawCirc(pi.CircFill),
-			function: "CircFill",
-			icon:     icons.CircFillTool,
+			draw: drawCirc("CircFill", pi.CircFill),
+			icon: icons.CircFillTool,
 		}
 	}
 }
 
-func drawCirc(f func(cx, cy, r int, color byte)) func(x0 int, y0 int, x1 int, y1 int, color byte) {
-	return func(x0, y0, x1, y1 int, color byte) {
+func drawShape(name string, f func(x0, y0, x1, y1 int, color byte)) func(x0, y0, x1, y1 int, color byte) string {
+	return func(x0, y0, x1, y1 int, color byte) string {
+		f(x0, y0, x1, y1, color)
+		command := fmt.Sprintf("pi.%s(%d, %d, %d, %d, %d)", name, x0, y0, x1, y1, color)
+		return command
+	}
+}
+
+func drawCirc(name string, f func(cx, cy, r int, color byte)) func(x0 int, y0 int, x1 int, y1 int, color byte) string {
+	return func(x0, y0, x1, y1 int, color byte) string {
 		dx := x1 - x0
 		cx := x0 + dx
 		if dx < 0 {
@@ -73,5 +77,8 @@ func drawCirc(f func(cx, cy, r int, color byte)) func(x0 int, y0 int, x1 int, y1
 		r := int(math.Sqrt(float64(dx*dx + dy*dy)))
 
 		f(cx, cy, r, FgColor)
+
+		command := fmt.Sprintf("pi.%s(%d, %d, %d, %d)", name, cx, cy, r, color)
+		return command
 	}
 }
