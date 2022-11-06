@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 
@@ -22,8 +21,6 @@ const tps = 30
 // Run opens the window and runs the game loop. It must be
 // called from the main thread.
 func Run() error {
-	lastTime = time.Now()
-
 	screen := pi.Scr() // TODO Screen size should be read each frame (and window size adjusted)
 
 	ebiten.SetTPS(tps)
@@ -35,7 +32,15 @@ func Run() error {
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	ebiten.SetWindowTitle("Pi Game")
 
-	if err := ebiten.RunGame(&game{}); err != nil {
+	var theAudio otoAudio
+	if err := theAudio.Start(); err != nil {
+		return err
+	}
+	defer theAudio.Stop()
+
+	theGame := &game{audio: theAudio}
+
+	if err := ebiten.RunGame(theGame); err != nil {
 		if err == gameStoppedErr {
 			return nil
 		}

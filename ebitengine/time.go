@@ -12,6 +12,12 @@ import (
 var lastTime time.Time
 
 func updateTime() {
+	if lastTime.IsZero() {
+		lastTime = time.Now()
+		pi.TimeSeconds = 0
+		return
+	}
+
 	now := time.Now()
 	timePassed := now.Sub(lastTime)
 	lastTime = now

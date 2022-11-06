@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.4.12
+	github.com/hajimehoshi/oto/v2 v2.3.1
 	github.com/stretchr/testify v1.8.1
 )
 
