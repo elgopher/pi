@@ -9,6 +9,7 @@ import "math"
 //
 // Sin returns an inverted result to suit screen space (where Y means "DOWN", as opposed
 // to mathematical diagrams where Y typically means "UP"):
+//
 //	sin(0.25) // returns -1
 //
 // If you want to use conventional radian-based function without the y inversion, use math.Sin.
@@ -28,8 +29,45 @@ func Cos(angle float64) float64 {
 // Atan2 converts DX, DY into an angle from 0..1
 //
 // Similar to Cos and Sin, angle is taken to run anticlockwise in screenspace. For example:
+//
 //	atan(0,-1)  // returns 0.25
 func Atan2(dx, dy float64) float64 {
 	v := math.Atan2(dx, dy)
 	return math.Mod(0.75+v/(math.Pi*2), 1)
+}
+
+// Int is a generic type for all integer types
+type Int interface {
+	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
+}
+
+// MinInt returns minimum of two integer numbers.
+func MinInt[T Int](x, y T) T {
+	if x < y {
+		return x
+	}
+
+	return y
+}
+
+// MaxInt returns maximum of two integer numbers.
+func MaxInt[T Int](x, y T) T {
+	if x > y {
+		return x
+	}
+
+	return y
+}
+
+// MidInt returns the middle of three integer numbers. Very useful for clamping.
+func MidInt[T Int](x, y, z T) T {
+	if (x < y && y < z) || (z < y && y < x) {
+		return y
+	}
+
+	if (y < x && x < z) || (z < x && x < y) {
+		return x
+	}
+
+	return z
 }
