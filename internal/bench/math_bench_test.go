@@ -52,3 +52,20 @@ func BenchmarkMidInt(b *testing.B) {
 		}
 	}
 }
+
+func BenchmarkMid(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		for j := 0; j < 20; j++ {
+			f := float64(j)
+			pi.Mid(f, f+1, f+2) // y
+			pi.Mid(f+2, f+1, f) // y
+			pi.Mid(f+1, f, f+2) // x
+			pi.Mid(f+1, f+2, f) // x
+			pi.Mid(f, f+2, f+1) // z
+			pi.Mid(f+2, f, f+1) // z
+		}
+	}
+}

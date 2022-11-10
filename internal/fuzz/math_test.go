@@ -28,3 +28,9 @@ func FuzzMidInt(f *testing.F) {
 		pi.MidInt(x, y, z)
 	})
 }
+
+func FuzzMid(f *testing.F) {
+	f.Fuzz(func(t *testing.T, x, y, z float64) {
+		_ = pi.Mid(x, y, z)
+	})
+}

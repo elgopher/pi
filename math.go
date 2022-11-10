@@ -71,3 +71,21 @@ func MidInt[T Int](x, y, z T) T {
 
 	return z
 }
+
+// Mid returns the middle of three float64 numbers. Very useful for clamping.
+// NaNs are always put at the beginning (are the smallest ones).
+func Mid(x, y, z float64) float64 {
+	if x > y || math.IsNaN(y) {
+		x, y = y, x
+	}
+
+	if y > z || math.IsNaN(z) {
+		y = z
+	}
+
+	if x > y || math.IsNaN(y) {
+		y = x
+	}
+
+	return y
+}
