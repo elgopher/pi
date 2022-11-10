@@ -43,10 +43,10 @@ func BenchmarkMidInt(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		for j := 0; j < 20; j++ {
-			pi.MidInt(j, j+1, j+2) // x
-			pi.MidInt(j+2, j+1, j) // x
-			pi.MidInt(j+1, j, j+2) // y
-			pi.MidInt(j+1, j+2, j) // y
+			pi.MidInt(j, j+1, j+2) // y
+			pi.MidInt(j+2, j+1, j) // y
+			pi.MidInt(j+1, j, j+2) // x
+			pi.MidInt(j+1, j+2, j) // x
 			pi.MidInt(j, j+2, j+1) // z
 			pi.MidInt(j+2, j, j+1) // z
 		}

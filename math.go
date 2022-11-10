@@ -61,15 +61,19 @@ func MaxInt[T Int](x, y T) T {
 
 // MidInt returns the middle of three integer numbers. Very useful for clamping.
 func MidInt[T Int](x, y, z T) T {
-	if (x < y && y < z) || (z < y && y < x) {
-		return y
+	if x > y {
+		x, y = y, x
 	}
 
-	if (y < x && x < z) || (z < x && x < y) {
-		return x
+	if y > z {
+		y = z
 	}
 
-	return z
+	if x > y {
+		y = x
+	}
+
+	return y
 }
 
 // Mid returns the middle of three float64 numbers. Very useful for clamping.
