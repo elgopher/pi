@@ -83,7 +83,7 @@ func Reset() {
 	systemFont.Data, _ = font.Load(systemFontPNG)
 	customFont = defaultCustomFont
 	customFont.Data = make([]byte, fontDataSize)
-	screen = newScreen(defaultScreenWidth, defaultScreenHeight)
+	screen = NewPixMap(defaultScreenWidth, defaultScreenHeight)
 	sprSheet = newSpriteSheet(defaultSpriteSheetWidth, defaultSpriteSheetHeight)
 	Palette = defaultPalette
 }

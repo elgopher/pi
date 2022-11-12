@@ -31,10 +31,10 @@ func Take() (string, error) {
 	}
 
 	screen := pi.Scr()
-	size := image.Rectangle{Max: image.Point{X: screen.W, Y: screen.H}}
+	size := image.Rectangle{Max: image.Point{X: screen.Width(), Y: screen.Height()}}
 	img := image.NewPaletted(size, palette)
 
-	copy(img.Pix, pi.Scr().Pix)
+	copy(img.Pix, pi.Scr().Pix())
 
 	file, err := os.CreateTemp("", "screenshot-*.png")
 	if err != nil {

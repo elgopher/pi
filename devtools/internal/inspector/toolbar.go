@@ -28,8 +28,8 @@ func (t *Toolbar) toggle() {
 		t.pos.X = 0
 	}
 	scr := pi.Scr()
-	if t.pos.X+toolbarWidth > scr.W {
-		t.pos.X = scr.W - toolbarWidth - 1
+	if t.pos.X+toolbarWidth > scr.Width() {
+		t.pos.X = scr.Width() - toolbarWidth - 1
 	}
 	t.pos.Y -= toolbarHeight + 2
 	if t.pos.Y < 0 {

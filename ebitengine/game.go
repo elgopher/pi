@@ -76,7 +76,7 @@ func (e *game) Draw(screen *ebiten.Image) {
 }
 
 func (e *game) writeScreenPixels(screen *ebiten.Image) {
-	pix := pi.Scr().Pix
+	pix := pi.Scr().Pix()
 	if e.screenDataRGBA == nil || len(e.screenDataRGBA)/4 != len(pix) {
 		e.screenDataRGBA = make([]byte, len(pix)*4)
 	}
@@ -96,5 +96,5 @@ func (e *game) writeScreenPixels(screen *ebiten.Image) {
 
 func (e *game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	scr := pi.Scr()
-	return scr.W, scr.H
+	return scr.Width(), scr.Height()
 }

@@ -25,9 +25,9 @@ func TestReset(t *testing.T) {
 		pi.Reset()
 		// then
 		sprSheet := pi.SprSheet()
-		assert.Equal(t, 128, sprSheet.W)
-		assert.Equal(t, 128, sprSheet.H)
-		assert.Equal(t, make([]byte, 16384), sprSheet.Pix)
+		assert.Equal(t, 128, sprSheet.Width())
+		assert.Equal(t, 128, sprSheet.Height())
+		assert.Equal(t, make([]byte, 16384), sprSheet.Pix())
 	})
 
 	t.Run("should reset screen", func(t *testing.T) {
@@ -36,11 +36,11 @@ func TestReset(t *testing.T) {
 		pi.Reset()
 		// then
 		scr := pi.Scr()
-		assert.Equal(t, 128, scr.W)
-		assert.Equal(t, 128, scr.H)
-		assert.Equal(t, make([]byte, 16384), scr.Pix)
-		assert.Zero(t, scr.Camera)
-		assert.Equal(t, pi.Region{W: 128, H: 128}, scr.Clip)
+		assert.Equal(t, 128, scr.Width())
+		assert.Equal(t, 128, scr.Height())
+		assert.Equal(t, make([]byte, 16384), scr.Pix())
+		assert.Zero(t, pi.ScreenCamera)
+		assert.Equal(t, pi.Region{W: 128, H: 128}, scr.Clip())
 	})
 
 	t.Run("should reset palette", func(t *testing.T) {
@@ -112,7 +112,7 @@ func TestSetScreenSize(t *testing.T) {
 			t.Run(strconv.Itoa(size), func(t *testing.T) {
 				pi.Reset()
 				assert.Panics(t, func() {
-					pi.SetScreenSize(size, pi.Scr().H)
+					pi.SetScreenSize(size, pi.Scr().Height())
 				})
 			})
 		}
@@ -123,7 +123,7 @@ func TestSetScreenSize(t *testing.T) {
 			t.Run(strconv.Itoa(size), func(t *testing.T) {
 				pi.Reset()
 				assert.Panics(t, func() {
-					pi.SetScreenSize(pi.Scr().W, size)
+					pi.SetScreenSize(pi.Scr().Width(), size)
 				})
 			})
 		}
@@ -134,7 +134,7 @@ func TestSetScreenSize(t *testing.T) {
 		// when
 		pi.SetScreenSize(2, 3)
 		// then
-		assert.Equal(t, make([]byte, 6), pi.Scr().Pix)
+		assert.Equal(t, make([]byte, 6), pi.Scr().Pix())
 	})
 }
 
@@ -148,10 +148,10 @@ func TestLoad(t *testing.T) {
 			"sprite-sheet.png": &fstest.MapFile{Data: spriteSheet16x16},
 		})
 		// then
-		assert.Equal(t, 16, pi.SprSheet().W)
-		assert.Equal(t, 16, pi.SprSheet().H)
+		assert.Equal(t, 16, pi.SprSheet().Width())
+		assert.Equal(t, 16, pi.SprSheet().Height())
 		img := decodePNG(t, "internal/testimage/sprite-sheet-16x16.png")
-		assert.Equal(t, img.Pixels, pi.SprSheet().Pix)
+		assert.Equal(t, img.Pixels, pi.SprSheet().Pix())
 		assert.Equal(t, img.Palette, pi.Palette)
 	})
 
@@ -179,7 +179,7 @@ func TestLoad(t *testing.T) {
 		})
 	})
 
-	t.Run("should panic if sprite-sheet size is not multiplication of 8", func(t *testing.T) {
+	t.Run("should panic if sprite-sheet size is not multiple of 8", func(t *testing.T) {
 		assert.Panics(t, func() {
 			pi.Load(fstest.MapFS{
 				"sprite-sheet.png": &fstest.MapFile{Data: invalidSpriteSheetWidth},

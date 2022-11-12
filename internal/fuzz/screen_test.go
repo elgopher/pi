@@ -13,19 +13,17 @@ import (
 
 const color = 7
 
-func FuzzPset(f *testing.F) {
-	pi.Reset()
-	pi.SetScreenSize(16, 16)
+func FuzzPixMap_Set(f *testing.F) {
+	pixMap := pi.NewPixMap(16, 16)
 	f.Fuzz(func(t *testing.T, x, y int) {
-		pi.Pset(x, y, color)
+		pixMap.Set(x, y, color)
 	})
 }
 
-func FuzzPget(f *testing.F) {
-	pi.Reset()
-	pi.SetScreenSize(16, 16)
+func FuzzPixMap_Get(f *testing.F) {
+	pixMap := pi.NewPixMap(16, 16)
 	f.Fuzz(func(t *testing.T, x, y int) {
-		pi.Pget(x, y)
+		pixMap.Get(x, y)
 	})
 }
 

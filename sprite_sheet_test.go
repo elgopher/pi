@@ -18,23 +18,23 @@ func TestUseEmptySpriteSheet(t *testing.T) {
 		0, 1, 7, 9,
 	}
 
-	t.Run("should panic if SpriteSheetWidth is not multiplication of 8", func(t *testing.T) {
+	t.Run("should panic if SpriteSheetWidth is not multiple of 8", func(t *testing.T) {
 		for _, width := range invalidSpriteSheetSizes {
 			t.Run(strconv.Itoa(width), func(t *testing.T) {
 				pi.Reset()
 				assert.Panics(t, func() {
-					pi.UseEmptySpriteSheet(width, pi.SprSheet().H)
+					pi.UseEmptySpriteSheet(width, pi.SprSheet().Height())
 				})
 			})
 		}
 	})
 
-	t.Run("should panic if SpriteSheetHeight is not multiplication of 8", func(t *testing.T) {
+	t.Run("should panic if SpriteSheetHeight is not multiple of 8", func(t *testing.T) {
 		for _, height := range invalidSpriteSheetSizes {
 			t.Run(strconv.Itoa(height), func(t *testing.T) {
 				pi.Reset()
 				assert.Panics(t, func() {
-					pi.UseEmptySpriteSheet(pi.SprSheet().W, height)
+					pi.UseEmptySpriteSheet(pi.SprSheet().Width(), height)
 				})
 			})
 		}
@@ -46,7 +46,7 @@ func TestUseEmptySpriteSheet(t *testing.T) {
 		pi.UseEmptySpriteSheet(16, 8)
 		// then
 		expectedSpriteSheetData := make([]byte, 16*8)
-		assert.Equal(t, expectedSpriteSheetData, pi.SprSheet().Pix)
+		assert.Equal(t, expectedSpriteSheetData, pi.SprSheet().Pix())
 	})
 }
 
@@ -58,13 +58,13 @@ func TestSset(t *testing.T) {
 		// when
 		pi.Sset(2, 1, col)
 		// then
-		assert.Equal(t, col, pi.SprSheet().Pix[10])
+		assert.Equal(t, col, pi.SprSheet().Pix()[10])
 	})
 
 	t.Run("should not set pixel outside the sprite sheet", func(t *testing.T) {
 		pi.UseEmptySpriteSheet(8, 8)
 
-		emptySheet := make([]byte, len(pi.SprSheet().Pix))
+		emptySheet := make([]byte, len(pi.SprSheet().Pix()))
 
 		tests := []struct{ X, Y int }{
 			{-1, 0},
@@ -78,7 +78,7 @@ func TestSset(t *testing.T) {
 				// when
 				pi.Sset(coords.X, coords.Y, col)
 				// then
-				assert.Equal(t, emptySheet, pi.SprSheet().Pix)
+				assert.Equal(t, emptySheet, pi.SprSheet().Pix())
 			})
 		}
 	})
@@ -95,7 +95,7 @@ func TestSget(t *testing.T) {
 
 	t.Run("should get color 0 if outside the sprite sheet", func(t *testing.T) {
 		pi.UseEmptySpriteSheet(8, 8)
-		pixels := pi.SprSheet().Pix
+		pixels := pi.SprSheet().Pix()
 		for i := 0; i < len(pixels); i++ {
 			pixels[i] = 7
 		}

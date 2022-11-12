@@ -29,10 +29,10 @@ func (m *Measure) drawBar() {
 	mouseX, mouseY := pi.MousePos()
 	var barY int
 	if !isBarOnTop {
-		barY = screen.H - 7
+		barY = screen.Height() - 7
 	}
 
-	pi.RectFill(0, barY, screen.W, barY+6, BgColor)
+	pi.RectFill(0, barY, screen.Width(), barY+6, BgColor)
 
 	textX := 1
 	textY := barY + 1
