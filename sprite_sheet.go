@@ -18,40 +18,14 @@ const (
 
 var sprSheet = newSpriteSheet(defaultSpriteSheetWidth, defaultSpriteSheetHeight)
 
-// Sset sets the pixel color on the sprite sheet. It does not update the global Color.
+// Sset sets the pixel color on the sprite sheet.
 func Sset(x, y int, color byte) {
-	if x < 0 {
-		return
-	}
-	if y < 0 {
-		return
-	}
-	if x >= sprSheet.W {
-		return
-	}
-	if y >= sprSheet.H {
-		return
-	}
-
-	sprSheet.Pix[y*sprSheet.W+x] = color
+	sprSheet.Set(x, y, color)
 }
 
 // Sget gets the pixel color on the sprite sheet.
 func Sget(x, y int) byte {
-	if x < 0 {
-		return 0
-	}
-	if y < 0 {
-		return 0
-	}
-	if x >= sprSheet.W {
-		return 0
-	}
-	if y >= sprSheet.H {
-		return 0
-	}
-
-	return sprSheet.Pix[y*sprSheet.W+x]
+	return sprSheet.Get(x, y)
 }
 
 func loadSpriteSheet(resources fs.ReadFileFS) error {
@@ -75,35 +49,22 @@ func useSpriteSheet(b []byte) error {
 
 	Palette = img.Palette
 	sprSheet = newSpriteSheet(img.Width, img.Height)
-	sprSheet.Pix = img.Pixels
+	copy(sprSheet.Pix(), img.Pixels)
 	return nil
 }
 
-type SpriteSheet struct {
-	// Width and height in pixels
-	W, H int
-
-	// Pix contains pixel colors for the entire sprite sheet.
-	// Each pixel is one byte. It is initialized during pi.Boot.
-	//
-	// Pixels in the sprite-sheet are organized from left to right,
-	// top to bottom. Slice element number 0 has pixel located
-	// in the top-left corner. Slice element number 1 has a pixel color
-	// on the right and so on.
-	//
-	// Can be freely read and updated.
-	// Useful when you want to use your own functions for pixel manipulation.
-	Pix []byte
+type spriteSheet struct {
+	PixMap
 
 	numberOfSprites int
 	spritesInLine   int
 }
 
-func SprSheet() SpriteSheet {
-	return sprSheet
+func SprSheet() PixMap {
+	return sprSheet.PixMap
 }
 
-func newSpriteSheet(w int, h int) SpriteSheet {
+func newSpriteSheet(w int, h int) spriteSheet {
 	if w%8 != 0 || w == 0 {
 		panic(fmt.Sprintf("sprite sheet width %d is not a multiplcation of 8", w))
 	}
@@ -113,10 +74,8 @@ func newSpriteSheet(w int, h int) SpriteSheet {
 
 	size := w * h
 
-	return SpriteSheet{
-		W:               w,
-		H:               h,
-		Pix:             make([]byte, size),
+	return spriteSheet{
+		PixMap:          NewPixMap(w, h),
 		numberOfSprites: size / (SpriteWidth * SpriteHeight),
 		spritesInLine:   w / SpriteWidth,
 	}

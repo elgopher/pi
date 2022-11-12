@@ -23,14 +23,15 @@ func Take() {
 	}
 
 	screen := pi.Scr()
+	pix := screen.Pix()
 	if snapshot == nil {
-		snapshot = make([]byte, len(screen.Pix))
+		snapshot = make([]byte, len(pix))
 	}
-	copy(snapshot, screen.Pix)
+	copy(snapshot, pix)
 }
 
 func Draw() {
-	copy(pi.Scr().Pix, snapshot)
+	copy(pi.Scr().Pix(), snapshot)
 }
 
 func Undo() {

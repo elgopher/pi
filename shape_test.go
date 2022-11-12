@@ -6,17 +6,16 @@ package pi_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elgopher/pi"
 )
 
-func TestRectFill(t *testing.T) {
-	testRect(t, pi.RectFill, "rectfill")
+const white, red = 7, 8
+
+func TestPixMap_RectFill(t *testing.T) {
+	testPixMapRect(t, pi.PixMap.RectFill, "rectfill")
 }
 
-func testRect(t *testing.T, rect func(x0, y0, x1, y1 int, color byte), dir string) {
-	const white = 7
+func testPixMapRect(t *testing.T, rect func(_ pi.PixMap, x0, y0, x1, y1 int, color byte), dir string) {
 
 	t.Run("should draw rectangle", func(t *testing.T) {
 		tests := map[string]struct {
@@ -55,11 +54,10 @@ func testRect(t *testing.T, rect func(x0, y0, x1, y1 int, color byte), dir strin
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.Reset()
-				pi.SetScreenSize(16, 16)
-				pi.ClsCol(5)
-				rect(test.x0, test.y0, test.x1, test.y1, test.color)
-				assertScreenEqual(t, "internal/testimage/"+dir+"/draw/"+name+".png")
+				pixMap := pi.NewPixMap(16, 16)
+				pixMap.ClearCol(5)
+				rect(pixMap, test.x0, test.y0, test.x1, test.y1, test.color)
+				assertPixMapEqual(t, pixMap, "internal/testimage/"+dir+"/draw/"+name+".png")
 			})
 		}
 	})
@@ -109,11 +107,9 @@ func testRect(t *testing.T, rect func(x0, y0, x1, y1 int, color byte), dir strin
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.Reset()
-				pi.SetScreenSize(16, 16)
-				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
-				rect(test.x0, test.y0, test.x1, test.y1, white)
-				assertScreenEqual(t, "internal/testimage/"+dir+"/clip/"+name+".png")
+				pixMap := pi.NewPixMap(16, 16).WithClip(test.clipX, test.clipY, test.clipW, test.clipH)
+				rect(pixMap, test.x0, test.y0, test.x1, test.y1, white)
+				assertPixMapEqual(t, pixMap, "internal/testimage/"+dir+"/clip/"+name+".png")
 			})
 		}
 	})
@@ -159,19 +155,24 @@ func testRect(t *testing.T, rect func(x0, y0, x1, y1 int, color byte), dir strin
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.Reset()
-				pi.SetScreenSize(16, 16)
-				// when
-				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
-				rect(test.x0, test.y0, test.x1, test.y1, white)
+				pixMap := pi.NewPixMap(16, 16).WithClip(test.clipX, test.clipY, test.clipW, test.clipH)
+				rect(pixMap, test.x0, test.y0, test.x1, test.y1, white)
 				// then
-				screen := pi.Scr()
-				emptyScreen := make([]byte, len(screen.Pix))
-				assert.Equal(t, emptyScreen, screen.Pix)
+				assertEmptyPixMap(t, pixMap)
 			})
 		}
 	})
+}
 
+func TestPixMap_Rect(t *testing.T) {
+	testPixMapRect(t, pi.PixMap.Rect, "rect")
+}
+
+func TestRectFill(t *testing.T) {
+	testRect(t, pi.RectFill, "rectfill")
+}
+
+func testRect(t *testing.T, rect func(x0 int, y0 int, x1 int, y1 int, col byte), dir string) {
 	t.Run("should move by camera position", func(t *testing.T) {
 		pi.Reset()
 		pi.SetScreenSize(16, 16)
@@ -193,9 +194,7 @@ func TestRect(t *testing.T) {
 	testRect(t, pi.Rect, "rect")
 }
 
-func TestLine(t *testing.T) {
-	const white, red = 7, 8
-
+func TestPixMap_Line(t *testing.T) {
 	t.Run("should not draw anything outside clipping region", func(t *testing.T) {
 		tests := map[string]struct {
 			clipX, clipY, clipW, clipH int
@@ -301,15 +300,11 @@ func TestLine(t *testing.T) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.Reset()
-				pi.SetScreenSize(16, 16)
+				pixMap := pi.NewPixMap(16, 16).WithClip(test.clipX, test.clipY, test.clipW, test.clipH)
 				// when
-				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
-				pi.Line(test.x0, test.y0, test.x1, test.y1, white)
+				pixMap.Line(test.x0, test.y0, test.x1, test.y1, white)
 				// then
-				screen := pi.Scr()
-				emptyScreen := make([]byte, len(screen.Pix))
-				assert.Equal(t, emptyScreen, screen.Pix)
+				assertEmptyPixMap(t, pixMap)
 			})
 		}
 	})
@@ -340,12 +335,11 @@ func TestLine(t *testing.T) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.Reset()
-				pi.SetScreenSize(16, 16)
-				pi.ClsCol(5)
+				pixMap := pi.NewPixMap(16, 16)
+				pixMap.ClearCol(5)
 				// when
-				pi.Line(test.x0, test.y0, test.x1, test.y1, test.color)
-				assertScreenEqual(t, "internal/testimage/line/draw/"+name+".png")
+				pixMap.Line(test.x0, test.y0, test.x1, test.y1, test.color)
+				assertPixMapEqual(t, pixMap, "internal/testimage/line/draw/"+name+".png")
 			})
 		}
 	})
@@ -407,17 +401,17 @@ func TestLine(t *testing.T) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.Reset()
-				pi.SetScreenSize(16, 16)
-				pi.ClsCol(5)
-				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
+				pixMap := pi.NewPixMap(16, 16).WithClip(test.clipX, test.clipY, test.clipW, test.clipH)
+				pixMap.ClearCol(5)
 				// when
-				pi.Line(test.x0, test.y0, test.x1, test.y1, white)
-				assertScreenEqual(t, "internal/testimage/line/clip/"+name+".png")
+				pixMap.Line(test.x0, test.y0, test.x1, test.y1, white)
+				assertPixMapEqual(t, pixMap, "internal/testimage/line/clip/"+name+".png")
 			})
 		}
 	})
+}
 
+func TestLine(t *testing.T) {
 	t.Run("should use draw palette", func(t *testing.T) {
 		tests := map[string]struct {
 			x0, y0, x1, y1 int
@@ -481,13 +475,11 @@ func TestLine(t *testing.T) {
 	})
 }
 
-func TestCirc(t *testing.T) {
-	testCirc(t, pi.Circ, "circ")
+func TestPixMap_Circ(t *testing.T) {
+	testPixMapCirc(t, pi.PixMap.Circ, "circ")
 }
 
-func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
-	const white, red = 7, 8
-
+func testPixMapCirc(t *testing.T, circ func(_ pi.PixMap, x, y, r int, color byte), dir string) {
 	t.Run("should draw", func(t *testing.T) {
 		tests := map[string]struct {
 			x, y, r int
@@ -507,34 +499,13 @@ func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.Reset()
-				pi.SetScreenSize(16, 16)
-				pi.ClsCol(5)
+				pixMap := pi.NewPixMap(16, 16)
+				pixMap.ClearCol(5)
 				// when
-				circ(test.x, test.y, test.r, test.color)
-				assertScreenEqual(t, "internal/testimage/"+dir+"/draw/"+name+".png")
+				circ(pixMap, test.x, test.y, test.r, test.color)
+				assertPixMapEqual(t, pixMap, "internal/testimage/"+dir+"/draw/"+name+".png")
 			})
 		}
-	})
-
-	t.Run("should use draw palette", func(t *testing.T) {
-		pi.Reset()
-		pi.SetScreenSize(16, 16)
-		pi.ClsCol(5)
-		pi.Pal(white, red)
-		// when
-		circ(8, 8, 1, white)
-		assertScreenEqual(t, "internal/testimage/"+dir+"/draw/radius 1, red.png")
-	})
-
-	t.Run("should move by camera position", func(t *testing.T) {
-		pi.Reset()
-		pi.SetScreenSize(16, 16)
-		pi.ClsCol(5)
-		pi.Camera(2, 1)
-		// when
-		circ(8, 8, 5, white)
-		assertScreenEqual(t, "internal/testimage/"+dir+"/camera.png")
 	})
 
 	t.Run("should draw inside clipping region", func(t *testing.T) {
@@ -562,15 +533,43 @@ func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
 
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
-				pi.Reset()
-				pi.SetScreenSize(16, 16)
-				pi.ClsCol(5)
+				pixMap := pi.NewPixMap(16, 16).WithClip(test.clipX, test.clipY, test.clipW, test.clipH)
+				pixMap.ClearCol(5)
 				// when
-				pi.Clip(test.clipX, test.clipY, test.clipW, test.clipH)
-				circ(test.x, test.y, test.r, white)
-				assertScreenEqual(t, "internal/testimage/"+dir+"/clip/"+name+".png")
+				circ(pixMap, test.x, test.y, test.r, white)
+				assertPixMapEqual(t, pixMap, "internal/testimage/"+dir+"/clip/"+name+".png")
 			})
 		}
+	})
+}
+
+func TestPixMap_CircFill(t *testing.T) {
+	testPixMapCirc(t, pi.PixMap.CircFill, "circfill")
+}
+
+func TestCirc(t *testing.T) {
+	testCirc(t, pi.Circ, "circ")
+}
+
+func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
+	t.Run("should use draw palette", func(t *testing.T) {
+		pi.Reset()
+		pi.SetScreenSize(16, 16)
+		pi.ClsCol(5)
+		pi.Pal(white, red)
+		// when
+		circ(8, 8, 1, white)
+		assertScreenEqual(t, "internal/testimage/"+dir+"/draw/radius 1, red.png")
+	})
+
+	t.Run("should move by camera position", func(t *testing.T) {
+		pi.Reset()
+		pi.SetScreenSize(16, 16)
+		pi.ClsCol(5)
+		pi.Camera(2, 1)
+		// when
+		circ(8, 8, 5, white)
+		assertScreenEqual(t, "internal/testimage/"+dir+"/camera.png")
 	})
 }
 

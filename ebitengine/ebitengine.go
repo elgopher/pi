@@ -30,8 +30,8 @@ func Run() error {
 	ebiten.SetScreenClearedEveryFrame(false)
 	ebiten.SetRunnableOnUnfocused(true)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
-	ebiten.SetWindowSize(screen.W*scale(), screen.H*scale())
-	ebiten.SetWindowSizeLimits(screen.W, screen.H, -1, -1)
+	ebiten.SetWindowSize(screen.Width()*scale(), screen.Height()*scale())
+	ebiten.SetWindowSizeLimits(screen.Width(), screen.Height(), -1, -1)
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	ebiten.SetWindowTitle("Pi Game")
 

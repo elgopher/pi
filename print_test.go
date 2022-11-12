@@ -5,15 +5,12 @@ package pi_test
 
 import (
 	_ "embed"
-	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elgopher/pi"
-	"github.com/elgopher/pi/snap"
 )
 
 func TestSetCustomFontWidth(t *testing.T) {
@@ -170,13 +167,4 @@ func TestPrint(t *testing.T) {
 			})
 		}
 	})
-}
-
-func assertScreenEqual(t *testing.T, file string) {
-	expected := decodePNG(t, file).Pixels
-	if !assert.Equal(t, expected, pi.Scr().Pix) {
-		screenshot, err := snap.Take()
-		require.NoError(t, err)
-		fmt.Println("Screenshot taken", screenshot)
-	}
 }

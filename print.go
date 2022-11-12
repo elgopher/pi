@@ -92,28 +92,29 @@ func (f Font) printRune(r rune, sx, sy int, color byte) int {
 
 	index := int(r) * 8
 
-	clip := screen.Clip
-	camera := screen.Camera
+	clip := screen.clip
 
 	for y := 0; y < 8; y++ {
-		if clip.Y > sy+y-camera.Y {
+		if clip.Y > sy+y-ScreenCamera.Y {
 			continue
 		}
-		if clip.Y+clip.H <= sy+y-camera.Y {
+		if clip.Y+clip.H <= sy+y-ScreenCamera.Y {
 			continue
 		}
 
-		offset := screen.W*y + sx + sy*screen.W - camera.Y*screen.W - camera.X
+		screenWidth := screen.Width()
+
+		offset := screenWidth*y + sx + sy*screenWidth - ScreenCamera.Y*screenWidth - ScreenCamera.X
 		line := f.Data[index+y]
 		for bit := 0; bit < 8; bit++ {
-			if clip.X > sx+bit-camera.X {
+			if clip.X > sx+bit-ScreenCamera.X {
 				continue
 			}
-			if clip.X+clip.W <= sx+bit-camera.X {
+			if clip.X+clip.W <= sx+bit-ScreenCamera.X {
 				continue
 			}
 			if line&(1<<bit) == 1<<bit {
-				screen.Pix[offset+bit] = color
+				screen.pix[offset+bit] = color
 			}
 		}
 	}

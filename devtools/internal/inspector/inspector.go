@@ -14,7 +14,7 @@ func moveBarIfNeeded() {
 	switch {
 	case isBarOnTop && mouseY <= 12:
 		isBarOnTop = false
-	case !isBarOnTop && mouseY >= pi.Scr().H-12:
+	case !isBarOnTop && mouseY >= pi.Scr().Height()-12:
 		isBarOnTop = true
 	}
 }

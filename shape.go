@@ -5,158 +5,89 @@ package pi
 
 import "math"
 
-// RectFill draws a filled rectangle between points x0,y0 and x1,y1 (inclusive).
+// RectFill draws a filled rectangle on screen between points x0,y0 and x1,y1 (inclusive).
 //
 // RectFill takes into account camera position, clipping region and draw palette.
 func RectFill(x0, y0, x1, y1 int, color byte) {
-	xmin, xmax := x0-screen.Camera.X, x1-screen.Camera.X
-	if xmin > xmax {
-		xmin, xmax = xmax, xmin
-	}
-	ymin, ymax := y0-screen.Camera.Y, y1-screen.Camera.Y
-	if ymin > ymax {
-		ymin, ymax = ymax, ymin
-	}
-
-	if xmin >= screen.Clip.X+screen.Clip.W {
-		return
-	}
-
-	if xmax < screen.Clip.X {
-		return
-	}
-
-	if ymin >= screen.Clip.Y+screen.Clip.H {
-		return
-	}
-
-	if ymax < screen.Clip.Y {
-		return
-	}
-
-	if xmin < screen.Clip.X {
-		xmin = screen.Clip.X
-	}
-
-	if xmax >= screen.Clip.X+screen.Clip.W {
-		xmax = screen.Clip.X + screen.Clip.W - 1
-	}
-
-	if ymin < screen.Clip.Y {
-		ymin = screen.Clip.Y
-	}
-
-	if ymax >= screen.Clip.Y+screen.Clip.H {
-		ymax = screen.Clip.Y + screen.Clip.H - 1
-	}
-
-	w := xmax - xmin + 1
 	col := DrawPalette[color]
-	for i := 0; i < w; i++ {
-		screen.lineOfScreenWidth[i] = col
-	}
-	line := screen.lineOfScreenWidth[:w]
 
-	for y := ymin; y <= ymax; y++ {
-		copy(screen.Pix[y*screen.W+xmin:], line)
+	x0 -= ScreenCamera.X
+	x1 -= ScreenCamera.X
+	y0 -= ScreenCamera.Y
+	y1 -= ScreenCamera.Y
+
+	screen.RectFill(x0, y0, x1, y1, col)
+}
+
+// RectFill draws a filled rectangle between points x0,y0 and x1,y1 (inclusive).
+func (p PixMap) RectFill(x0 int, y0 int, x1 int, y1 int, col byte) {
+	if x0 > x1 {
+		x0, x1 = x1, x0
+	}
+	if y0 > y1 {
+		y0, y1 = y1, y0
+	}
+
+	ptr, ok := p.Pointer(x0, y0, x1-x0+1, y1-y0+1)
+	if !ok {
+		return
+	}
+
+	line := p.lineOfColor(col, ptr.RemainingPixels)
+
+	copy(ptr.Pix, line)
+	for y := 1; y < ptr.RemainingLines; y++ {
+		ptr.Pix = ptr.Pix[p.width:]
+		copy(ptr.Pix, line)
 	}
 }
 
-// Rect draws a rectangle between points x0,y0 and x1,y1 (inclusive).
+// Rect draws a rectangle on screen between points x0,y0 and x1,y1 (inclusive).
 //
 // Rect takes into account camera position, clipping region and draw palette.
 func Rect(x0, y0, x1, y1 int, color byte) {
-	xmin, xmax := x0-screen.Camera.X, x1-screen.Camera.X
-	if xmin > xmax {
-		xmin, xmax = xmax, xmin
-	}
-	ymin, ymax := y0-screen.Camera.Y, y1-screen.Camera.Y
-	if ymin > ymax {
-		ymin, ymax = ymax, ymin
-	}
+	color = DrawPalette[color]
 
-	if xmin >= screen.Clip.X+screen.Clip.W {
-		return
-	}
+	x0, x1 = x0-ScreenCamera.X, x1-ScreenCamera.X
+	y0, y1 = y0-ScreenCamera.Y, y1-ScreenCamera.Y
 
-	if xmax < screen.Clip.X {
-		return
-	}
-
-	if ymin >= screen.Clip.Y+screen.Clip.H {
-		return
-	}
-
-	if ymax < screen.Clip.Y {
-		return
-	}
-
-	drawLeftLine := true
-	drawRightLine := true
-
-	if xmin < screen.Clip.X {
-		xmin = screen.Clip.X
-		drawLeftLine = false
-	}
-
-	if xmax >= screen.Clip.X+screen.Clip.W {
-		xmax = screen.Clip.X + screen.Clip.W - 1
-		drawRightLine = false
-	}
-
-	col := DrawPalette[color]
-
-	w := xmax - xmin + 1
-	for i := 0; i < w; i++ {
-		screen.lineOfScreenWidth[i] = col
-	}
-	line := screen.lineOfScreenWidth[:w]
-
-	if ymin < screen.Clip.Y {
-		ymin = screen.Clip.Y
-	} else {
-		copy(screen.Pix[ymin*screen.W+xmin:], line)
-	}
-
-	if ymax >= screen.Clip.Y+screen.Clip.H {
-		ymax = screen.Clip.Y + screen.Clip.H - 1
-	} else {
-		copy(screen.Pix[ymax*screen.W+xmin:], line)
-	}
-
-	if drawLeftLine {
-		for y := ymin; y <= ymax; y++ {
-			screen.Pix[y*screen.W+xmin] = col
-		}
-	}
-
-	if drawRightLine {
-		for y := ymin; y <= ymax; y++ {
-			screen.Pix[y*screen.W+xmax] = col
-		}
-	}
+	screen.Rect(x0, y0, x1, y1, color)
 }
 
-// Line draws a line between points x0,y0 and x1,y1 (inclusive).
+// Rect draws a rectangle between points x0,y0 and x1,y1 (inclusive).
+func (p PixMap) Rect(x0, y0, x1, y1 int, col byte) {
+	p.horizontalLine(y0, x0, x1, col)
+	p.horizontalLine(y1, x0, x1, col)
+	p.verticalLine(x0, y0, y1, col)
+	p.verticalLine(x1, y0, y1, col)
+}
+
+// Line draws a line on screen between points x0,y0 and x1,y1 (inclusive).
 //
 // Line takes into account camera position, clipping region and draw palette.
 func Line(x0, y0, x1, y1 int, color byte) {
-	camera := screen.Camera
-	x0 -= camera.X
-	x1 -= camera.X
-	y0 -= camera.Y
-	y1 -= camera.Y
+	color = DrawPalette[color]
 
+	x0 -= ScreenCamera.X
+	x1 -= ScreenCamera.X
+	y0 -= ScreenCamera.Y
+	y1 -= ScreenCamera.Y
+
+	screen.Line(x0, y0, x1, y1, color)
+}
+
+// Line draws a line between points x0,y0 and x1,y1 (inclusive).
+func (p PixMap) Line(x0, y0, x1, y1 int, color byte) {
 	// Bresenham algorithm: https://www.youtube.com/watch?v=IDFB5CDpLDE
 	run := float64(x1 - x0)
 	if run == 0 {
-		verticalLine(x0, y0, y1, color)
+		p.verticalLine(x0, y0, y1, color)
 		return
 	}
 
 	rise := float64(y1 - y0)
 	if rise == 0 {
-		horizontalLine(y0, x0, x1, color)
+		p.horizontalLine(y0, x0, x1, color)
 		return
 	}
 
@@ -179,7 +110,7 @@ func Line(x0, y0, x1, y1 int, color byte) {
 		}
 
 		for x := x0; x <= x1; x++ {
-			pset(x, y, color)
+			p.Set(x, y, color)
 
 			offset += delta
 			if offset >= threshold {
@@ -196,7 +127,7 @@ func Line(x0, y0, x1, y1 int, color byte) {
 		}
 
 		for y := y0; y <= y1; y++ {
-			pset(x, y, color)
+			p.Set(x, y, color)
 
 			offset += delta
 			if offset >= threshold {
@@ -208,81 +139,67 @@ func Line(x0, y0, x1, y1 int, color byte) {
 }
 
 // verticalLine draws a vertical line between y0-y1 inclusive
-func verticalLine(x, y0, y1 int, color byte) {
+func (p PixMap) verticalLine(x, y0, y1 int, color byte) {
 	if y0 > y1 {
 		y0, y1 = y1, y0
 	}
 
-	if x < screen.Clip.X {
+	ptr, ok := p.Pointer(x, y0, 1, y1-y0+1)
+	if !ok {
 		return
 	}
 
-	if x >= screen.Clip.X+screen.Clip.W {
-		return
-	}
-
-	if y0 < screen.Clip.Y {
-		y0 = screen.Clip.Y
-	}
-
-	if y1 >= screen.Clip.Y+screen.Clip.H {
-		y1 = screen.Clip.Y + screen.Clip.H - 1
-	}
-
-	for y := y0; y <= y1; y++ {
-		screen.Pix[y*screen.W+x] = DrawPalette[color]
+	index := 0
+	for i := 0; i < ptr.RemainingLines; i++ {
+		ptr.Pix[index] = color
+		index += p.width
 	}
 }
 
 // horizontalLine draws a vertical line between x0-x1 inclusive
-func horizontalLine(y, x0, x1 int, color byte) {
-	if y < screen.Clip.Y {
-		return
-	}
-
-	if y >= screen.Clip.Y+screen.Clip.H {
-		return
-	}
-
+func (p PixMap) horizontalLine(y, x0, x1 int, color byte) {
 	if x0 > x1 {
 		x0, x1 = x1, x0
 	}
-
-	if x0 < screen.Clip.X {
-		x0 = screen.Clip.X
+	ptr, ok := p.Pointer(x0, y, x1-x0+1, 1)
+	if !ok {
+		return
 	}
 
-	if x1 >= screen.Clip.X+screen.Clip.W {
-		x1 = screen.Clip.X + screen.Clip.W - 1
-	}
-
-	offset := y * screen.W
-
-	for x := x0; x <= x1; x++ {
-		screen.Pix[offset+x] = DrawPalette[color]
+	pix := ptr.Pix[:ptr.RemainingPixels]
+	for i := 0; i < len(pix); i++ {
+		pix[i] = color
 	}
 }
 
-// Circ draws a circle
+// Circ draws a circle on screen.
 //
 // Circ takes into account camera position, clipping region and draw palette.
 func Circ(centerX, centerY, radius int, color byte) {
-	centerX = centerX - screen.Camera.X
-	centerY = centerY - screen.Camera.Y
+	color = DrawPalette[color]
+
+	centerX = centerX - ScreenCamera.X
+	centerY = centerY - ScreenCamera.Y
+
+	screen.Circ(centerX, centerY, radius, color)
+}
+
+// Circ draws a circle.
+func (p PixMap) Circ(centerX int, centerY int, radius int, color byte) {
 	// Code based on Frédéric Goset work: http://fredericgoset.ovh/mathematiques/courbes/en/bresenham_circle.html
 	x := 0
 	y := radius
 	m := 5 - 4*radius
 
 	for x <= y {
-		pset(centerX+x, centerY+y, color)
-		pset(centerX+x, centerY-y, color)
-		pset(centerX-x, centerY+y, color)
-		pset(centerX-x, centerY-y, color)
-		pset(centerX+y, centerY+x, color)
-		pset(centerX+y, centerY-x, color)
-		pset(centerX-y, centerY+x, color)
-		pset(centerX-y, centerY-x, color)
+		p.Set(centerX+x, centerY+y, color)
+		p.Set(centerX+x, centerY-y, color)
+		p.Set(centerX-x, centerY+y, color)
+		p.Set(centerX-x, centerY-y, color)
+		p.Set(centerX+y, centerY+x, color)
+		p.Set(centerX+y, centerY-x, color)
+		p.Set(centerX-y, centerY+x, color)
+		p.Set(centerX-y, centerY-x, color)
 
 		if m > 0 {
 			y--
@@ -299,18 +216,27 @@ func Circ(centerX, centerY, radius int, color byte) {
 //
 // CircFill takes into account camera position, clipping region and draw palette.
 func CircFill(centerX, centerY, radius int, color byte) {
+	color = DrawPalette[color]
+
+	centerX = centerX - ScreenCamera.X
+	centerY = centerY - ScreenCamera.Y
+
 	// Code based on Frédéric Goset work: http://fredericgoset.ovh/mathematiques/courbes/en/filled_circle.html
+	screen.CircFill(centerX, centerY, radius, color)
+}
+
+func (p PixMap) CircFill(centerX int, centerY int, radius int, color byte) {
 	x := 0
 	y := radius
 	m := 5 - 4*radius
 
 	for x <= y {
-		RectFill(centerX-y, centerY-x, centerX+y, centerY-x, color)
-		RectFill(centerX-y, centerY+x, centerX+y, centerY+x, color)
+		p.RectFill(centerX-y, centerY-x, centerX+y, centerY-x, color)
+		p.RectFill(centerX-y, centerY+x, centerX+y, centerY+x, color)
 
 		if m > 0 {
-			RectFill(centerX-x, centerY-y, centerX+x, centerY-y, color)
-			RectFill(centerX-x, centerY+y, centerX+x, centerY+y, color)
+			p.RectFill(centerX-x, centerY-y, centerX+x, centerY-y, color)
+			p.RectFill(centerX-x, centerY+y, centerX+x, centerY+y, color)
 			y--
 			m -= 8 * y
 		}

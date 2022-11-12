@@ -25,7 +25,7 @@ func TestSnap(t *testing.T) {
 	t.Run("should take screenshot and store it to temp file", func(t *testing.T) {
 		pi.Reset()
 		screen := pi.Scr()
-		pix := screen.Pix
+		pix := screen.Pix()
 		for i := 0; i < len(pix); i++ {
 			pix[i] = byte(i % 16) // 16 colors by default
 		}
@@ -34,8 +34,8 @@ func TestSnap(t *testing.T) {
 		// then
 		require.NoError(t, err)
 		img := decodeScreenshot(t, screenshot)
-		assert.Equal(t, screen.W, img.Width)
-		assert.Equal(t, screen.H, img.Height)
+		assert.Equal(t, screen.Width(), img.Width)
+		assert.Equal(t, screen.Height(), img.Height)
 		assert.Equal(t, pix, img.Pixels)
 		assert.Equal(t, pi.Palette, img.Palette)
 	})
@@ -51,7 +51,7 @@ func TestSnap(t *testing.T) {
 		require.NoError(t, err)
 		img := decodeScreenshot(t, screenshot)
 		assert.Equal(t, pi.Palette[2], img.Palette[1]) // 1 is replaced by 2
-		assert.Equal(t, pi.Scr().Pix, img.Pixels)
+		assert.Equal(t, pi.Scr().Pix(), img.Pixels)
 	})
 }
 

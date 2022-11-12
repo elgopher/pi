@@ -37,7 +37,7 @@ func Draw() {
 func cursorOutOfWindow() bool {
 	x, y := pi.MousePos()
 	screen := pi.Scr()
-	return x < 0 || x >= screen.W || y < 0 || y >= screen.H
+	return x < 0 || x >= screen.Width() || y < 0 || y >= screen.Height()
 }
 
 func handleScreenshot() {

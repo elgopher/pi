@@ -11,7 +11,7 @@ import (
 
 func main() {
 	pi.Draw = func() {
-		pixels := pi.Scr().Pix
+		pixels := pi.Scr().Pix()
 		for i := 0; i < len(pixels); i++ {
 			randomColor := byte(rand.Intn(16))
 			pixels[i] = randomColor // put a random color to each pixel
