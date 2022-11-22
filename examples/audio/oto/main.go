@@ -1,19 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"math"
-	"runtime"
-	"sync"
 	"time"
 
 	"github.com/hajimehoshi/oto/v2"
 )
 
 var (
-	sampleRate      = 48000
+	sampleRate      = 44100
 	channelCount    = 1
-	bitDepthInBytes = 1
+	bitDepthInBytes = 2
 )
 
 type SineWave struct {
@@ -34,6 +33,7 @@ func NewSineWave(freq float64, duration time.Duration) *SineWave {
 }
 
 func (s *SineWave) Read(buf []byte) (int, error) {
+	fmt.Println("READ ", len(buf), time.Now().UnixMilli())
 	if len(s.remaining) > 0 {
 		n := copy(buf, s.remaining)
 		copy(s.remaining, s.remaining[n:])
@@ -98,10 +98,11 @@ func (s *SineWave) Read(buf []byte) (int, error) {
 	return n, nil
 }
 
-func play(context *oto.Context, freq float64, duration time.Duration) oto.Player {
+func play(context *oto.Context, freq float64, duration time.Duration) {
 	p := context.NewPlayer(NewSineWave(freq, duration))
+	p.(oto.BufferSizeSetter).SetBufferSize(4096)
+	p.SetVolume(0.05)
 	p.Play()
-	return p
 }
 
 func run() error {
@@ -118,54 +119,8 @@ func run() error {
 	}
 	<-ready
 
-	var wg sync.WaitGroup
-	var players []oto.Player
-	var m sync.Mutex
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		p := play(c, freqC, 3*time.Second)
-		m.Lock()
-		players = append(players, p)
-		m.Unlock()
-		time.Sleep(3 * time.Second)
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		p := play(c, freqE, 3*time.Second)
-		m.Lock()
-		players = append(players, p)
-		m.Unlock()
-		time.Sleep(3 * time.Second)
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		p := play(c, freqG, 3*time.Second)
-		m.Lock()
-		players = append(players, p)
-		m.Unlock()
-		time.Sleep(3 * time.Second)
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		p := play(c, freqA, 3*time.Second)
-		m.Lock()
-		players = append(players, p)
-		m.Unlock()
-		time.Sleep(3 * time.Second)
-	}()
-
-	wg.Wait()
-
-	// Pin the players not to GC the players.
-	runtime.KeepAlive(players)
+	play(c, freqG, 3*time.Second)
+	time.Sleep(3 * time.Second)
 
 	return nil
 }
