@@ -32,13 +32,13 @@ func Run() error {
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	ebiten.SetWindowTitle("Pi Game")
 
-	var theAudio otoAudio
-	if err := theAudio.Start(); err != nil {
-		return err
-	}
-	defer theAudio.Stop()
+	//var theAudio otoAudio
+	//if err := theAudio.Start(); err != nil {
+	//	return err
+	//}
+	//defer theAudio.Stop()
 
-	theGame := &game{audio: theAudio}
+	theGame := &game{}
 
 	if err := ebiten.RunGame(theGame); err != nil {
 		if err == gameStoppedErr {

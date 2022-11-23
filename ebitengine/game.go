@@ -16,7 +16,6 @@ type game struct {
 	screenDataRGBA     []byte // reused RGBA pixels
 	screenChanged      bool
 	shouldSkipNextDraw bool
-	audio              otoAudio
 }
 
 func (e *game) Update() error {
@@ -31,8 +30,6 @@ func (e *game) Update() error {
 	if pi.Update != nil {
 		pi.Update()
 	}
-
-	e.audio.Update()
 
 	if pi.GameLoopStopped {
 		return gameStoppedErr

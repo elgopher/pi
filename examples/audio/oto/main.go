@@ -1,22 +1,27 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"math"
+	"sync"
 	"time"
 
 	"github.com/hajimehoshi/oto/v2"
+
+	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/ebitengine"
+	"github.com/elgopher/pi/key"
 )
 
 var (
 	sampleRate      = 44100
-	channelCount    = 1
+	channelCount    = 2
 	bitDepthInBytes = 2
+	freq            = 400
+	m               sync.Mutex
 )
 
 type SineWave struct {
-	freq   float64
 	length int64
 	pos    int64
 
@@ -27,13 +32,15 @@ func NewSineWave(freq float64, duration time.Duration) *SineWave {
 	l := int64(channelCount) * int64(bitDepthInBytes) * int64(sampleRate) * int64(duration) / int64(time.Second)
 	l = l / 4 * 4
 	return &SineWave{
-		freq:   freq,
 		length: l,
 	}
 }
 
 func (s *SineWave) Read(buf []byte) (int, error) {
-	fmt.Println("READ ", len(buf), time.Now().UnixMilli())
+	m.Lock()
+	defer m.Unlock()
+
+	//fmt.Println("READ ", len(buf), time.Now().UnixMilli())
 	if len(s.remaining) > 0 {
 		n := copy(buf, s.remaining)
 		copy(s.remaining, s.remaining[n:])
@@ -57,7 +64,7 @@ func (s *SineWave) Read(buf []byte) (int, error) {
 		buf = make([]byte, len(origBuf)+4-len(origBuf)%4)
 	}
 
-	length := float64(sampleRate) / float64(s.freq)
+	length := float64(sampleRate) / float64(freq)
 
 	num := (bitDepthInBytes) * (channelCount)
 	p := s.pos / int64(num)
@@ -98,14 +105,15 @@ func (s *SineWave) Read(buf []byte) (int, error) {
 	return n, nil
 }
 
-func play(context *oto.Context, freq float64, duration time.Duration) {
+func play(context *oto.Context, freq float64, duration time.Duration) oto.Player {
 	p := context.NewPlayer(NewSineWave(freq, duration))
-	p.(oto.BufferSizeSetter).SetBufferSize(4096)
+	p.(oto.BufferSizeSetter).SetBufferSize(8192)
 	p.SetVolume(0.05)
 	p.Play()
+	return p
 }
 
-func run() error {
+func run() (oto.Player, error) {
 	const (
 		freqC = 523.3
 		freqE = 659.3
@@ -115,19 +123,31 @@ func run() error {
 
 	c, ready, err := oto.NewContext(sampleRate, channelCount, bitDepthInBytes)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	<-ready
 
-	play(c, freqG, 3*time.Second)
-	time.Sleep(3 * time.Second)
+	player := play(c, freqG, 20*time.Second)
 
-	return nil
+	return player, nil
 }
 
 func main() {
 	//flag.Parse()
-	if err := run(); err != nil {
-		panic(err)
+	player, _ := run()
+	pi.Update = func() {
+		player.Play()
+		if key.Btnp(key.Space) {
+			if freq == 400 {
+				freq = 0
+			} else if freq == 0 {
+				freq = 500
+			} else if freq == 500 {
+				freq = 0
+			}
+		}
+
 	}
+	ebitengine.MustRun()
+
 }
