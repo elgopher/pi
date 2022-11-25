@@ -82,7 +82,9 @@ func (s *SineWave) Read(buf []byte) (int, error) {
 	case 2:
 		for i := 0; i < len(buf)/num; i++ {
 			const max = 32767
-			b := int16(math.Sin(2*math.Pi*float64(p)/length) * 0.3 * max)
+			phase := 2 * math.Pi * float64(p) / length
+			fff := math.Sin(phase) * 0.3
+			b := int16(fff * max)
 			for ch := 0; ch < channelCount; ch++ {
 				buf[num*i+2*ch] = byte(b)
 				buf[num*i+1+2*ch] = byte(b >> 8)

@@ -5,7 +5,6 @@ import (
 
 	"github.com/hajimehoshi/oto/v2"
 
-	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/audio"
 )
 
@@ -36,7 +35,6 @@ func (a *otoAudio) Start() error {
 }
 
 func (a *otoAudio) Update() {
-	audio.Write(pi.Time(), pi.Audio().Plan, a.buffer)
 }
 
 func (a *otoAudio) Stop() {

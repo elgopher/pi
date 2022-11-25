@@ -3,8 +3,6 @@ package audio
 import (
 	"math"
 	"sync"
-
-	"github.com/elgopher/pi"
 )
 
 const (
@@ -25,7 +23,7 @@ var data = make([]byte, Size)
 //
 //	[data]      = [sample 0] [sample 1] [sample 2] ...
 //	[sample *]  = [byte 0] [byte 1]
-func Write(time float64, audioPlan pi.AudioPlan, buffer Buffer) {
+func Write(time float64, buffer Buffer) {
 	pos := SampleRate * time
 
 	length := float64(SampleRate) / float64(400)
