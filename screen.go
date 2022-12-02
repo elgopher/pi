@@ -231,13 +231,21 @@ type Position struct {
 	X, Y int
 }
 
-func SetScreenSize(w, h int) {
-	if w <= 0 {
-		panic(fmt.Sprintf("screen width %d is not greather than 0", w))
+const maxScreenSize = 1024 * 64
+
+// SetScreenSize sets the screen size to specified resolution. The maximum number of pixels is 65536 (64KB).
+// Will panic if screen size is too big or width/height are <= 0.
+func SetScreenSize(width, height int) {
+	if width <= 0 {
+		panic(fmt.Sprintf("screen width %d is not greather than 0", width))
 	}
-	if h <= 0 {
-		panic(fmt.Sprintf("screen height %d is not greather than 0", h))
+	if height <= 0 {
+		panic(fmt.Sprintf("screen height %d is not greather than 0", height))
 	}
 
-	screen = NewPixMap(w, h)
+	if width*height > maxScreenSize {
+		panic(fmt.Sprintf("number of pixels for screen resolution %dx%d is higher than maximum %d. Please use smaller screen.", width, height, maxScreenSize))
+	}
+
+	screen = NewPixMap(width, height)
 }
