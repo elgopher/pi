@@ -5,6 +5,7 @@ package pi_test
 
 import (
 	_ "embed"
+	"fmt"
 	"strconv"
 	"testing"
 	"testing/fstest"
@@ -124,6 +125,39 @@ func TestSetScreenSize(t *testing.T) {
 				pi.Reset()
 				assert.Panics(t, func() {
 					pi.SetScreenSize(pi.Scr().Width(), size)
+				})
+			})
+		}
+	})
+
+	t.Run("should panic when total number of pixels is higher than 65536", func(t *testing.T) {
+		tests := []struct{ w, h int }{
+			{w: 65537, h: 1},
+			{w: 1, h: 65537},
+		}
+
+		for _, test := range tests {
+			t.Run(fmt.Sprintf("%dx%d", test.w, test.h), func(t *testing.T) {
+				pi.Reset()
+				assert.Panics(t, func() {
+					pi.SetScreenSize(test.w, test.h)
+				})
+			})
+		}
+	})
+
+	t.Run("should not panic when total number of pixels is lower/equal than 65536", func(t *testing.T) {
+		tests := []struct{ w, h int }{
+			{w: 1024, h: 64},
+			{w: 256, h: 256},
+			{w: 320, h: 200},
+		}
+
+		for _, test := range tests {
+			t.Run(fmt.Sprintf("%dx%d", test.w, test.h), func(t *testing.T) {
+				pi.Reset()
+				assert.NotPanics(t, func() {
+					pi.SetScreenSize(test.w, test.h)
 				})
 			})
 		}
