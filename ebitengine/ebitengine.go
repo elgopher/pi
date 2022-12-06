@@ -22,6 +22,12 @@ const tps = 30
 // Run opens the window and runs the game loop. It must be
 // called from the main thread.
 func Run() error {
+	stopAudio, err := startAudio()
+	if err != nil {
+		return err
+	}
+	defer stopAudio()
+
 	lastTime = time.Now()
 
 	screen := pi.Scr() // TODO Screen size should be read each frame (and window size adjusted)
