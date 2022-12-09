@@ -3,7 +3,7 @@ module github.com/elgopher/pi
 go 1.18
 
 require (
-	github.com/hajimehoshi/ebiten/v2 v2.4.12
+	github.com/hajimehoshi/ebiten/v2 v2.4.13
 	github.com/stretchr/testify v1.8.1
 )
 
