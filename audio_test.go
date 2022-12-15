@@ -21,11 +21,11 @@ func TestAudioSystem_Read(t *testing.T) {
 	})
 
 	t.Run("should clear the buffer with 0 when no channels are used", func(t *testing.T) {
-		buffer := []byte{1, 2, 3, 4}
+		buffer := []float64{1, 2, 3, 4}
 		n, err := pi.Audio().Read(buffer)
 		require.NotZero(t, n)
 		require.NoError(t, err)
-		expected := make([]byte, n)
+		expected := make([]float64, n)
 		assert.Equal(t, expected, buffer)
 	})
 }
@@ -41,7 +41,7 @@ func TestAudio(t *testing.T) {
 				audio.Set(0, pi.SoundEffect{})
 				_ = audio.Get(0)
 				audio.Play(0, 0, 0, 0)
-				_, err := audio.Read(make([]byte, 8192))
+				_, err := audio.Read(make([]float64, 8192))
 				require.NoError(t, err)
 				audio.Reset()
 				wg.Done()
@@ -80,10 +80,10 @@ func TestAudioSystem_Play(t *testing.T) {
 		// when
 		audio.Play(0, 0, 0, 1)
 		// then
-		buffer := make([]byte, 1500)
+		buffer := make([]float64, 1500)
 		_, err := audio.Read(buffer)
 		require.NoError(t, err)
-		assert.NotEqual(t, make([]byte, 1500), buffer)
+		assert.NotEqual(t, make([]float64, 1500), buffer)
 	})
 
 	t.Run("should not generate audio stream when channel is higher than max", func(t *testing.T) {
@@ -93,9 +93,9 @@ func TestAudioSystem_Play(t *testing.T) {
 		// when
 		audio.Play(0, 4, 0, 1)
 		// then
-		buffer := make([]byte, 1500)
+		buffer := make([]float64, 1500)
 		_, err := audio.Read(buffer)
 		require.NoError(t, err)
-		assert.Equal(t, make([]byte, 1500), buffer)
+		assert.Equal(t, make([]float64, 1500), buffer)
 	})
 }
