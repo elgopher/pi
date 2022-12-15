@@ -65,12 +65,13 @@ type Note struct {
 	Volume byte // 0 - quiet. 255 - loudest. 255 values is way too much!
 }
 
-// Read method is used by back-end to read generated audio stream and play it back to the user. The sample rate is 44100,
-// 16 bit depth and stereo (2 audio channels).
+// Read method is used by back-end to read generated audio stream and play it back to the user. The sample rate is 44100
+// and mono.
 //
 // Read is (usually) executed concurrently with main game loop. Back-end could decide about buffer size, although
-// the higher the size the higher the lag. Usually the buffer is 8KB, which is 46ms of audio.
-func (s *AudioSystem) Read(p []byte) (n int, err error) {
+// the higher the size the higher the lag. Usually the buffer is 2KB, which is roughly 46ms of audio (if the slice is converted
+// to PCM signed 16bit integer with two channels - stereo).
+func (s *AudioSystem) Read(p []float64) (n int, err error) {
 	if len(p) == 0 {
 		return 0, nil
 	}
@@ -88,7 +89,7 @@ func (s *AudioSystem) Read(p []byte) (n int, err error) {
 		}
 
 		for i := 0; i < len(p); i++ {
-			p[i] = byte(i)
+			p[i] = float64(i)
 		}
 	}
 
