@@ -9,7 +9,7 @@ import (
 	"github.com/elgopher/pi/key"
 )
 
-var keyMapping = map[int]ebiten.Key{
+var keyMapping = map[key.Button]ebiten.Key{
 	key.Shift:        ebiten.KeyShift,
 	key.Ctrl:         ebiten.KeyControl,
 	key.Alt:          ebiten.KeyAlt,
