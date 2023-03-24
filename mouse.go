@@ -8,9 +8,9 @@ import "github.com/elgopher/pi/internal/input"
 type MouseButton int
 
 const (
-	MouseLeft   = 0
-	MouseMiddle = 1
-	MouseRight  = 2
+	MouseLeft   MouseButton = 0
+	MouseMiddle MouseButton = 1
+	MouseRight  MouseButton = 2
 )
 
 var (
