@@ -108,7 +108,7 @@ var keyboardMapping = [...][6][]ebiten.Key{
 	},
 }
 
-func isKeyboardPressed(player int, button int) bool {
+func isKeyboardPressed(player int, button pi.Button) bool {
 	if player >= len(keyboardMapping) {
 		return false
 	}
