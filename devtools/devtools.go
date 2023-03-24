@@ -23,7 +23,14 @@ var (
 // show screen inspector. F12 again resumes the game.
 func MustRun(runBackend func() error) {
 	update := pi.Update
+	if update == nil {
+		update = func() {}
+	}
+
 	draw := pi.Draw
+	if draw == nil {
+		draw = func() {}
+	}
 
 	inspector.BgColor, inspector.FgColor = BgColor, FgColor
 	fmt.Println("Press F12 to pause the game and show devtools.")
@@ -31,14 +38,14 @@ func MustRun(runBackend func() error) {
 	pi.Update = func() {
 		updateDevTools()
 
-		if !gamePaused && update != nil {
+		if !gamePaused {
 			update()
 			handleStoppedGame()
 		}
 	}
 
 	pi.Draw = func() {
-		if !gamePaused && draw != nil {
+		if !gamePaused {
 			draw()
 			handleStoppedGame()
 		} else {
