@@ -20,12 +20,12 @@ type Button int
 // First connected gamepad controller is player 0, second player 1 and so on.
 // On XBox controller [O] is A and Y, [X] is B and X.
 const (
-	Left  = 0
-	Right = 1
-	Up    = 2
-	Down  = 3
-	O     = 4 // O is a first fire button
-	X     = 5 // X is a second fire button
+	Left  Button = 0
+	Right Button = 1
+	Up    Button = 2
+	Down  Button = 3
+	O     Button = 4 // O is a first fire button
+	X     Button = 5 // X is a second fire button
 )
 
 var Controllers [8]Controller // 0th element is for Player 0, 1st for Player 1 etc.
@@ -104,7 +104,7 @@ func isPressed(duration uint) bool {
 func buttonBits(player int, isSet func(uint) bool) int {
 	c := Controllers[player]
 	var b int
-	for i := 0; i <= X; i++ {
+	for i := 0; i <= int(X); i++ {
 		if isSet(c.BtnDuration[i]) {
 			b += 1 << i
 		}
