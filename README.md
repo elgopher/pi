@@ -49,3 +49,8 @@ Pi is under development. Only limited functionality is provided. API is not stab
 
 * Use a pixel-art editor which supports indexed color mode, such as [Aseprite](https://www.aseprite.org/) or [LibreSprite](https://libresprite.github.io/).
 * Palette for the game is stored inside sprite-sheet.png. 
+
+## Attributions
+
+* system font used by Pi is the [original Pico-8 font](https://www.lexaloffle.com/pico-8.php?page=faq) created by Zep - [CC-0 license](https://creativecommons.org/publicdomain/zero/1.0/)
+* default palette is the [original Pico-8 palette](https://www.lexaloffle.com/pico-8.php?page=faq) created by Zep - [CC-0 license](https://creativecommons.org/publicdomain/zero/1.0/)
