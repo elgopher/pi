@@ -44,3 +44,8 @@ Pi is under development. Only limited functionality is provided. API is not stab
 2. Try examples from [examples](examples) directory.
 3. Create a new game using provided [Github template](https://github.com/elgopher/pi-template).
 4. Read the [documentation](https://pkg.go.dev/github.com/elgopher/pi).
+
+### How to edit PNG files like sprite-sheet.png and custom-font.png?
+
+* Use a pixel-art editor which supports indexed color mode, such as [Aseprite](https://www.aseprite.org/) or [LibreSprite](https://libresprite.github.io/).
+* Palette for the game is stored inside sprite-sheet.png. 
