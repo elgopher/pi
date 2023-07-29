@@ -60,7 +60,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3.6.0
         with:
           args: "-v"
-          version: v1.52.1
+          version: v1.54.1
 
       - name: Generate coverage report
         run: go test -v -coverprofile=coverage.txt -covermode=atomic ./...
