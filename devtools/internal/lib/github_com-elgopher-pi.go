@@ -39,10 +39,8 @@ func init() {
 		"Left":                      reflect.ValueOf(pi.Left),
 		"Line":                      reflect.ValueOf(pi.Line),
 		"Load":                      reflect.ValueOf(pi.Load),
-		"MaxInt":                    reflect.ValueOf(pi.MaxInt[int]), // TODO Generic functions not supported by Yaegi yet
 		"Mid":                       reflect.ValueOf(pi.Mid),
 		"MidInt":                    reflect.ValueOf(pi.MidInt[int]), // TODO Generic functions not supported by Yaegi yet
-		"MinInt":                    reflect.ValueOf(pi.MinInt[int]), // TODO Generic functions not supported by Yaegi yet
 		"MouseBtn":                  reflect.ValueOf(pi.MouseBtn),
 		"MouseBtnDuration":          reflect.ValueOf(&pi.MouseBtnDuration).Elem(),
 		"MouseBtnp":                 reflect.ValueOf(pi.MouseBtnp),

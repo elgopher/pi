@@ -21,7 +21,7 @@
     * [ ] map API
 * [ ] math API
     * [x] Cos, Sin, Atan2
-    * [x] Min, Max, Mid for integers
+    * [x] Mid for integers
     * [x] Mid for float64
 * [x] Game controller support: gamepad and keyboard
 * [x] Mouse support

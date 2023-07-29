@@ -41,24 +41,6 @@ type Int interface {
 	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
 }
 
-// MinInt returns minimum of two integer numbers.
-func MinInt[T Int](x, y T) T {
-	if x < y {
-		return x
-	}
-
-	return y
-}
-
-// MaxInt returns maximum of two integer numbers.
-func MaxInt[T Int](x, y T) T {
-	if x > y {
-		return x
-	}
-
-	return y
-}
-
 // MidInt returns the middle of three integer numbers. Very useful for clamping.
 func MidInt[T Int](x, y, z T) T {
 	if x > y {

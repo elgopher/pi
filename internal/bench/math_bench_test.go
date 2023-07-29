@@ -9,34 +9,6 @@ import (
 	"github.com/elgopher/pi"
 )
 
-func BenchmarkMinInt(b *testing.B) {
-	b.ReportAllocs()
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		for j := 0; j < 60; j++ {
-			pi.MinInt(j, j+1)
-		}
-		for j := 0; j < 60; j++ {
-			pi.MinInt(j+1, j)
-		}
-	}
-}
-
-func BenchmarkMaxInt(b *testing.B) {
-	b.ReportAllocs()
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		for j := 0; j < 60; j++ {
-			pi.MaxInt(j, j+1)
-		}
-		for j := 0; j < 60; j++ {
-			pi.MaxInt(j+1, j)
-		}
-	}
-}
-
 func BenchmarkMidInt(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()

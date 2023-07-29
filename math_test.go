@@ -114,24 +114,6 @@ func TestAtan2(t *testing.T) {
 	}
 }
 
-func TestMinInt(t *testing.T) {
-	assert.Equal(t, 0, pi.MinInt(0, 0))
-	assert.Equal(t, 1, pi.MinInt(1, 2))
-	assert.Equal(t, 1, pi.MinInt(1, 1))
-	assert.Equal(t, 1, pi.MinInt(2, 1))
-	assert.Equal(t, -2, pi.MinInt(-1, -2))
-	assert.Equal(t, -2, pi.MinInt(-2, 2))
-}
-
-func TestMaxInt(t *testing.T) {
-	assert.Equal(t, 0, pi.MaxInt(0, 0))
-	assert.Equal(t, 2, pi.MaxInt(2, 1))
-	assert.Equal(t, 1, pi.MaxInt(1, 1))
-	assert.Equal(t, 2, pi.MaxInt(1, 2))
-	assert.Equal(t, -1, pi.MaxInt(-1, -2))
-	assert.Equal(t, 2, pi.MaxInt(-2, 2))
-}
-
 func TestMidInt(t *testing.T) {
 	assert.Equal(t, 0, pi.MidInt(0, 0, 0))
 	assert.Equal(t, 1, pi.MidInt(0, 1, 2))
