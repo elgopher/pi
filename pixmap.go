@@ -23,7 +23,6 @@ type PixMap struct {
 	height int
 	clip   Region
 
-	zeroPix      []byte
 	wholeLinePix []byte
 }
 
@@ -44,7 +43,6 @@ func NewPixMap(width, height int) PixMap {
 		width:        width,
 		height:       height,
 		clip:         Region{W: width, H: height},
-		zeroPix:      make([]byte, len(pixels)),
 		wholeLinePix: make([]byte, width),
 	}
 }
@@ -84,7 +82,6 @@ func NewPixMapWithPixels(pixels []byte, lineWidth int) PixMap {
 		width:        lineWidth,
 		height:       height,
 		clip:         Region{W: lineWidth, H: height},
-		zeroPix:      make([]byte, len(pixels)),
 		wholeLinePix: make([]byte, lineWidth),
 	}
 }
@@ -147,7 +144,7 @@ func (p PixMap) WithClip(x, y, w, h int) PixMap {
 
 // Clear clears the entire PixMap with color 0. It does not take into account the clipping region.
 func (p PixMap) Clear() {
-	copy(p.pix, p.zeroPix)
+	clear(p.pix)
 }
 
 // ClearCol clears the entire PixMap with specified color. It does not take into account the clipping region.
