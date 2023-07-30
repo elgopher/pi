@@ -3,7 +3,10 @@
 
 package pi
 
-import "math"
+import (
+	"cmp"
+	"math"
+)
 
 // Sin returns the sine of angle which is in the range of 0.0-1.0 measured clockwise.
 //
@@ -36,42 +39,11 @@ func Atan2(dx, dy float64) float64 {
 	return math.Mod(0.75+v/(math.Pi*2), 1)
 }
 
-// Int is a generic type for all integer types
-type Int interface {
-	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
-}
-
-// MidInt returns the middle of three integer numbers. Very useful for clamping.
-func MidInt[T Int](x, y, z T) T {
-	if x > y {
-		x, y = y, x
-	}
-
-	if y > z {
-		y = z
-	}
-
-	if x > y {
-		y = x
-	}
-
-	return y
-}
-
-// Mid returns the middle of three float64 numbers. Very useful for clamping.
-// NaNs are always put at the beginning (are the smallest ones).
-func Mid(x, y, z float64) float64 {
-	if x > y || math.IsNaN(y) {
-		x, y = y, x
-	}
-
-	if y > z || math.IsNaN(z) {
-		y = z
-	}
-
-	if x > y || math.IsNaN(y) {
-		y = x
-	}
+// Mid returns the middle of three ordered values (numbers or strings). Very useful for clamping.
+func Mid[T cmp.Ordered](x, y, z T) T {
+	x, y = min(x, y), max(x, y)
+	y = min(y, z)
+	y = max(x, y)
 
 	return y
 }

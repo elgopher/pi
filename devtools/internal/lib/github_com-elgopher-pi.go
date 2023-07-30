@@ -39,8 +39,7 @@ func init() {
 		"Left":                      reflect.ValueOf(pi.Left),
 		"Line":                      reflect.ValueOf(pi.Line),
 		"Load":                      reflect.ValueOf(pi.Load),
-		"Mid":                       reflect.ValueOf(pi.Mid),
-		"MidInt":                    reflect.ValueOf(pi.MidInt[int]), // TODO Generic functions not supported by Yaegi yet
+		"Mid":                       reflect.ValueOf(pi.Mid[float64]), // TODO Generic functions not supported by Yaegi yet
 		"MouseBtn":                  reflect.ValueOf(pi.MouseBtn),
 		"MouseBtnDuration":          reflect.ValueOf(&pi.MouseBtnDuration).Elem(),
 		"MouseBtnp":                 reflect.ValueOf(pi.MouseBtnp),
@@ -85,7 +84,6 @@ func init() {
 		"Button":      reflect.ValueOf((*pi.Button)(nil)),
 		"Controller":  reflect.ValueOf((*pi.Controller)(nil)),
 		"Font":        reflect.ValueOf((*pi.Font)(nil)),
-		//"Int":         reflect.ValueOf((*pi.Int)(nil)),  // TODO Generic constraints not supported by Yaegi yet
 		"MouseButton":  reflect.ValueOf((*pi.MouseButton)(nil)),
 		"PixMap":       reflect.ValueOf((*pi.PixMap)(nil)),
 		"Pointer":      reflect.ValueOf((*pi.Pointer)(nil)),
@@ -93,13 +91,5 @@ func init() {
 		"Position":     reflect.ValueOf((*pi.Position)(nil)),
 		"Region":       reflect.ValueOf((*pi.Region)(nil)),
 		"Transparency": reflect.ValueOf((*pi.Transparency)(nil)),
-
-		// interface wrapper definitions
-		"_Int": reflect.ValueOf((*_github_com_elgopher_pi_Int)(nil)),
 	}
-}
-
-// _github_com_elgopher_pi_Int is an interface wrapper for Int type
-type _github_com_elgopher_pi_Int struct {
-	IValue interface{}
 }

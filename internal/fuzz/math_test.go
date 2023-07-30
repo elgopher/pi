@@ -13,7 +13,7 @@ import (
 
 func FuzzMidInt(f *testing.F) {
 	f.Fuzz(func(t *testing.T, x, y, z int) {
-		pi.MidInt(x, y, z)
+		pi.Mid(x, y, z)
 	})
 }
 
