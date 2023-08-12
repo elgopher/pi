@@ -8,17 +8,13 @@ import "fmt"
 var screen = NewPixMap(defaultScreenWidth, defaultScreenHeight)
 
 // Cls cleans the entire screen with color 0. It does not take into account any global state such as clipping region or camera.
-// Cls also resets clipping region.
 func Cls() {
 	screen.Clear()
-	ClipReset()
 }
 
 // ClsCol cleans the entire screen with specified color. It does not take into account any global state such as clipping region or camera.
-// ClsCol also resets clipping region.
 func ClsCol(col byte) {
 	screen.ClearCol(col)
-	ClipReset()
 }
 
 // Pset sets a pixel color on the screen. It takes into account camera and draw palette.
