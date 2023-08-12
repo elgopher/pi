@@ -62,7 +62,7 @@ func main() {
 		// Animate hello world
 		for i := 0; i < 12; i++ {
 			x := 20 + i*8
-			y := pi.Cos(pi.Time()+float64(i)/64) * 60
+			y := pi.Cos(pi.Time+float64(i)/64) * 60
 			pi.Spr(i, x, 60+int(y))
 		}
 

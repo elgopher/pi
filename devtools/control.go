@@ -25,13 +25,13 @@ func pauseGame() {
 		fmt.Println("Press P in the game window to take screenshot.")
 	}
 	gamePaused = true
-	timeWhenPaused = pi.TimeSeconds
+	timeWhenPaused = pi.Time
 	snapshot.Take()
 }
 
 func resumeGame() {
 	gamePaused = false
-	pi.TimeSeconds = timeWhenPaused
+	pi.Time = timeWhenPaused
 	snapshot.Draw()
 	fmt.Println("Game resumed")
 }
