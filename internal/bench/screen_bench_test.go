@@ -85,15 +85,15 @@ func BenchmarkSprSizeFlip(b *testing.B) {
 func BenchmarkPalt(b *testing.B) {
 	runBenchmarks(b, func(res Resolution) {
 		for i := 0; i < 100; i++ { // Palt is too fast
-			pi.Palt(byte(i), true)
+			pi.Palt[byte(i)] = true
 		}
 	})
 }
 
-func BenchmarkPaltReset(b *testing.B) {
+func BenchmarkPalt_Reset(b *testing.B) {
 	runBenchmarks(b, func(res Resolution) {
-		for i := 0; i < 100; i++ { // PaltReset is too fast
-			pi.PaltReset()
+		for i := 0; i < 100; i++ { // Reset is too fast
+			pi.Palt.Reset()
 		}
 	})
 }
@@ -101,7 +101,7 @@ func BenchmarkPaltReset(b *testing.B) {
 func BenchmarkPal(b *testing.B) {
 	runBenchmarks(b, func(res Resolution) {
 		for i := 0; i < 100; i++ { // Pal is too fast
-			pi.Pal(byte(i), byte(i+1))
+			pi.Pal[byte(i)] = byte(i + 1)
 		}
 	})
 }
@@ -109,15 +109,15 @@ func BenchmarkPal(b *testing.B) {
 func BenchmarkPalDisplay(b *testing.B) {
 	runBenchmarks(b, func(res Resolution) {
 		for i := 0; i < 100; i++ { // PalDisplay is too fast
-			pi.PalDisplay(byte(i), byte(i+1))
+			pi.Pald[byte(i)] = byte(i + 1)
 		}
 	})
 }
 
-func BenchmarkPalReset(b *testing.B) {
+func BenchmarkPal_Reset(b *testing.B) {
 	runBenchmarks(b, func(res Resolution) {
-		for i := 0; i < 100; i++ { // PalReset is too fast
-			pi.PalReset()
+		for i := 0; i < 100; i++ { // Reset is too fast
+			pi.Pal.Reset()
 		}
 	})
 }

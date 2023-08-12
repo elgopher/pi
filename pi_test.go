@@ -52,21 +52,21 @@ func TestReset(t *testing.T) {
 	})
 
 	t.Run("should reset display palette", func(t *testing.T) {
-		pi.DisplayPalette[0] = 255
+		pi.Pald[0] = 255
 		pi.Reset()
-		assert.NotEqual(t, 255, pi.DisplayPalette[0])
+		assert.NotEqual(t, 255, pi.Pald[0])
 	})
 
 	t.Run("should reset draw palette", func(t *testing.T) {
-		pi.DrawPalette[0] = 255
+		pi.Pal[0] = 255
 		pi.Reset()
-		assert.NotEqual(t, 255, pi.DrawPalette[0])
+		assert.NotEqual(t, 255, pi.Pal[0])
 	})
 
 	t.Run("should reset palette transparency", func(t *testing.T) {
-		pi.ColorTransparency[0] = false
+		pi.Palt[0] = false
 		pi.Reset()
-		assert.True(t, pi.ColorTransparency[0])
+		assert.True(t, pi.Palt[0])
 	})
 
 	t.Run("should reset system font", func(t *testing.T) {

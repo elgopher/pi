@@ -59,39 +59,19 @@ var (
 	// a PNG file with indexed color mode). If sprite-sheet.png was not
 	// found, then default 16 color palette is used.
 	//
-	// Can be freely read and updated. Changes will be visible immediately.
+	// Can be freely read and updated when the game is running. Changes will be visible immediately.
 	Palette = defaultPalette
 
 	// Camera has camera offset used for all subsequent draw operations.
 	Camera Position
 )
 
-// Global state
-var (
-	// DrawPalette contains mapping of colors used to replace color with
-	// another one for all subsequent drawings.
-	//
-	// The index of array is original color, the value is color replacement.
-	DrawPalette [256]byte
+// Time returns the amount of time since game was run, as a (fractional) number of seconds
+//
+// Time is updated each frame.
+var Time float64
 
-	// DisplayPalette contains mapping of colors used to replace color with
-	// another one for the entire screen, at the end of a frame
-	//
-	// The index of array is original color, the value is color replacement.
-	DisplayPalette [256]byte
-
-	// ColorTransparency contains information whether given color is transparent.
-	//
-	// The index of array is a color number.
-	ColorTransparency = defaultTransparency
-
-	// Time returns the amount of time since game was run, as a (fractional) number of seconds
-	//
-	// Time is updated each frame.
-	Time float64
-
-	GameLoopStopped bool
-)
+var GameLoopStopped bool
 
 // Load loads files like sprite-sheet.png, custom-font.png
 func Load(resources fs.ReadFileFS) {
@@ -109,8 +89,9 @@ func Reset() {
 	Draw = nil
 	Camera.Reset()
 	ClipReset()
-	PalReset()
-	PaltReset()
+	Pald.Reset()
+	Pal.Reset()
+	Palt.Reset()
 	systemFont.Data, _ = font.Load(systemFontPNG)
 	customFont = defaultCustomFont
 	customFont.Data = make([]byte, fontDataSize)

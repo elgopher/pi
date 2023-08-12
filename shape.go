@@ -9,7 +9,7 @@ import "math"
 //
 // RectFill takes into account camera position, clipping region and draw palette.
 func RectFill(x0, y0, x1, y1 int, color byte) {
-	col := DrawPalette[color]
+	col := Pal[color]
 
 	x0 -= Camera.X
 	x1 -= Camera.X
@@ -46,7 +46,7 @@ func (p PixMap) RectFill(x0 int, y0 int, x1 int, y1 int, col byte) {
 //
 // Rect takes into account camera position, clipping region and draw palette.
 func Rect(x0, y0, x1, y1 int, color byte) {
-	color = DrawPalette[color]
+	color = Pal[color]
 
 	x0, x1 = x0-Camera.X, x1-Camera.X
 	y0, y1 = y0-Camera.Y, y1-Camera.Y
@@ -66,7 +66,7 @@ func (p PixMap) Rect(x0, y0, x1, y1 int, col byte) {
 //
 // Line takes into account camera position, clipping region and draw palette.
 func Line(x0, y0, x1, y1 int, color byte) {
-	color = DrawPalette[color]
+	color = Pal[color]
 
 	x0 -= Camera.X
 	x1 -= Camera.X
@@ -176,7 +176,7 @@ func (p PixMap) horizontalLine(y, x0, x1 int, color byte) {
 //
 // Circ takes into account camera position, clipping region and draw palette.
 func Circ(centerX, centerY, radius int, color byte) {
-	color = DrawPalette[color]
+	color = Pal[color]
 
 	centerX = centerX - Camera.X
 	centerY = centerY - Camera.Y
@@ -216,7 +216,7 @@ func (p PixMap) Circ(centerX int, centerY int, radius int, color byte) {
 //
 // CircFill takes into account camera position, clipping region and draw palette.
 func CircFill(centerX, centerY, radius int, color byte) {
-	color = DrawPalette[color]
+	color = Pal[color]
 
 	centerX = centerX - Camera.X
 	centerY = centerY - Camera.Y

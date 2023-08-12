@@ -19,7 +19,7 @@ func ClsCol(col byte) {
 
 // Pset sets a pixel color on the screen. It takes into account camera and draw palette.
 func Pset(x, y int, color byte) {
-	screen.Set(x-Camera.X, y-Camera.Y, DrawPalette[color])
+	screen.Set(x-Camera.X, y-Camera.Y, Pal[color])
 }
 
 // Pget gets a pixel color on the screen.
@@ -141,63 +141,15 @@ func SprSizeFlip(n, x, y int, w, h float64, flipX, flipY bool) {
 
 		for j := 0; j < len(spriteSheetLine); j++ {
 			col := spriteSheetLine[startingPixel+(step*j)]
-			if ColorTransparency[col] {
+			if Palt[col] {
 				continue
 			}
 
-			screen.pix[screenOffset+j] = DrawPalette[col]
+			screen.pix[screenOffset+j] = Pal[col]
 		}
 		screenOffset += screenWidth
 		spriteSheetOffset += spriteSheetStep
 	}
-}
-
-// Palt sets color transparency. If true then the color will not be drawn
-// for next drawing operations.
-//
-// Color transparency is used by Spr, SprSize and SprSizeFlip.
-func Palt(color byte, transparent bool) {
-	ColorTransparency[color] = transparent
-}
-
-var defaultTransparency = [256]bool{true}
-
-// PaltReset sets all transparent colors to false and makes color 0 transparent.
-func PaltReset() {
-	ColorTransparency = defaultTransparency
-}
-
-// Pal replaces color with another one for all subsequent drawings (it is changing
-// the so-called draw palette).
-//
-// Affected functions are Pset, Spr, SprSize, SprSizeFlip, Rect and RectFill.
-func Pal(color byte, replacementColor byte) {
-	DrawPalette[color] = replacementColor
-}
-
-// PalDisplay replaces color with another one for the whole screen at the end of a frame
-// (it is changing the so-called display palette).
-func PalDisplay(color byte, replacementColor byte) {
-	DisplayPalette[color] = replacementColor
-}
-
-// PalSecondary
-
-var notSwappedPalette [256]byte
-
-func init() {
-	for i := 0; i < 256; i++ {
-		c := byte(i)
-		notSwappedPalette[i] = c
-		DrawPalette[i] = c
-		DisplayPalette[i] = c
-	}
-}
-
-// PalReset resets all swapped colors for all palettes.
-func PalReset() {
-	DrawPalette = notSwappedPalette
-	DisplayPalette = notSwappedPalette
 }
 
 // Scr returns the Screen PixMap

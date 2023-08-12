@@ -24,7 +24,7 @@ func main() {
 	// merge from sprite-sheet to screen using custom merge function, which merges two lines
 	pi.SprSheet().Merge(-1, -1, 103, 70, pi.Scr(), -1, -1, func(dst, src []byte) {
 		for x := 0; x < len(dst); x++ {
-			dst[x] += pi.DrawPalette[src[x]] + 1
+			dst[x] += pi.Pal[src[x]] + 1
 		}
 	})
 

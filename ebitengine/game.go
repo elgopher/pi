@@ -83,7 +83,7 @@ func (e *game) writeScreenPixels(screen *ebiten.Image) {
 
 	offset := 0
 	for _, col := range pix {
-		rgb := pi.Palette[pi.DisplayPalette[col]]
+		rgb := pi.Palette[pi.Pald[col]]
 		e.screenDataRGBA[offset] = rgb.R
 		e.screenDataRGBA[offset+1] = rgb.G
 		e.screenDataRGBA[offset+2] = rgb.B

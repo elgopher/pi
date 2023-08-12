@@ -37,16 +37,16 @@ func draw() {
 	x, y := 0, 0
 
 	for _, eyeColor := range eyeColors {
-		pi.Pal(eyes, eyeColor)
+		pi.Pal[eyes] = eyeColor
 
 		for _, skinColor := range skinColors {
-			pi.Pal(skin, skinColor)
+			pi.Pal[skin] = skinColor
 
 			for _, hairColor := range hairColors {
-				pi.Pal(hair, hairColor)
+				pi.Pal[hair] = hairColor
 
 				for _, mouthColor := range mouthColors {
-					pi.Pal(mouth, mouthColor)
+					pi.Pal[mouth] = mouthColor
 					// draw the sprite with swapped colors:
 					pi.Spr(0, x, y)
 
