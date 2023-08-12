@@ -82,8 +82,10 @@ var (
 	// The index of array is a color number.
 	ColorTransparency = defaultTransparency
 
-	// TimeSeconds is the number of seconds since game was started
-	TimeSeconds float64
+	// Time returns the amount of time since game was run, as a (fractional) number of seconds
+	//
+	// Time is updated each frame.
+	Time float64
 
 	GameLoopStopped bool
 )
@@ -131,11 +133,4 @@ func loadGameResources(resources fs.ReadFileFS) error {
 // will be closed.
 func Stop() {
 	GameLoopStopped = true
-}
-
-// Time returns the amount of time since game was run, as a (fractional) number of seconds.
-//
-// Calling Time() multiple times in the same frame will always return the same result.
-func Time() float64 {
-	return TimeSeconds
 }

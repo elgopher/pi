@@ -229,6 +229,6 @@ func TestLoad(t *testing.T) {
 
 func TestTime(t *testing.T) {
 	t.Run("should return 0.0 when game was not run", func(t *testing.T) {
-		assert.Zero(t, pi.Time())
+		assert.Zero(t, pi.Time)
 	})
 }

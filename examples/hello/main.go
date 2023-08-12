@@ -28,7 +28,7 @@ func main() {
 		for i := 0; i < 12; i++ {
 			// Calculate the position of letter on screen:
 			x := 20 + i*8
-			y := pi.Cos(pi.Time()+float64(i)/64) * 60
+			y := pi.Cos(pi.Time+float64(i)/64) * 60
 			// Draw sprite:
 			pi.Spr(i, x, 60+int(y))
 		}

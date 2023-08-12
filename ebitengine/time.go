@@ -15,5 +15,5 @@ func updateTime() {
 	now := time.Now()
 	timePassed := now.Sub(lastTime)
 	lastTime = now
-	pi.TimeSeconds += float64(timePassed) / float64(time.Second)
+	pi.Time += float64(timePassed) / float64(time.Second)
 }
