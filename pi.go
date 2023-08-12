@@ -61,6 +61,9 @@ var (
 	//
 	// Can be freely read and updated. Changes will be visible immediately.
 	Palette = defaultPalette
+
+	// Camera has camera offset used for all subsequent draw operations.
+	Camera Position
 )
 
 // Global state
@@ -104,7 +107,7 @@ func Load(resources fs.ReadFileFS) {
 func Reset() {
 	Update = nil
 	Draw = nil
-	CameraReset()
+	Camera.Reset()
 	ClipReset()
 	PalReset()
 	PaltReset()

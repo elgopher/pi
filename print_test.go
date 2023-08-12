@@ -110,7 +110,7 @@ func TestPrint(t *testing.T) {
 
 	t.Run("should print moved by camera position", func(t *testing.T) {
 		reset()
-		pi.Camera(-1, -2)
+		pi.Camera.Set(-1, -2)
 		pi.Print("0L\n1L", 0, 0, color)
 		assertScreenEqual(t, "internal/testimage/print/two-lines-at-1.2.png")
 	})
@@ -139,7 +139,7 @@ func TestPrint(t *testing.T) {
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
 				reset()
-				pi.Camera(test.cameraX, test.cameraY)
+				pi.Camera.Set(test.cameraX, test.cameraY)
 				pi.Clip(test.x, test.y, test.w, test.h)
 				pi.Print("\u0080", test.posX, test.posY, color)
 				assertScreenEqual(t, "internal/testimage/print/"+test.file)

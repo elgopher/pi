@@ -176,7 +176,7 @@ func testRect(t *testing.T, rect func(x0 int, y0 int, x1 int, y1 int, col byte),
 	t.Run("should move by camera position", func(t *testing.T) {
 		pi.Reset()
 		pi.SetScreenSize(16, 16)
-		pi.Camera(-2, -3)
+		pi.Camera.Set(-2, -3)
 		rect(0, 1, 2, 4, white)
 		assertScreenEqual(t, "internal/testimage/"+dir+"/camera_0,1,2,4.png")
 	})
@@ -466,7 +466,7 @@ func TestLine(t *testing.T) {
 				pi.Reset()
 				pi.SetScreenSize(16, 16)
 				pi.ClsCol(5)
-				pi.Camera(-1, -2)
+				pi.Camera.Set(-1, -2)
 				// when
 				pi.Line(test.x0, test.y0, test.x1, test.y1, red)
 				assertScreenEqual(t, "internal/testimage/line/camera/"+name+".png")
@@ -566,7 +566,7 @@ func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
 		pi.Reset()
 		pi.SetScreenSize(16, 16)
 		pi.ClsCol(5)
-		pi.Camera(2, 1)
+		pi.Camera.Set(2, 1)
 		// when
 		circ(8, 8, 5, white)
 		assertScreenEqual(t, "internal/testimage/"+dir+"/camera.png")

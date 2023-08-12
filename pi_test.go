@@ -40,7 +40,7 @@ func TestReset(t *testing.T) {
 		assert.Equal(t, 128, scr.Width())
 		assert.Equal(t, 128, scr.Height())
 		assert.Equal(t, make([]byte, 16384), scr.Pix())
-		assert.Zero(t, pi.ScreenCamera)
+		assert.Zero(t, pi.Camera)
 		assert.Equal(t, pi.Region{W: 128, H: 128}, scr.Clip())
 	})
 
