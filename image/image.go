@@ -24,6 +24,7 @@ type Image struct {
 	Pixels []byte
 }
 
+// String returns Image as string for debugging purposes.
 func (i Image) String() string {
 	return fmt.Sprintf("{width:%d, height:%d, palette: %+v, pixels:%s}",
 		i.Width, i.Height, sfmt.FormatBigSlice(i.Palette[:], 32), sfmt.FormatBigSlice(i.Pixels, 1000))

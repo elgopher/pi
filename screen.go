@@ -219,6 +219,7 @@ func PalReset() {
 	DisplayPalette = notSwappedPalette
 }
 
+// Scr returns the Screen PixMap
 func Scr() PixMap {
 	return screen
 }
