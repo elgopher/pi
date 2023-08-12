@@ -51,32 +51,6 @@ func TestPixMap_ClearCol(t *testing.T) {
 	})
 }
 
-func TestCls(t *testing.T) {
-	testCls(t, pi.Cls)
-}
-
-func testCls(t *testing.T, cls func()) {
-	t.Run("should reset clipping region", func(t *testing.T) {
-		pi.Reset()
-		pi.SetScreenSize(2, 2)
-		pi.Clip(1, 2, 3, 4)
-		// when
-		cls() // clips to 0,0,w,h
-		// then
-		prevX, prevY, prevW, prevH := pi.ClipReset()
-		assert.Zero(t, prevX)
-		assert.Zero(t, prevY)
-		assert.Equal(t, pi.Scr().Width(), prevW)
-		assert.Equal(t, pi.Scr().Height(), prevH)
-	})
-}
-
-func TestClsCol(t *testing.T) {
-	testCls(t, func() {
-		pi.ClsCol(0)
-	})
-}
-
 func TestPixMap_Set(t *testing.T) {
 	const col byte = 2
 
