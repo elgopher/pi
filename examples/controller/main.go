@@ -39,33 +39,33 @@ func main() {
 }
 
 func drawPlayerController(player, x, y int) {
-	pi.PalReset()
+	pi.Pal.Reset()
 	// make all buttons inactive:
-	pi.Pal(left, dpadInactive)
-	pi.Pal(up, dpadInactive)
-	pi.Pal(down, dpadInactive)
-	pi.Pal(right, dpadInactive)
-	pi.Pal(btnO, buttonInactive)
-	pi.Pal(btnX, buttonInactive)
+	pi.Pal[left] = dpadInactive
+	pi.Pal[up] = dpadInactive
+	pi.Pal[down] = dpadInactive
+	pi.Pal[right] = dpadInactive
+	pi.Pal[btnO] = buttonInactive
+	pi.Pal[btnX] = buttonInactive
 
 	// make pressed buttons active:
 	if pi.BtnPlayer(pi.O, player) {
-		pi.Pal(btnO, active)
+		pi.Pal[btnO] = active
 	}
 	if pi.BtnPlayer(pi.X, player) {
-		pi.Pal(btnX, active)
+		pi.Pal[btnX] = active
 	}
 	if pi.BtnPlayer(pi.Left, player) {
-		pi.Pal(left, active)
+		pi.Pal[left] = active
 	}
 	if pi.BtnPlayer(pi.Up, player) {
-		pi.Pal(up, active)
+		pi.Pal[up] = active
 	}
 	if pi.BtnPlayer(pi.Down, player) {
-		pi.Pal(down, active)
+		pi.Pal[down] = active
 	}
 	if pi.BtnPlayer(pi.Right, player) {
-		pi.Pal(right, active)
+		pi.Pal[right] = active
 	}
 	// draw gamepad sprite:
 	pi.SprSize(0, x, y, 8.0, 4.0)
@@ -74,7 +74,7 @@ func drawPlayerController(player, x, y int) {
 }
 
 func drawPlayerNumber(x int, y int, player int) {
-	pi.PalReset()
+	pi.Pal.Reset()
 	for i := 0; i <= player; i++ {
 		pi.Pset(x+50-i*2, y+8, yellow)
 	}

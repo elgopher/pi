@@ -24,7 +24,7 @@ func Take() (string, error) {
 	}
 
 	var palette color.Palette
-	for _, col := range pi.DisplayPalette {
+	for _, col := range pi.Pald {
 		rgb := pi.Palette[col]
 		rgba := &color.NRGBA{R: rgb.R, G: rgb.G, B: rgb.B, A: 255}
 		palette = append(palette, rgba)

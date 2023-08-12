@@ -184,7 +184,7 @@ func testRect(t *testing.T, rect func(x0 int, y0 int, x1 int, y1 int, col byte),
 	t.Run("should replace color from draw palette", func(t *testing.T) {
 		pi.Reset()
 		pi.SetScreenSize(16, 16)
-		pi.Pal(white, 3)
+		pi.Pal[white] = 3
 		rect(5, 5, 10, 10, white)
 		assertScreenEqual(t, "internal/testimage/"+dir+"/pal_5,5,10,10.png")
 	})
@@ -435,7 +435,7 @@ func TestLine(t *testing.T) {
 				pi.Reset()
 				pi.SetScreenSize(16, 16)
 				pi.ClsCol(5)
-				pi.Pal(white, red)
+				pi.Pal[white] = red
 				// when
 				pi.Line(test.x0, test.y0, test.x1, test.y1, white)
 				assertScreenEqual(t, "internal/testimage/line/pal/"+name+".png")
@@ -556,7 +556,7 @@ func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
 		pi.Reset()
 		pi.SetScreenSize(16, 16)
 		pi.ClsCol(5)
-		pi.Pal(white, red)
+		pi.Pal[white] = red
 		// when
 		circ(8, 8, 1, white)
 		assertScreenEqual(t, "internal/testimage/"+dir+"/draw/radius 1, red.png")
