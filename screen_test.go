@@ -161,7 +161,7 @@ func TestPset(t *testing.T) {
 	t.Run("should set pixel taking camera position into account", func(t *testing.T) {
 		pi.Reset()
 		pi.SetScreenSize(2, 2)
-		pi.Camera(1, 2)
+		pi.Camera.Set(1, 2)
 		// when
 		pi.Pset(1, 2, 8)
 		// then
@@ -192,7 +192,7 @@ func TestPset(t *testing.T) {
 				pi.Reset()
 				pi.SetScreenSize(2, 2)
 				// when
-				pi.Camera(1, 1)
+				pi.Camera.Set(1, 1)
 				pi.Pset(coords.X, coords.Y, col)
 				// then
 				assert.Equal(t, emptyScreen, pi.Scr().Pix())
@@ -307,7 +307,7 @@ func TestPget(t *testing.T) {
 	t.Run("should get pixel taking camera position into consideration", func(t *testing.T) {
 		pi.Reset()
 		pi.SetScreenSize(2, 2)
-		pi.Camera(1, 2)
+		pi.Camera.Set(1, 2)
 		const color byte = 8
 		pi.Pset(1, 2, color)
 		// when
@@ -337,7 +337,7 @@ func TestPget(t *testing.T) {
 				pi.Reset()
 				pi.SetScreenSize(2, 2)
 				pi.ClsCol(7)
-				pi.Camera(1, 1)
+				pi.Camera.Set(1, 1)
 				// when
 				actual := pi.Pget(coords.X, coords.Y)
 				// then
@@ -422,17 +422,8 @@ func TestClipReset(t *testing.T) {
 func TestCamera(t *testing.T) {
 	t.Run("should return initial camera", func(t *testing.T) {
 		pi.Reset()
-		initialX, initialY := pi.Camera(1, 2)
-		assert.Equal(t, 0, initialX)
-		assert.Equal(t, 0, initialY)
-	})
-
-	t.Run("should return previous camera", func(t *testing.T) {
-		pi.Reset()
-		pi.Camera(1, 2)
-		x, y := pi.Camera(2, 3)
-		assert.Equal(t, 1, x)
-		assert.Equal(t, 2, y)
+		assert.Equal(t, 0, pi.Camera.X)
+		assert.Equal(t, 0, pi.Camera.Y)
 	})
 }
 
@@ -490,7 +481,7 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 				boot(8, 8, spriteSheet16x16)
 				expectedScreen := decodePNG(t, "internal/testimage/spr/"+test.expectedScreenFile)
 				// when
-				pi.Camera(test.cameraX, test.cameraY)
+				pi.Camera.Set(test.cameraX, test.cameraY)
 				spr(test.spriteNo, test.x, test.y)
 				// then
 				assert.Equal(t, expectedScreen.Pixels, pi.Scr().Pix())
@@ -692,6 +683,22 @@ func TestSprSizeFlip(t *testing.T) {
 		// then
 		expectedScreen := decodePNG(t, "internal/testimage/spr/spr_1_on_top_of_2_trans_50_flipx.png")
 		assert.Equal(t, expectedScreen.Pixels, pi.Scr().Pix())
+	})
+}
+
+func TestPosition_Reset(t *testing.T) {
+	t.Run("should reset x,y to origin", func(t *testing.T) {
+		p := pi.Position{X: 1, Y: 2}
+		p.Reset()
+		assert.Zero(t, p)
+	})
+}
+
+func TestPosition_Set(t *testing.T) {
+	t.Run("should update x and y simultaneously", func(t *testing.T) {
+		var p pi.Position
+		p.Set(1, 2)
+		assert.Equal(t, pi.Position{X: 1, Y: 2}, p)
 	})
 }
 

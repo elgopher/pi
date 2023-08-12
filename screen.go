@@ -23,13 +23,13 @@ func ClsCol(col byte) {
 
 // Pset sets a pixel color on the screen. It takes into account camera and draw palette.
 func Pset(x, y int, color byte) {
-	screen.Set(x-ScreenCamera.X, y-ScreenCamera.Y, DrawPalette[color])
+	screen.Set(x-Camera.X, y-Camera.Y, DrawPalette[color])
 }
 
 // Pget gets a pixel color on the screen.
 func Pget(x, y int) byte {
-	x -= ScreenCamera.X
-	y -= ScreenCamera.Y
+	x -= Camera.X
+	y -= Camera.Y
 
 	return screen.Get(x, y)
 }
@@ -48,22 +48,7 @@ func ClipReset() (prevX, prevY, prevW, prevH int) {
 	return Clip(0, 0, screen.Width(), screen.Height())
 }
 
-//func ClipPrev(x, y, w, h int) {}
-
-// Camera sets the camera offset used for all subsequent draw operations.
-func Camera(x, y int) (prevX, prevY int) {
-	prev := ScreenCamera
-	ScreenCamera.X = x
-	ScreenCamera.Y = y
-	return prev.X, prev.Y
-}
-
-var ScreenCamera Position
-
-// CameraReset resets the camera offset to origin (0,0).
-func CameraReset() (prevX, prevY int) {
-	return Camera(0, 0)
-}
+// func ClipPrev(x, y, w, h int) {}
 
 // Spr draws a sprite with specified number on the screen.
 // Sprites are counted from left to right, top to bottom. Sprite 0 is on top-left corner, sprite 1 is to the right and so on.
@@ -92,8 +77,8 @@ func SprSizeFlip(n, x, y int, w, h float64, flipX, flipY bool) {
 		return
 	}
 
-	x -= ScreenCamera.X
-	y -= ScreenCamera.Y
+	x -= Camera.X
+	y -= Camera.Y
 
 	screenWidth := screen.Width()
 
@@ -230,6 +215,17 @@ type Region struct {
 
 type Position struct {
 	X, Y int
+}
+
+func (p *Position) Set(x, y int) {
+	p.X = x
+	p.Y = y
+}
+
+// Reset resets the X and Y to origin (0,0).
+func (p *Position) Reset() {
+	p.X = 0
+	p.Y = 0
 }
 
 const maxScreenSize = 1024 * 64

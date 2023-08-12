@@ -11,10 +11,10 @@ import "math"
 func RectFill(x0, y0, x1, y1 int, color byte) {
 	col := DrawPalette[color]
 
-	x0 -= ScreenCamera.X
-	x1 -= ScreenCamera.X
-	y0 -= ScreenCamera.Y
-	y1 -= ScreenCamera.Y
+	x0 -= Camera.X
+	x1 -= Camera.X
+	y0 -= Camera.Y
+	y1 -= Camera.Y
 
 	screen.RectFill(x0, y0, x1, y1, col)
 }
@@ -48,8 +48,8 @@ func (p PixMap) RectFill(x0 int, y0 int, x1 int, y1 int, col byte) {
 func Rect(x0, y0, x1, y1 int, color byte) {
 	color = DrawPalette[color]
 
-	x0, x1 = x0-ScreenCamera.X, x1-ScreenCamera.X
-	y0, y1 = y0-ScreenCamera.Y, y1-ScreenCamera.Y
+	x0, x1 = x0-Camera.X, x1-Camera.X
+	y0, y1 = y0-Camera.Y, y1-Camera.Y
 
 	screen.Rect(x0, y0, x1, y1, color)
 }
@@ -68,10 +68,10 @@ func (p PixMap) Rect(x0, y0, x1, y1 int, col byte) {
 func Line(x0, y0, x1, y1 int, color byte) {
 	color = DrawPalette[color]
 
-	x0 -= ScreenCamera.X
-	x1 -= ScreenCamera.X
-	y0 -= ScreenCamera.Y
-	y1 -= ScreenCamera.Y
+	x0 -= Camera.X
+	x1 -= Camera.X
+	y0 -= Camera.Y
+	y1 -= Camera.Y
 
 	screen.Line(x0, y0, x1, y1, color)
 }
@@ -178,8 +178,8 @@ func (p PixMap) horizontalLine(y, x0, x1 int, color byte) {
 func Circ(centerX, centerY, radius int, color byte) {
 	color = DrawPalette[color]
 
-	centerX = centerX - ScreenCamera.X
-	centerY = centerY - ScreenCamera.Y
+	centerX = centerX - Camera.X
+	centerY = centerY - Camera.Y
 
 	screen.Circ(centerX, centerY, radius, color)
 }
@@ -218,8 +218,8 @@ func (p PixMap) Circ(centerX int, centerY int, radius int, color byte) {
 func CircFill(centerX, centerY, radius int, color byte) {
 	color = DrawPalette[color]
 
-	centerX = centerX - ScreenCamera.X
-	centerY = centerY - ScreenCamera.Y
+	centerX = centerX - Camera.X
+	centerY = centerY - Camera.Y
 
 	// Code based on Frédéric Goset work: http://fredericgoset.ovh/mathematiques/courbes/en/filled_circle.html
 	screen.CircFill(centerX, centerY, radius, color)
