@@ -4,7 +4,6 @@
 package inspector
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/elgopher/pi"
@@ -33,14 +32,7 @@ func calcDistance() (dist float64, width, height int) {
 	return
 }
 
-var helpShown bool
-
 func Update() {
-	if !helpShown {
-		helpShown = true
-		fmt.Println("Press right mouse button to show toolbar.")
-		fmt.Println("Press P to take screenshot.")
-	}
 
 	if !toolbar.visible {
 		tool.Update()

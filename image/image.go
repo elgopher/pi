@@ -6,6 +6,12 @@
 // Package is used internally by Pi, but it can also be used when writing unit tests.
 package image
 
+import (
+	"fmt"
+
+	"github.com/elgopher/pi/internal/sfmt"
+)
+
 // Image contains information about decoded image.
 type Image struct {
 	Width, Height int
@@ -16,6 +22,11 @@ type Image struct {
 	// 0th element of slice represent pixel color in top-left corner.
 	// 1st element is a next pixel on the right and so on.
 	Pixels []byte
+}
+
+func (i Image) String() string {
+	return fmt.Sprintf("{width:%d, height:%d, palette: %+v, pixels:%s}",
+		i.Width, i.Height, sfmt.FormatBigSlice(i.Palette[:], 32), sfmt.FormatBigSlice(i.Pixels, 1000))
 }
 
 // RGB represents color

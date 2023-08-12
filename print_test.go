@@ -5,6 +5,7 @@ package pi_test
 
 import (
 	_ "embed"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -166,5 +167,30 @@ func TestPrint(t *testing.T) {
 				assert.Equal(t, test.expectedX, x)
 			})
 		}
+	})
+}
+
+func TestFont_String(t *testing.T) {
+	t.Run("should convert font with small data to string", func(t *testing.T) {
+		font := pi.Font{
+			Data:         make([]byte, 2), // invalid data, but still possible to initialize by hand
+			Width:        1,
+			SpecialWidth: 2,
+			Height:       3,
+		}
+		actual := font.String()
+		assert.Equal(t, "{width: 1, specialWidth: 2, height: 3, data: [0 0]}", actual)
+	})
+
+	t.Run("should convert font to string", func(t *testing.T) {
+		font := pi.Font{
+			Data:         make([]byte, 2048),
+			Width:        1,
+			SpecialWidth: 2,
+			Height:       3,
+		}
+		actual := font.String()
+		fmt.Println(len(actual))
+		assert.True(t, len(actual) < 1500)
 	})
 }

@@ -3,6 +3,12 @@
 
 package pi
 
+import (
+	"fmt"
+
+	"github.com/elgopher/pi/internal/sfmt"
+)
+
 // PixMap is a generic data structure for manipulating any kind of pixel data - screen, sprite-sheet etc.
 // PixMap uses a single byte (8 bits) for storing single color/pixel. This means that max 256 colors
 // can be used. PixMap can also be used for maps which not necessary contain pixel colors, such as world map
@@ -19,6 +25,11 @@ type PixMap struct {
 
 	zeroPix      []byte
 	wholeLinePix []byte
+}
+
+func (p PixMap) String() string {
+	return fmt.Sprintf("{width:%d, height:%d, clip:%+v, pix:%s}",
+		p.width, p.height, p.clip, sfmt.FormatBigSlice(p.pix, 1024))
 }
 
 // NewPixMap creates new instance of PixMap with specified size.

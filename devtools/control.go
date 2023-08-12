@@ -4,6 +4,8 @@
 package devtools
 
 import (
+	"fmt"
+
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/devtools/internal/snapshot"
 )
@@ -13,7 +15,15 @@ var (
 	timeWhenPaused float64
 )
 
+var helpShown bool
+
 func pauseGame() {
+	fmt.Println("Game paused")
+	if !helpShown {
+		helpShown = true
+		fmt.Println("\nPress right mouse button in the game window to show the toolbar.")
+		fmt.Println("Press P in the game window to take screenshot.")
+	}
 	gamePaused = true
 	timeWhenPaused = pi.TimeSeconds
 	snapshot.Take()
@@ -23,4 +33,5 @@ func resumeGame() {
 	gamePaused = false
 	pi.TimeSeconds = timeWhenPaused
 	snapshot.Draw()
+	fmt.Println("Game resumed")
 }
