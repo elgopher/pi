@@ -27,11 +27,6 @@ type PixMap struct {
 	wholeLinePix []byte
 }
 
-func (p PixMap) String() string {
-	return fmt.Sprintf("{width:%d, height:%d, clip:%+v, pix:%s}",
-		p.width, p.height, p.clip, sfmt.FormatBigSlice(p.pix, 1024))
-}
-
 // NewPixMap creates new instance of PixMap with specified size.
 // Width and height cannot be negative.
 func NewPixMap(width, height int) PixMap {
@@ -377,4 +372,10 @@ func addY(p Pointer, n int, lineWidth int) Pointer {
 	}
 	p.Pix = p.Pix[n*lineWidth:]
 	return p
+}
+
+// String returns PixMap as string for debugging purposes.
+func (p PixMap) String() string {
+	return fmt.Sprintf("{width:%d, height:%d, clip:%+v, pix:%s}",
+		p.width, p.height, p.clip, sfmt.FormatBigSlice(p.pix, 1024))
 }

@@ -3,6 +3,31 @@
 
 // Package pi provides API to develop retro games.
 //
+// Like other game development engines, Pi runs your game in a loop:
+//
+//	for {
+//	  pi.Update()
+//	  pi.Draw()
+//	  sleep() // sleep until next frame (30 frames per second)
+//	 }
+//
+// Both pi.Update and pi.Draw functions are provided by you. By default,
+// they do nothing. You can set them by using:
+//
+//	pi.Draw = func() {
+//	  pi.Print("HELLO WORLD", 40, 60, 7)
+//	}
+//
+// To run the game please use the ebitengine back-end by calling
+// ebitengine.Run or ebitengine.MustRun.
+//
+// During development, you might want to use dev-tools which provide tools
+// for screen inspection and REPL terminal, where you can write Go code
+// live when your game is running. To start the game with dev-tools
+// please use:
+//
+//	devtools.MustRun(ebitengine.Run)
+//
 // Please note that the entire pi package is not concurrency-safe.
 // This means that it is unsafe to run functions and access package
 // variables from go-routines started by your code.
@@ -15,7 +40,7 @@ import (
 	"github.com/elgopher/pi/font"
 )
 
-// User parameters.
+// User parameters
 var (
 	// Update is a user provided function executed each frame (30 times per second).
 	//
@@ -38,6 +63,7 @@ var (
 	Palette = defaultPalette
 )
 
+// Global state
 var (
 	// DrawPalette contains mapping of colors used to replace color with
 	// another one for all subsequent drawings.

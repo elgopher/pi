@@ -60,6 +60,7 @@ type spriteSheet struct {
 	spritesInLine   int
 }
 
+// SprSheet returns the sprite-sheet PixMap
 func SprSheet() PixMap {
 	return sprSheet.PixMap
 }

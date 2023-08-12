@@ -62,11 +62,6 @@ type Font struct {
 	Height int
 }
 
-func (f Font) String() string {
-	return fmt.Sprintf("{width: %d, specialWidth: %d, height: %d, data: %s}",
-		f.Width, f.SpecialWidth, f.Height, sfmt.FormatBigSlice(f.Data, 512))
-}
-
 // Print prints text on the screen at given coordinates. It takes into account
 // clipping region and camera position.
 //
@@ -130,6 +125,12 @@ func (f Font) printRune(r rune, sx, sy int, color byte) int {
 	} else {
 		return f.SpecialWidth
 	}
+}
+
+// String returns Font as string for debugging purposes.
+func (f Font) String() string {
+	return fmt.Sprintf("{width: %d, specialWidth: %d, height: %d, data: %s}",
+		f.Width, f.SpecialWidth, f.Height, sfmt.FormatBigSlice(f.Data, 512))
 }
 
 // Print prints text on the screen using system font. It takes into consideration
