@@ -8,6 +8,7 @@ import (
 
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/devtools/internal/inspector"
+	"github.com/elgopher/pi/devtools/internal/terminal"
 )
 
 var (
@@ -33,7 +34,8 @@ func MustRun(runBackend func() error) {
 	}
 
 	inspector.BgColor, inspector.FgColor = BgColor, FgColor
-	fmt.Println("Press F12 to pause the game and show devtools.")
+	fmt.Println("Press F12 in the game window to pause the game and activate devtools inspector.")
+	fmt.Println("Terminal activated. Type help for help.")
 
 	pi.Update = func() {
 		updateDevTools()
@@ -52,6 +54,17 @@ func MustRun(runBackend func() error) {
 			drawDevTools()
 		}
 	}
+
+	if err := interpreterInstance.SetUpdate(&update); err != nil {
+		panic(fmt.Sprintf("problem exporting Update function: %s", err))
+	}
+
+	if err := interpreterInstance.SetDraw(&draw); err != nil {
+		panic(fmt.Sprintf("problem exporting Draw function: %s", err))
+	}
+
+	terminal.StartReadingCommands()
+	defer terminal.StopReadingCommandsFromStdin()
 
 	if err := runBackend(); err != nil {
 		panic(fmt.Sprintf("Something terrible happened! Pi cannot be run: %v\n", err))

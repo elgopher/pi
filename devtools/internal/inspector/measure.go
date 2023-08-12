@@ -94,7 +94,7 @@ func (m *Measure) Update() {
 	case pi.MouseBtnp(pi.MouseLeft) && !distance.measuring:
 		distance.measuring = true
 		distance.startX, distance.startY = x, y
-		fmt.Printf("Measuring started at (%d, %d)\n", x, y)
+		fmt.Printf("\nMeasuring started at (%d, %d)\n", x, y)
 	case !pi.MouseBtn(pi.MouseLeft) && distance.measuring:
 		distance.measuring = false
 		dist, width, height := calcDistance()

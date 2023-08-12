@@ -24,3 +24,25 @@ func TestRGB_String(t *testing.T) {
 		assert.Equal(t, expected, rgb.String())
 	}
 }
+
+func TestImage_String(t *testing.T) {
+	t.Run("should convert small image to string", func(t *testing.T) {
+		img := image.Image{
+			Width: 2, Height: 1,
+			Palette: [256]image.RGB{{1, 1, 1}, {2, 2, 2}},
+			Pixels:  make([]byte, 2),
+		}
+
+		actual := img.String()
+		expected := "{width:2, height:1, palette: (256)[#010101 #020202 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 #000000 ...], pixels:[0 0]}"
+		assert.Equal(t, expected, actual)
+	})
+
+	t.Run("should convert big image to string", func(t *testing.T) {
+		img := image.Image{
+			Pixels: make([]byte, 100*100), // 10K bytes
+		}
+		actual := img.String()
+		assert.True(t, len(actual) < 2500)
+	})
+}

@@ -532,6 +532,20 @@ func TestPixMap_Merge(t *testing.T) {
 	})
 }
 
+func TestPixMap_String(t *testing.T) {
+	t.Run("should convert small pixmap to string", func(t *testing.T) {
+		pixMap := pi.NewPixMap(1, 2)
+		actual := pixMap.String()
+		assert.Equal(t, "{width:1, height:2, clip:{X:0 Y:0 W:1 H:2}, pix:[0 0]}", actual)
+	})
+
+	t.Run("should convert big pixmap to string", func(t *testing.T) {
+		pixMap := pi.NewPixMap(100, 100) // 10K bytes
+		actual := pixMap.String()
+		assert.True(t, len(actual) < 2500)
+	})
+}
+
 type pointerResult struct {
 	pointer pi.Pointer
 	ok      bool

@@ -10,6 +10,7 @@ import (
 	"io/fs"
 
 	"github.com/elgopher/pi/font"
+	"github.com/elgopher/pi/internal/sfmt"
 )
 
 const fontDataSize = 8 * 256
@@ -59,6 +60,11 @@ type Font struct {
 	SpecialWidth int
 	// Height of line
 	Height int
+}
+
+func (f Font) String() string {
+	return fmt.Sprintf("{width: %d, specialWidth: %d, height: %d, data: %s}",
+		f.Width, f.SpecialWidth, f.Height, sfmt.FormatBigSlice(f.Data, 512))
 }
 
 // Print prints text on the screen at given coordinates. It takes into account

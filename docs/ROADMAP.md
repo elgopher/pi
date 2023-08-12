@@ -42,6 +42,7 @@
       * [ ] drawing on the screen using Pi functions
         * [x] Pset, shapes
         * [ ] Spr, Print
+    * [x] **scripting/REPL** - write Go code **live** when the game is running
     * [ ] palette inspector
       * [ ] display, draw palette
     * [ ] sprite-sheet editor

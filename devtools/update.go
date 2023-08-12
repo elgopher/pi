@@ -20,4 +20,6 @@ func updateDevTools() {
 	if gamePaused {
 		inspector.Update()
 	}
+
+	evaluateNextCommandFromTerminal()
 }
