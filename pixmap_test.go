@@ -57,20 +57,20 @@ func TestNewPixMap(t *testing.T) {
 	})
 }
 
-func TestNewPixMapWithPixels(t *testing.T) {
+func TestNewPixMapWithPix(t *testing.T) {
 	t.Run("should panic when", func(t *testing.T) {
 		tests := map[string]func(){
 			"length of pixels is not multiple of line width": func() {
-				pi.NewPixMapWithPixels(make([]byte, 3), 2)
+				pi.NewPixMapWithPix(make([]byte, 3), 2)
 			},
 			"pixels slice length is lower than line width": func() {
-				pi.NewPixMapWithPixels(make([]byte, 1), 2)
+				pi.NewPixMapWithPix(make([]byte, 1), 2)
 			},
 			"line width is negative": func() {
-				pi.NewPixMapWithPixels(make([]byte, 2), -2)
+				pi.NewPixMapWithPix(make([]byte, 2), -2)
 			},
 			"line width is zero and pixels slice is not empty": func() {
-				pi.NewPixMapWithPixels(make([]byte, 1), 0)
+				pi.NewPixMapWithPix(make([]byte, 1), 0)
 			},
 		}
 		for name, test := range tests {
@@ -83,16 +83,16 @@ func TestNewPixMapWithPixels(t *testing.T) {
 	t.Run("should not panic", func(t *testing.T) {
 		tests := map[string]func(){
 			"length of pixels is multiple of line width": func() {
-				pi.NewPixMapWithPixels(make([]byte, 4), 2)
+				pi.NewPixMapWithPix(make([]byte, 4), 2)
 			},
 			"line width is equal to pixels slice length": func() {
-				pi.NewPixMapWithPixels(make([]byte, 2), 2)
+				pi.NewPixMapWithPix(make([]byte, 2), 2)
 			},
 			"line width is zero and pixels slice length is 0": func() {
-				pi.NewPixMapWithPixels(make([]byte, 0), 0)
+				pi.NewPixMapWithPix(make([]byte, 0), 0)
 			},
 			"line width is zero and pixels slice is nil": func() {
-				pi.NewPixMapWithPixels(nil, 0)
+				pi.NewPixMapWithPix(nil, 0)
 			},
 		}
 		for name, test := range tests {
@@ -103,17 +103,17 @@ func TestNewPixMapWithPixels(t *testing.T) {
 	})
 
 	t.Run("should create similar PixMap to NewPixMap", func(t *testing.T) {
-		pixMap := pi.NewPixMapWithPixels(make([]byte, 6), 3)
+		pixMap := pi.NewPixMapWithPix(make([]byte, 6), 3)
 		assert.Equal(t, pi.NewPixMap(3, 2), pixMap)
 	})
 
 	t.Run("clipping region should cover entire PixMap", func(t *testing.T) {
-		pixMap := pi.NewPixMapWithPixels(make([]byte, 2*3), 2)
+		pixMap := pi.NewPixMapWithPix(make([]byte, 2*3), 2)
 		assert.Equal(t, pi.Region{W: 2, H: 3}, pixMap.Clip())
 	})
 
 	t.Run("Width() and Height() should return original dimensions", func(t *testing.T) {
-		pixMap := pi.NewPixMapWithPixels(make([]byte, 2*3), 2)
+		pixMap := pi.NewPixMapWithPix(make([]byte, 2*3), 2)
 		pixMap = pixMap.WithClip(1, 1, 1, 1)
 		assert.Equal(t, pixMap.Width(), 2)
 		assert.Equal(t, pixMap.Height(), 3)
@@ -121,17 +121,17 @@ func TestNewPixMapWithPixels(t *testing.T) {
 
 	t.Run("Pix() should return pixel slice passed to constructor", func(t *testing.T) {
 		pix := []byte{1, 2, 3, 4, 5, 6}
-		pixMap := pi.NewPixMapWithPixels(pix, 2)
+		pixMap := pi.NewPixMapWithPix(pix, 2)
 		assert.Equal(t, pix, pixMap.Pix())
 	})
 
 	t.Run("should create zero value", func(t *testing.T) {
 		tests := map[string]func() pi.PixMap{
 			"line width is zero and pixels slice length is 0": func() pi.PixMap {
-				return pi.NewPixMapWithPixels(make([]byte, 0), 0)
+				return pi.NewPixMapWithPix(make([]byte, 0), 0)
 			},
 			"line width is zero and pixels slice is nil": func() pi.PixMap {
-				return pi.NewPixMapWithPixels(nil, 0)
+				return pi.NewPixMapWithPix(nil, 0)
 			},
 		}
 		for name, newPixMap := range tests {
@@ -376,7 +376,7 @@ func TestPixMap_Foreach(t *testing.T) {
 
 	t.Run("should pass trimmed lines", func(t *testing.T) {
 		pix := []byte{0, 1, 2, 3, 4, 5, 6, 7, 8}
-		pixMap := pi.NewPixMapWithPixels(pix, 3)
+		pixMap := pi.NewPixMapWithPix(pix, 3)
 
 		t.Run("x=0", func(t *testing.T) {
 			var lines [][]byte
@@ -397,7 +397,7 @@ func TestPixMap_Foreach(t *testing.T) {
 
 	t.Run("should pass x,y of each line", func(t *testing.T) {
 		pix := []byte{0, 1, 2, 3, 4, 5, 6, 7, 8}
-		pixMap := pi.NewPixMapWithPixels(pix, 3)
+		pixMap := pi.NewPixMapWithPix(pix, 3)
 
 		t.Run("inside clipping range", func(t *testing.T) {
 			var coords []pi.Position
@@ -444,7 +444,7 @@ func TestPixMap_Copy(t *testing.T) {
 
 func testPixMapCopy(t *testing.T, merge func(pi.PixMap, int, int, int, int, pi.PixMap, int, int)) {
 	t.Run("src bigger than dst", func(t *testing.T) {
-		src := pi.NewPixMapWithPixels([]byte{
+		src := pi.NewPixMapWithPix([]byte{
 			1, 2, 3,
 			4, 5, 6,
 			7, 8, 9,
@@ -495,7 +495,7 @@ func testPixMapCopy(t *testing.T, merge func(pi.PixMap, int, int, int, int, pi.P
 	})
 
 	t.Run("src smaller than dst", func(t *testing.T) {
-		src := pi.NewPixMapWithPixels([]byte{
+		src := pi.NewPixMapWithPix([]byte{
 			1, 2,
 			4, 5,
 			7, 8,

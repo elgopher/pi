@@ -14,7 +14,7 @@ import (
 // can be used. PixMap can also be used for maps which not necessary contain pixel colors, such as world map
 // (as long as only 256 different tiles are used).
 //
-// To create PixMap please use either NewPixMap or NewPixMapWithPixels function.
+// To create PixMap please use either NewPixMap or NewPixMapWithPix function.
 //
 // All PixMap functions (besides Clear and ClearCol) take into account the clipping region.
 type PixMap struct {
@@ -37,20 +37,20 @@ func NewPixMap(width, height int) PixMap {
 		panic("negative PixMap height")
 	}
 
-	pixels := make([]byte, width*height)
+	pix := make([]byte, width*height)
 
 	return PixMap{
-		pix:          pixels,
+		pix:          pix,
 		width:        width,
 		height:       height,
 		clip:         Region{W: width, H: height},
-		zeroPix:      make([]byte, len(pixels)),
+		zeroPix:      make([]byte, len(pix)),
 		wholeLinePix: make([]byte, width),
 	}
 }
 
-// NewPixMapWithPixels creates new instance of PixMap using the slice of pixel colors
-// as a source. Pixels slice contains colors for the entire PixMap.
+// NewPixMapWithPix creates new instance of PixMap using the slice of pixel colors
+// as a source. pix slice contains colors for the entire PixMap.
 // Pixels are organized from left to right, top to bottom. Slice element
 // number 0 has pixel located in the top-left corner. Slice element number 1
 // has pixel color on the right, and so on.
@@ -58,33 +58,33 @@ func NewPixMap(width, height int) PixMap {
 // The lineWidth is the width of PixMap. Height is calculated by dividing pixels
 // by lineWith.
 //
-// This function is handy when you already have a pixel slice and want to create a PixMap
+// This function is handy when you already have a pix slice and want to create a PixMap
 // out of it. This function does not allocate anything on the heap.
-func NewPixMapWithPixels(pixels []byte, lineWidth int) PixMap {
+func NewPixMapWithPix(pix []byte, lineWidth int) PixMap {
 	if lineWidth < 0 {
 		panic("PixMap lineWidth cant be negative")
 	}
 
 	if lineWidth == 0 {
-		if len(pixels) > 0 {
-			panic("PixMap lineWidth cant be zero when pixel slice is not empty")
+		if len(pix) > 0 {
+			panic("PixMap lineWidth cant be zero when pix slice is not empty")
 		}
 
 		return PixMap{}
 	}
 
-	if len(pixels)%lineWidth != 0 {
-		panic("invalid pixmap lineWidth. Length of pixels slice must be multiple of lineWidth.")
+	if len(pix)%lineWidth != 0 {
+		panic("invalid pixmap lineWidth. Length of pix slice must be multiple of lineWidth.")
 	}
 
-	height := len(pixels) / lineWidth
+	height := len(pix) / lineWidth
 
 	return PixMap{
-		pix:          pixels,
+		pix:          pix,
 		width:        lineWidth,
 		height:       height,
 		clip:         Region{W: lineWidth, H: height},
-		zeroPix:      make([]byte, len(pixels)),
+		zeroPix:      make([]byte, len(pix)),
 		wholeLinePix: make([]byte, lineWidth),
 	}
 }

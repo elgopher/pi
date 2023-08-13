@@ -51,7 +51,7 @@ func init() {
 		"MousePos":                  reflect.ValueOf(&pi.MousePos).Elem(),
 		"MouseRight":                reflect.ValueOf(pi.MouseRight),
 		"NewPixMap":                 reflect.ValueOf(pi.NewPixMap),
-		"NewPixMapWithPixels":       reflect.ValueOf(pi.NewPixMapWithPixels),
+		"NewPixMapWithPix":          reflect.ValueOf(pi.NewPixMapWithPix),
 		"O":                         reflect.ValueOf(pi.O),
 		"Palette":                   reflect.ValueOf(&pi.Palette).Elem(),
 		"Get":                       reflect.ValueOf(pi.Get),
