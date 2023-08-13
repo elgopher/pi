@@ -24,7 +24,7 @@ It's a game that resembles old 8-bit/16-bit games. This usually means:
 
 ### What similarities does Pi have with Pico-8?
 
-* Most API function names are similar and behave the same way.
+* Most concepts are similar: game loop, drawing sprites and shapes, printing text, clipping, camera, palette swapping, handling user input. Some functions have even same names.
 * Screen resolution is small, and the number of colors is limited. Although in Pi you can change the resolution and palette.
 * You have one small sprite sheet.
 
