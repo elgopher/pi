@@ -132,7 +132,6 @@ func runBenchmarks(b *testing.B, callback func(res Resolution)) {
 	var resolutions = [...]Resolution{
 		{W: 128, H: 128},
 		{W: 256, H: 256},
-		{W: 512, H: 512},
 	}
 
 	for _, resolution := range resolutions {
