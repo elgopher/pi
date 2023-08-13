@@ -27,7 +27,7 @@ func PrintHelp(topic string) error {
 			"\n\n" +
 			"Type help topic for more information. For example: help pi or help pi.Spr" +
 			"\n\n" +
-			"Available commands: help [h], pause [p], resume [r], undo [u]",
+			"Available commands: help [h], pause [p], resume [r], undo [u], next [n]",
 		)
 		return nil
 	default:

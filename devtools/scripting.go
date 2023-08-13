@@ -70,6 +70,8 @@ func evaluateNextCommandFromTerminal() {
 		case interpreter.Undoed:
 			snapshot.Undo()
 			fmt.Println("Undoed last draw operation")
+		case interpreter.NextFrameRequested:
+			resumeUntilNextFrame()
 		}
 
 		if result == interpreter.Continued {
