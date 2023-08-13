@@ -74,6 +74,16 @@ var Time float64
 var GameLoopStopped bool
 
 // Load loads files like sprite-sheet.png, custom-font.png
+//
+// Load looks for resources with specific names in the resources parameter, eg "sprite-sheet.png".
+//
+// To acquire the resources object, the easiest way is to include the resources in the game binary
+// by using go:embed directive:
+//
+//	package main
+//
+//	// go:embed sprite-sheet.png
+//	var resources embed.FS
 func Load(resources fs.ReadFileFS) {
 	if resources == nil {
 		return
