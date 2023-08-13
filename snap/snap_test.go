@@ -45,7 +45,7 @@ func TestSnap(t *testing.T) {
 		pi.SetScreenSize(1, 1)
 		original, replacement := byte(1), byte(2)
 		pi.Pald[original] = replacement // replace 1 by 2
-		pi.Pset(0, 0, original)
+		pi.Set(0, 0, original)
 		screenshot, err := snap.Take()
 		// then
 		require.NoError(t, err)

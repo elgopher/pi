@@ -23,8 +23,8 @@ func selectTool(icon byte) {
 	switch icon {
 	case icons.MeasureTool:
 		tool = &Measure{}
-	case icons.PsetTool:
-		tool = &Pset{}
+	case icons.SetTool:
+		tool = &Set{}
 	case icons.LineTool:
 		tool = &Shape{
 			draw: drawShape("Line", pi.Line),

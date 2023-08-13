@@ -18,16 +18,6 @@ const (
 
 var sprSheet = newSpriteSheet(defaultSpriteSheetWidth, defaultSpriteSheetHeight)
 
-// Sset sets the pixel color on the sprite sheet.
-func Sset(x, y int, color byte) {
-	sprSheet.Set(x, y, color)
-}
-
-// Sget gets the pixel color on the sprite sheet.
-func Sget(x, y int) byte {
-	return sprSheet.Get(x, y)
-}
-
 func loadSpriteSheet(resources fs.ReadFileFS) error {
 	fileContents, err := resources.ReadFile("sprite-sheet.png")
 	if errors.Is(err, fs.ErrNotExist) {

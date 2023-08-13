@@ -129,7 +129,7 @@ func TestPixMap_Set(t *testing.T) {
 	})
 }
 
-func TestPset(t *testing.T) {
+func TestSet(t *testing.T) {
 	const col byte = 2
 
 	t.Run("should set pixel taking camera position into account", func(t *testing.T) {
@@ -137,7 +137,7 @@ func TestPset(t *testing.T) {
 		pi.SetScreenSize(2, 2)
 		pi.Camera.Set(1, 2)
 		// when
-		pi.Pset(1, 2, 8)
+		pi.Set(1, 2, 8)
 		// then
 		expected := make([]byte, 4)
 		expected[0] = 8
@@ -167,7 +167,7 @@ func TestPset(t *testing.T) {
 				pi.SetScreenSize(2, 2)
 				// when
 				pi.Camera.Set(1, 1)
-				pi.Pset(coords.X, coords.Y, col)
+				pi.Set(coords.X, coords.Y, col)
 				// then
 				assert.Equal(t, emptyScreen, pi.Scr().Pix())
 			})
@@ -179,7 +179,7 @@ func TestPset(t *testing.T) {
 		pi.SetScreenSize(1, 1)
 		pi.Pal[1] = 2
 		// when
-		pi.Pset(0, 0, 1)
+		pi.Set(0, 0, 1)
 		// then
 		assert.Equal(t, []byte{2}, pi.Scr().Pix())
 	})
@@ -190,7 +190,7 @@ func TestPset(t *testing.T) {
 		pi.Pal[1] = 2
 		pi.Pal.Reset()
 		// when
-		pi.Pset(0, 0, 1)
+		pi.Set(0, 0, 1)
 		// then
 		assert.Equal(t, []byte{1}, pi.Scr().Pix())
 	})
@@ -277,15 +277,15 @@ func TestPixMap_Get(t *testing.T) {
 	})
 }
 
-func TestPget(t *testing.T) {
+func TestGet(t *testing.T) {
 	t.Run("should get pixel taking camera position into consideration", func(t *testing.T) {
 		pi.Reset()
 		pi.SetScreenSize(2, 2)
 		pi.Camera.Set(1, 2)
 		const color byte = 8
-		pi.Pset(1, 2, color)
+		pi.Set(1, 2, color)
 		// when
-		actual := pi.Pget(1, 2)
+		actual := pi.Get(1, 2)
 		// then
 		assert.Equal(t, color, actual)
 	})
@@ -313,7 +313,7 @@ func TestPget(t *testing.T) {
 				pi.ClsCol(7)
 				pi.Camera.Set(1, 1)
 				// when
-				actual := pi.Pget(coords.X, coords.Y)
+				actual := pi.Get(coords.X, coords.Y)
 				// then
 				assert.Zero(t, actual)
 			})
@@ -528,12 +528,12 @@ func testSpr(t *testing.T, spr func(spriteNo int, x int, y int)) {
 		pi.SetScreenSize(8, 8)
 		const originalColor byte = 7
 		const replacementColor byte = 15
-		pi.Sset(5, 5, originalColor)
+		pi.SprSheet().Set(5, 5, originalColor)
 		pi.Pal[originalColor] = replacementColor
 		// when
 		spr(0, 0, 0)
 		// then
-		actual := pi.Pget(5, 5)
+		actual := pi.Get(5, 5)
 		assert.Equal(t, replacementColor, actual)
 	})
 

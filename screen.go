@@ -17,13 +17,13 @@ func ClsCol(col byte) {
 	screen.ClearCol(col)
 }
 
-// Pset sets a pixel color on the screen. It takes into account camera and draw palette.
-func Pset(x, y int, color byte) {
+// Set sets a pixel color on the screen. It takes into account camera and draw palette.
+func Set(x, y int, color byte) {
 	screen.Set(x-Camera.X, y-Camera.Y, Pal[color])
 }
 
-// Pget gets a pixel color on the screen.
-func Pget(x, y int) byte {
+// Get gets a pixel color on the screen.
+func Get(x, y int) byte {
 	x -= Camera.X
 	y -= Camera.Y
 

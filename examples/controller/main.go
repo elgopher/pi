@@ -76,6 +76,6 @@ func drawPlayerController(player, x, y int) {
 func drawPlayerNumber(x int, y int, player int) {
 	pi.Pal.Reset()
 	for i := 0; i <= player; i++ {
-		pi.Pset(x+50-i*2, y+8, yellow)
+		pi.Set(x+50-i*2, y+8, yellow)
 	}
 }
