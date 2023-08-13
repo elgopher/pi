@@ -13,7 +13,8 @@ import (
 )
 
 const (
-	SpriteWidth, SpriteHeight = 8, 8
+	SpriteHeight = 8
+	SpriteWidth  = 8
 )
 
 var sprSheet = newSpriteSheet(defaultSpriteSheetWidth, defaultSpriteSheetHeight)
