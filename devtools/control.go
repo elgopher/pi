@@ -13,8 +13,14 @@ import (
 var (
 	gamePaused       bool
 	pauseOnNextFrame bool
-	timeWhenPaused   float64
+	stateCopy        stateWhenGameWasPaused
 )
+
+type stateWhenGameWasPaused struct {
+	time   float64
+	camera pi.Position
+	clip   pi.Region
+}
 
 var helpShown bool
 
@@ -28,13 +34,26 @@ func pauseGame() {
 		fmt.Println("Press F12 in the game window to resume the game and exit devtools inspector.")
 	}
 	gamePaused = true
-	timeWhenPaused = pi.Time
+
+	pi.Camera.Reset()
+	x, y, w, h := pi.ClipReset()
+
+	stateCopy = stateWhenGameWasPaused{
+		time:   pi.Time,
+		camera: pi.Camera,
+		clip:   pi.Region{X: x, Y: y, W: w, H: h},
+	}
+
 	snapshot.Take()
 }
 
 func resumeGame() {
 	gamePaused = false
-	pi.Time = timeWhenPaused
+
+	pi.Time = stateCopy.time
+	pi.Camera = stateCopy.camera
+	pi.Clip(stateCopy.clip.X, stateCopy.clip.Y, stateCopy.clip.W, stateCopy.clip.H)
+
 	snapshot.Draw()
 	fmt.Println("Game resumed")
 }
