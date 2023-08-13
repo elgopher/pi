@@ -3,6 +3,16 @@
 
 package pi
 
+import "github.com/elgopher/pi/image"
+
+// Palette has all colors available in the game. Up to 256.
+// Palette is taken from loaded sprite sheet (which must be
+// a PNG file with indexed color mode). If sprite-sheet.png was not
+// found, then default 16 color palette is used.
+//
+// Can be freely read and updated when the game is running. Changes will be visible immediately.
+var Palette [256]image.RGB = defaultPalette
+
 // Palette swapping variables. Use them to generate new graphics by swapping colors.
 var (
 	// Pal (draw palette) contains mapping of colors used to replace color with
