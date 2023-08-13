@@ -18,7 +18,7 @@ var pixelColorAtMouseCoords byte
 
 func Draw() {
 	snapshot.Draw()
-	pixelColorAtMouseCoords = pi.Pget(pi.MousePos.X, pi.MousePos.Y)
+	pixelColorAtMouseCoords = pi.Get(pi.MousePos.X, pi.MousePos.Y)
 	handleScreenshot()
 
 	moveBarIfNeeded()

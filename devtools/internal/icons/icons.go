@@ -14,7 +14,7 @@ import (
 const (
 	Pointer      = 0
 	MeasureTool  = 1
-	PsetTool     = 2
+	SetTool      = 2
 	LineTool     = 3
 	RectTool     = 4
 	RectFillTool = 5

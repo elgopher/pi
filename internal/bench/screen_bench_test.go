@@ -24,20 +24,20 @@ func BenchmarkClsCol(b *testing.B) {
 	})
 }
 
-func BenchmarkPset(b *testing.B) {
+func BenchmarkSet(b *testing.B) {
 	runBenchmarks(b, func(res Resolution) {
-		for i := 0; i < 1000; i++ { // Pset is too fast
-			pi.Pset(2, 2, color)
+		for i := 0; i < 1000; i++ { // Set is too fast
+			pi.Set(2, 2, color)
 		}
 	})
 }
 
 var sink byte
 
-func BenchmarkPget(b *testing.B) {
+func BenchmarkGet(b *testing.B) {
 	runBenchmarks(b, func(res Resolution) {
-		for i := 0; i < 1000; i++ { // Pget is too fast
-			sink = pi.Pget(2, 2)
+		for i := 0; i < 1000; i++ { // Get is too fast
+			sink = pi.Get(2, 2)
 		}
 	})
 }

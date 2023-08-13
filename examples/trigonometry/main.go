@@ -30,12 +30,12 @@ func draw(line int, color byte, f func(x float64) float64) {
 	for x := 0.0; x < 128; x++ {
 		angle := (x + start) / 128
 		dy := math.Round(f(angle) * 16)
-		pi.Pset(int(x), line+int(dy), color)
+		pi.Set(int(x), line+int(dy), color)
 	}
 }
 
 func drawHorizontalAxis(line int) {
 	for x := 0; x < 128; x++ {
-		pi.Pset(x, line, 1)
+		pi.Set(x, line, 1)
 	}
 }

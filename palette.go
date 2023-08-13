@@ -7,7 +7,7 @@ package pi
 var (
 	// Pal (draw palette) contains mapping of colors used to replace color with
 	// another one for all subsequent drawings. Affected functions are:
-	// Pset, Spr, SprSize, SprSizeFlip, Circ, CircFill, Line, Rect and RectFill.
+	// Set, Spr, SprSize, SprSizeFlip, Circ, CircFill, Line, Rect and RectFill.
 	//
 	// The index of array is original color, the value is the color replacement.
 	// For example,

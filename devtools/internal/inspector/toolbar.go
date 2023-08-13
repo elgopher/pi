@@ -73,7 +73,7 @@ func (t *Toolbar) draw() {
 		y := t.pos.Y
 		pi.RectFill(x, y, x+toolbarWidth, y+toolbarHeight, BgColor)
 		icons.Draw(x+1, y+1, FgColor,
-			icons.MeasureTool, icons.PsetTool, icons.LineTool, icons.RectTool, icons.RectFillTool, icons.CircTool, icons.CircFillTool)
+			icons.MeasureTool, icons.SetTool, icons.LineTool, icons.RectTool, icons.RectFillTool, icons.CircTool, icons.CircFillTool)
 
 		if t.toolHighlighted > 0 {
 			toolX := x + int((t.toolHighlighted-1)*4)

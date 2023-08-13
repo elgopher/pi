@@ -11,27 +11,27 @@ import (
 	"github.com/elgopher/pi/devtools/internal/snapshot"
 )
 
-type Pset struct {
+type Set struct {
 	running bool
 }
 
-func (p *Pset) Update() {
+func (p *Set) Update() {
 	x, y := pi.MousePos.X, pi.MousePos.Y
 	leftp := pi.MouseBtnp(pi.MouseLeft) && !p.running
 	left := pi.MouseBtn(pi.MouseLeft) && p.running
 	if (leftp || left) && pixelColorAtMouseCoords != FgColor {
 		p.running = true
 		snapshot.Draw()
-		pi.Pset(x, y, FgColor)
-		fmt.Printf("pi.Pset(%d, %d, %d)\n", x, y, FgColor)
+		pi.Set(x, y, FgColor)
+		fmt.Printf("pi.Set(%d, %d, %d)\n", x, y, FgColor)
 		snapshot.Take()
 	}
 }
 
-func (p *Pset) Draw() {
-	pi.Pset(pi.MousePos.X, pi.MousePos.Y, FgColor)
+func (p *Set) Draw() {
+	pi.Set(pi.MousePos.X, pi.MousePos.Y, FgColor)
 }
 
-func (p *Pset) Icon() byte {
-	return icons.PsetTool
+func (p *Set) Icon() byte {
+	return icons.SetTool
 }

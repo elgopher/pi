@@ -40,7 +40,7 @@
       * [x] presenting pixel coords and color
       * [ ] zoom-in, zoom-out
       * [ ] drawing on the screen using Pi functions
-        * [x] Pset, shapes
+        * [x] Set, shapes
         * [ ] Spr, Print
     * [x] **scripting/REPL** - write Go code **live** when the game is running
     * [ ] palette inspector

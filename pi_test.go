@@ -208,8 +208,8 @@ func TestLoad(t *testing.T) {
 			pi.Spr(4, 0, 0) // sprite-sheet.png has only 4 sprites (from 0 to 3)
 			pi.SprSize(4, 0, 0, 1.0, 1.0)
 			pi.SprSizeFlip(4, 0, 0, 1.0, 1.0, false, false)
-			pi.Pset(16, 16, color) // sprite-sheet.png is only 16x16 pixels (0..15)
-			pi.Pget(16, 16)
+			pi.Set(16, 16, color) // sprite-sheet.png is only 16x16 pixels (0..15)
+			pi.Get(16, 16)
 		})
 	})
 
