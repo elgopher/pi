@@ -32,7 +32,7 @@ var Controllers [8]Controller // 0th element is for Player 0, 1st for Player 1 e
 
 type Controller struct {
 	// BtnDuration is how many frames button was pressed:
-	// Index of array is equal to controller button constant.
+	// Index of array is equal to Button constant
 	BtnDuration [6]uint
 }
 
