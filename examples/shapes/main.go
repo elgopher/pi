@@ -100,7 +100,7 @@ func drawMousePointer() {
 func radius(x0, y0, x1, y1 int) int {
 	dx := math.Abs(float64(x0 - x1))
 	dy := math.Abs(float64(y0 - y1))
-	return int(math.Max(dx, dy))
+	return int(max(dx, dy))
 }
 
 func printCmd(command string) {

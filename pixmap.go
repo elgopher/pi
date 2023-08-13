@@ -23,7 +23,6 @@ type PixMap struct {
 	height int
 	clip   Region
 
-	zeroPix      []byte
 	wholeLinePix []byte
 }
 
@@ -44,7 +43,6 @@ func NewPixMap(width, height int) PixMap {
 		width:        width,
 		height:       height,
 		clip:         Region{W: width, H: height},
-		zeroPix:      make([]byte, len(pixels)),
 		wholeLinePix: make([]byte, width),
 	}
 }
@@ -84,7 +82,6 @@ func NewPixMapWithPixels(pixels []byte, lineWidth int) PixMap {
 		width:        lineWidth,
 		height:       height,
 		clip:         Region{W: lineWidth, H: height},
-		zeroPix:      make([]byte, len(pixels)),
 		wholeLinePix: make([]byte, lineWidth),
 	}
 }
@@ -147,7 +144,7 @@ func (p PixMap) WithClip(x, y, w, h int) PixMap {
 
 // Clear clears the entire PixMap with color 0. It does not take into account the clipping region.
 func (p PixMap) Clear() {
-	copy(p.pix, p.zeroPix)
+	clear(p.pix)
 }
 
 // ClearCol clears the entire PixMap with specified color. It does not take into account the clipping region.
@@ -212,8 +209,8 @@ func (p PixMap) Pointer(x, y, w, h int) (ptr Pointer, ok bool) {
 		DeltaX:          dx,
 		DeltaY:          dy,
 		Pix:             pix,
-		RemainingPixels: MinInt(w, clip.X+clip.W-x),
-		RemainingLines:  MinInt(h, clip.Y+clip.H-y),
+		RemainingPixels: min(w, clip.X+clip.W-x),
+		RemainingLines:  min(h, clip.Y+clip.H-y),
 	}, true
 }
 
@@ -230,13 +227,13 @@ type Pointer struct {
 func (p PixMap) Copy(x, y, w, h int, dst PixMap, dstX, dstY int) {
 	dstPtr, srcPtr := p.pointersForCopy(x, y, w, h, dst, dstX, dstY)
 
-	remainingLines := MinInt(dstPtr.RemainingLines, srcPtr.RemainingLines)
+	remainingLines := min(dstPtr.RemainingLines, srcPtr.RemainingLines)
 
 	if remainingLines == 0 {
 		return
 	}
 
-	remainingPixels := MinInt(dstPtr.RemainingPixels, srcPtr.RemainingPixels)
+	remainingPixels := min(dstPtr.RemainingPixels, srcPtr.RemainingPixels)
 
 	copy(dstPtr.Pix[:remainingPixels], srcPtr.Pix)
 	for i := 1; i < remainingLines; i++ {
@@ -250,13 +247,13 @@ func (p PixMap) Copy(x, y, w, h int, dst PixMap, dstX, dstY int) {
 func (p PixMap) Merge(x, y, w, h int, dst PixMap, dstX, dstY int, merge func(dst, src []byte)) {
 	dstPtr, srcPtr := p.pointersForCopy(x, y, w, h, dst, dstX, dstY)
 
-	remainingLines := MinInt(dstPtr.RemainingLines, srcPtr.RemainingLines)
+	remainingLines := min(dstPtr.RemainingLines, srcPtr.RemainingLines)
 
 	if remainingLines == 0 {
 		return
 	}
 
-	remainingPixels := MinInt(dstPtr.RemainingPixels, srcPtr.RemainingPixels)
+	remainingPixels := min(dstPtr.RemainingPixels, srcPtr.RemainingPixels)
 
 	merge(dstPtr.Pix[:remainingPixels], srcPtr.Pix)
 	for i := 1; i < remainingLines; i++ {

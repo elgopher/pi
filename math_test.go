@@ -114,51 +114,31 @@ func TestAtan2(t *testing.T) {
 	}
 }
 
-func TestMinInt(t *testing.T) {
-	assert.Equal(t, 0, pi.MinInt(0, 0))
-	assert.Equal(t, 1, pi.MinInt(1, 2))
-	assert.Equal(t, 1, pi.MinInt(1, 1))
-	assert.Equal(t, 1, pi.MinInt(2, 1))
-	assert.Equal(t, -2, pi.MinInt(-1, -2))
-	assert.Equal(t, -2, pi.MinInt(-2, 2))
-}
-
-func TestMaxInt(t *testing.T) {
-	assert.Equal(t, 0, pi.MaxInt(0, 0))
-	assert.Equal(t, 2, pi.MaxInt(2, 1))
-	assert.Equal(t, 1, pi.MaxInt(1, 1))
-	assert.Equal(t, 2, pi.MaxInt(1, 2))
-	assert.Equal(t, -1, pi.MaxInt(-1, -2))
-	assert.Equal(t, 2, pi.MaxInt(-2, 2))
-}
-
-func TestMidInt(t *testing.T) {
-	assert.Equal(t, 0, pi.MidInt(0, 0, 0))
-	assert.Equal(t, 1, pi.MidInt(0, 1, 2))
-	assert.Equal(t, 1, pi.MidInt(2, 1, 0))
-	assert.Equal(t, 1, pi.MidInt(1, 0, 2))
-	assert.Equal(t, 1, pi.MidInt(1, 2, 0))
-	assert.Equal(t, 1, pi.MidInt(2, 0, 1))
-	assert.Equal(t, 1, pi.MidInt(0, 2, 1))
-	assert.Equal(t, -1, pi.MidInt(0, -1, -2))
-}
-
 func TestMid(t *testing.T) {
-	assert.Equal(t, 0.0, pi.Mid(0, 0, 0))
-	assert.Equal(t, 1.0, pi.Mid(0, 1, 2))
-	assert.Equal(t, 1.0, pi.Mid(2, 1, 0))
-	assert.Equal(t, 1.0, pi.Mid(1, 0, 2))
-	assert.Equal(t, 1.0, pi.Mid(1, 2, 0))
-	assert.Equal(t, 1.0, pi.Mid(2, 0, 1))
-	assert.Equal(t, 1.0, pi.Mid(0, 2, 1))
-	assert.Equal(t, -1.0, pi.Mid(0, -1, -2))
+	assert.Equal(t, 0, pi.Mid(0, 0, 0))
+	assert.Equal(t, 1, pi.Mid(0, 1, 2))
+	assert.Equal(t, 1, pi.Mid(2, 1, 0))
+	assert.Equal(t, 1, pi.Mid(1, 0, 2))
+	assert.Equal(t, 1, pi.Mid(1, 2, 0))
+	assert.Equal(t, 1, pi.Mid(2, 0, 1))
+	assert.Equal(t, 1, pi.Mid(0, 2, 1))
+	assert.Equal(t, -1, pi.Mid(0, -1, -2))
+
+	assert.Equal(t, 0.0, pi.Mid(0.0, 0.0, 0.0))
+	assert.Equal(t, 1.0, pi.Mid(0.0, 1.0, 2.0))
+	assert.Equal(t, 1.0, pi.Mid(2.0, 1.0, 0.0))
+	assert.Equal(t, 1.0, pi.Mid(1.0, 0.0, 2.0))
+	assert.Equal(t, 1.0, pi.Mid(1.0, 2.0, 0.0))
+	assert.Equal(t, 1.0, pi.Mid(2.0, 0.0, 1.0))
+	assert.Equal(t, 1.0, pi.Mid(0.0, 2.0, 1.0))
+	assert.Equal(t, -1.0, pi.Mid(0.0, -1.0, -2.0))
 
 	assertNaN(t, pi.Mid(math.NaN(), math.NaN(), math.NaN()))
 	assertInf(t, pi.Mid(math.Inf(1), math.Inf(1), math.Inf(1)), 1)
-	assert.Equal(t, 1.0, pi.Mid(1.0, math.NaN(), 2.0)) // NaNs always go to the beginning
+	assertNaN(t, pi.Mid(1.0, math.NaN(), 2.0))
 	assertNaN(t, pi.Mid(math.NaN(), math.NaN(), 1.0))
 	assertNaN(t, pi.Mid(1.0, math.NaN(), math.NaN()))
-	assert.Equal(t, 1.0, pi.Mid(1.0, 2.0, math.NaN()))
+	assertNaN(t, pi.Mid(1.0, 2.0, math.NaN()))
 	assert.Equal(t, 1.0, pi.Mid(math.Inf(1), math.Inf(-1), 1.0))
 }
 
