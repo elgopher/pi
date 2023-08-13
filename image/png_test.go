@@ -52,6 +52,6 @@ func TestDecodePNG(t *testing.T) {
 			//nolint:govet
 			[256]image.RGB{{0, 0, 0}, {0xff, 0xd4, 0x53}, {0xed, 0x45, 0x9c}, {0x6b, 0xd4, 0x7f}},
 			img.Palette)
-		assert.Equal(t, []byte{0, 1, 2, 3}, img.Pixels)
+		assert.Equal(t, []byte{0, 1, 2, 3}, img.Pix)
 	})
 }

@@ -51,7 +51,7 @@ func load(img image.Image) ([]byte, error) {
 	if img.Width != imgWidth || img.Height != imgHeight {
 		return nil, fmt.Errorf("invalid font image size: must be %dx%d", imgWidth, imgHeight)
 	}
-	if len(img.Pixels) != expectedNumberOfPixels {
+	if len(img.Pix) != expectedNumberOfPixels {
 		return nil, fmt.Errorf("invalid font image pixels slice len: must be %d", expectedNumberOfPixels)
 	}
 
@@ -65,7 +65,7 @@ func load(img image.Image) ([]byte, error) {
 					imageOffsetY := row*imgWidth*charHeight + y*imgWidth
 					imageOffset := imageOffsetY + (cell * charWidth) + x
 
-					if img.Pixels[imageOffset] != 0 {
+					if img.Pix[imageOffset] != 0 {
 						outOffset := row*charBytes*cells + y + cell*charBytes
 						fontData[outOffset] |= 1 << x
 					}

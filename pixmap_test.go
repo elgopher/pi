@@ -560,7 +560,7 @@ func pointer(pointer pi.Pointer, _ bool) pi.Pointer {
 }
 
 func assertPixMapEqual(t *testing.T, pixMap pi.PixMap, file string) {
-	expected := decodePNG(t, file).Pixels
+	expected := decodePNG(t, file).Pix
 	if !assert.Equal(t, expected, pixMap.Pix()) {
 		screenshot, err := snap.Take()
 		require.NoError(t, err)

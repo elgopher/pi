@@ -185,7 +185,7 @@ func TestLoad(t *testing.T) {
 		assert.Equal(t, 16, pi.SprSheet().Width())
 		assert.Equal(t, 16, pi.SprSheet().Height())
 		img := decodePNG(t, "internal/testimage/sprite-sheet-16x16.png")
-		assert.Equal(t, img.Pixels, pi.SprSheet().Pix())
+		assert.Equal(t, img.Pix, pi.SprSheet().Pix())
 		assert.Equal(t, img.Palette, pi.Palette)
 	})
 

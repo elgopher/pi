@@ -35,7 +35,7 @@ func DecodePNG(reader io.Reader) (Image, error) {
 		Width:   bounds.Dx(),
 		Height:  bounds.Dy(),
 		Palette: convertPaletteToRGB(indexedPalette),
-		Pixels:  convertImageToPixels(stdImage, indexedPalette),
+		Pix:     convertImageToPixels(stdImage, indexedPalette),
 	}, nil
 }
 

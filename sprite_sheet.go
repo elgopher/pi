@@ -40,7 +40,7 @@ func useSpriteSheet(b []byte) error {
 
 	Palette = img.Palette
 	sprSheet = newSpriteSheet(img.Width, img.Height)
-	copy(sprSheet.Pix(), img.Pixels)
+	copy(sprSheet.Pix(), img.Pix)
 	return nil
 }
 
