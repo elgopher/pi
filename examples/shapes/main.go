@@ -19,42 +19,42 @@ var (
 	//go:embed sprite-sheet.png
 	resources embed.FS
 
-	drawShape func(x0, y0, x1, y1 int)
+	drawShape func(start, stop pi.Position)
 
-	drawFunctions = []func(x0, y0, x1, y1 int){
-		func(x0, y0, x1, y1 int) {
-			pi.Rect(x0, y0, x1, y1, shapeColor)
-			command := fmt.Sprintf("Rect(%d,%d,%d,%d,%d)", x0, y0, x1, y1, shapeColor)
+	drawFunctions = []func(start, stop pi.Position){
+		func(start, stop pi.Position) {
+			pi.Rect(start.X, start.Y, stop.X, stop.Y, shapeColor)
+			command := fmt.Sprintf("Rect(%d,%d,%d,%d,%d)", start.X, start.Y, stop.X, stop.Y, shapeColor)
 			printCmd(command)
 		},
-		func(x0, y0, x1, y1 int) {
-			pi.RectFill(x0, y0, x1, y1, shapeColor)
-			command := fmt.Sprintf("RectFill(%d,%d,%d,%d,%d)", x0, y0, x1, y1, shapeColor)
+		func(start, stop pi.Position) {
+			pi.RectFill(start.X, start.Y, stop.X, stop.Y, shapeColor)
+			command := fmt.Sprintf("RectFill(%d,%d,%d,%d,%d)", start.X, start.Y, stop.X, stop.Y, shapeColor)
 			printCmd(command)
 		},
-		func(x0, y0, x1, y1 int) {
-			pi.Line(x0, y0, x1, y1, shapeColor)
-			command := fmt.Sprintf("Line(%d,%d,%d,%d,%d)", x0, y0, x1, y1, shapeColor)
+		func(start, stop pi.Position) {
+			pi.Line(start.X, start.Y, stop.X, stop.Y, shapeColor)
+			command := fmt.Sprintf("Line(%d,%d,%d,%d,%d)", start.X, start.Y, stop.X, stop.Y, shapeColor)
 			printCmd(command)
 		},
-		func(x0, y0, x1, y1 int) {
-			r := radius(x0, y0, x1, y1)
-			pi.Circ(x0, y0, r, shapeColor)
+		func(start, stop pi.Position) {
+			r := radius(start.X, start.Y, stop.X, stop.Y)
+			pi.Circ(start.X, start.Y, r, shapeColor)
 
-			command := fmt.Sprintf("Circ(%d,%d,%d,%d)", x0, y0, r, shapeColor)
+			command := fmt.Sprintf("Circ(%d,%d,%d,%d)", start.X, start.Y, r, shapeColor)
 			printCmd(command)
 		},
-		func(x0, y0, x1, y1 int) {
-			r := radius(x0, y0, x1, y1)
-			pi.CircFill(x0, y0, r, shapeColor)
-			command := fmt.Sprintf("CircFill(%d,%d,%d,%d)", x0, y0, r, shapeColor)
+		func(start, stop pi.Position) {
+			r := radius(start.X, start.Y, stop.X, stop.Y)
+			pi.CircFill(start.X, start.Y, r, shapeColor)
+			command := fmt.Sprintf("CircFill(%d,%d,%d,%d)", start.X, start.Y, r, shapeColor)
 			printCmd(command)
 		},
 	}
 
 	current = 0
 
-	x0, y0 int
+	start pi.Position
 )
 
 func main() {
@@ -72,15 +72,15 @@ func main() {
 
 		// set initial coordinates on start dragging
 		if pi.MouseBtn(pi.MouseLeft) && drawShape == nil {
-			x0, y0 = pi.MousePos()
+			start = pi.MousePos
 			drawShape = drawFunctions[current]
 
 		}
 
 		// set coordinates during dragging
 		if drawShape != nil {
-			x1, y1 := pi.MousePos()
-			drawShape(x0, y0, x1, y1)
+			stop := pi.MousePos
+			drawShape(start, stop)
 		}
 
 		if !pi.MouseBtn(pi.MouseLeft) {
@@ -94,8 +94,7 @@ func main() {
 }
 
 func drawMousePointer() {
-	x, y := pi.MousePos()
-	pi.Spr(current, x, y)
+	pi.Spr(current, pi.MousePos.X, pi.MousePos.Y)
 }
 
 func radius(x0, y0, x1, y1 int) int {

@@ -26,6 +26,6 @@ func updateMouse() {
 	}
 
 	x, y := ebiten.CursorPosition()
-	pi.MousePosition.X = x
-	pi.MousePosition.Y = y
+	pi.MousePos.X = x
+	pi.MousePos.Y = y
 }

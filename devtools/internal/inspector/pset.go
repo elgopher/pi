@@ -16,7 +16,7 @@ type Pset struct {
 }
 
 func (p *Pset) Update() {
-	x, y := pi.MousePos()
+	x, y := pi.MousePos.X, pi.MousePos.Y
 	leftp := pi.MouseBtnp(pi.MouseLeft) && !p.running
 	left := pi.MouseBtn(pi.MouseLeft) && p.running
 	if (leftp || left) && pixelColorAtMouseCoords != FgColor {
@@ -29,8 +29,7 @@ func (p *Pset) Update() {
 }
 
 func (p *Pset) Draw() {
-	x, y := pi.MousePos()
-	pi.Pset(x, y, FgColor)
+	pi.Pset(pi.MousePos.X, pi.MousePos.Y, FgColor)
 }
 
 func (p *Pset) Icon() byte {
