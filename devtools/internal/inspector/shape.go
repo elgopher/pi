@@ -21,20 +21,19 @@ type Shape struct {
 func (l *Shape) Update() {
 	switch {
 	case pi.MouseBtnp(pi.MouseLeft) && !l.started:
-		l.start = pi.MousePosition
+		l.start = pi.MousePos
 		l.started = true
 	case !pi.MouseBtn(pi.MouseLeft) && l.started:
-		x, y := pi.MousePos()
 		l.started = false
 		snapshot.Draw()
-		command := l.draw(l.start.X, l.start.Y, x, y, FgColor)
+		command := l.draw(l.start.X, l.start.Y, pi.MousePos.X, pi.MousePos.Y, FgColor)
 		fmt.Println(command)
 		snapshot.Take()
 	}
 }
 
 func (l *Shape) Draw() {
-	x, y := pi.MousePos()
+	x, y := pi.MousePos.X, pi.MousePos.Y
 	icons.Draw(x, y, FgColor, icons.Pointer)
 	icons.Draw(x+2, y+2, FgColor, l.icon)
 	if pi.MouseBtn(pi.MouseLeft) && l.started {

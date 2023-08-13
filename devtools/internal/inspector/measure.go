@@ -26,7 +26,6 @@ func (m *Measure) Draw() {
 
 func (m *Measure) drawBar() {
 	screen := pi.Scr()
-	mouseX, mouseY := pi.MousePos()
 	var barY int
 	if !isBarOnTop {
 		barY = screen.Height() - 7
@@ -40,7 +39,7 @@ func (m *Measure) drawBar() {
 	if distance.measuring {
 		m.printDistance(textX, textY)
 	} else {
-		mostX := m.printCoords(mouseX, mouseY, textX, textY)
+		mostX := m.printCoords(pi.MousePos.X, pi.MousePos.Y, textX, textY)
 		m.printPixelColor(pixelColorAtMouseCoords, mostX+4, textY)
 	}
 }
@@ -66,8 +65,7 @@ func (m *Measure) choosePointerColor(x, y int) byte {
 
 func (m *Measure) drawDistanceLine() {
 	if distance.measuring {
-		x, y := pi.MousePos()
-		pi.Line(distance.startX, distance.startY, x, y, BgColor)
+		pi.Line(distance.startX, distance.startY, pi.MousePos.X, pi.MousePos.Y, BgColor)
 	}
 }
 
@@ -82,14 +80,14 @@ func (m *Measure) printDistance(x, y int) int {
 }
 
 func (m *Measure) drawPointer() {
-	x, y := pi.MousePos()
+	x, y := pi.MousePos.X, pi.MousePos.Y
 	color := m.choosePointerColor(x, y)
 	icons.Draw(x, y, color, icons.Pointer)
 	icons.Draw(x+2, y+2, color, tool.Icon())
 }
 
 func (m *Measure) Update() {
-	x, y := pi.MousePos()
+	x, y := pi.MousePos.X, pi.MousePos.Y
 	switch {
 	case pi.MouseBtnp(pi.MouseLeft) && !distance.measuring:
 		distance.measuring = true

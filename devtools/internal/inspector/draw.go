@@ -18,7 +18,7 @@ var pixelColorAtMouseCoords byte
 
 func Draw() {
 	snapshot.Draw()
-	pixelColorAtMouseCoords = pi.Pget(pi.MousePos())
+	pixelColorAtMouseCoords = pi.Pget(pi.MousePos.X, pi.MousePos.Y)
 	handleScreenshot()
 
 	moveBarIfNeeded()
@@ -35,7 +35,7 @@ func Draw() {
 }
 
 func cursorOutOfWindow() bool {
-	x, y := pi.MousePos()
+	x, y := pi.MousePos.X, pi.MousePos.Y
 	screen := pi.Scr()
 	return x < 0 || x >= screen.Width() || y < 0 || y >= screen.Height()
 }

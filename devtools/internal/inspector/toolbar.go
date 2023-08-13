@@ -22,7 +22,7 @@ type Toolbar struct {
 
 func (t *Toolbar) toggle() {
 	t.visible = !t.visible
-	t.pos = pi.MousePosition
+	t.pos = pi.MousePos
 	t.pos.X -= toolbarWidth/2 - 2
 	if t.pos.X < 0 {
 		t.pos.X = 0
@@ -33,7 +33,7 @@ func (t *Toolbar) toggle() {
 	}
 	t.pos.Y -= toolbarHeight + 2
 	if t.pos.Y < 0 {
-		t.pos.Y = pi.MousePosition.Y + 6
+		t.pos.Y = pi.MousePos.Y + 6
 	}
 }
 
@@ -45,8 +45,7 @@ func (t *Toolbar) hide() {
 
 func (t *Toolbar) update() {
 	if t.visible {
-		x, y := pi.MousePos()
-		sx, sy := x-t.pos.X, y-t.pos.Y
+		sx, sy := pi.MousePos.X-t.pos.X, pi.MousePos.Y-t.pos.Y
 		mouseOverToolbar := sx >= 0 && sy >= 0 && sx <= toolbarWidth && sy <= toolbarHeight
 		if mouseOverToolbar {
 			t.toolHighlighted = byte((sx-1)/4) + 1
@@ -88,7 +87,6 @@ func (t *Toolbar) draw() {
 
 func (t *Toolbar) drawPointer() {
 	if t.toolHighlighted == 0 {
-		x, y := pi.MousePos()
-		icons.Draw(x, y, FgColor, icons.Pointer)
+		icons.Draw(pi.MousePos.X, pi.MousePos.Y, FgColor, icons.Pointer)
 	}
 }

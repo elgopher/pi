@@ -10,11 +10,10 @@ import (
 var isBarOnTop bool
 
 func moveBarIfNeeded() {
-	_, mouseY := pi.MousePos()
 	switch {
-	case isBarOnTop && mouseY <= 12:
+	case isBarOnTop && pi.MousePos.Y <= 12:
 		isBarOnTop = false
-	case !isBarOnTop && mouseY >= pi.Scr().Height()-12:
+	case !isBarOnTop && pi.MousePos.Y >= pi.Scr().Height()-12:
 		isBarOnTop = true
 	}
 }

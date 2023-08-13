@@ -17,14 +17,12 @@ var distance struct {
 }
 
 func calcDistance() (dist float64, width, height int) {
-	x, y := pi.MousePos()
-
-	width = x - distance.startX
+	width = pi.MousePos.X - distance.startX
 	if width < 0 {
 		width *= -1
 	}
 
-	height = y - distance.startY
+	height = pi.MousePos.Y - distance.startY
 	if height < 0 {
 		height *= -1
 	}

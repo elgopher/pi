@@ -33,9 +33,3 @@ func testMouseBtn(t *testing.T, mouseBtn func(button pi.MouseButton) bool) {
 func TestMouseBtnp(t *testing.T) {
 	testMouseBtn(t, pi.MouseBtnp)
 }
-
-func TestMousePos(t *testing.T) {
-	t.Run("should not panic", func(t *testing.T) {
-		pi.MousePos()
-	})
-}
