@@ -15,7 +15,7 @@ const (
 
 var (
 	// MouseBtnDuration has how many frames in a row a mouse button was pressed:
-	// Index of array is equal to mouse button constant.
+	// Index of array is equal to MouseButton constant.
 	MouseBtnDuration [3]uint
 
 	// MousePos is the position of mouse in screen coordinates.
