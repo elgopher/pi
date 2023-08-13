@@ -40,7 +40,7 @@ import (
 	"github.com/elgopher/pi/font"
 )
 
-// User parameters
+// Game-loop function callbacks
 var (
 	// Update is a user provided function executed each frame (30 times per second).
 	//
@@ -53,18 +53,10 @@ var (
 	//
 	// The purpose of this function is to draw on screen.
 	Draw func()
-
-	// Palette has all colors available in the game. Up to 256.
-	// Palette is taken from loaded sprite sheet (which must be
-	// a PNG file with indexed color mode). If sprite-sheet.png was not
-	// found, then default 16 color palette is used.
-	//
-	// Can be freely read and updated when the game is running. Changes will be visible immediately.
-	Palette = defaultPalette
-
-	// Camera has camera offset used for all subsequent draw operations.
-	Camera Position
 )
+
+// Camera has camera offset used for all subsequent draw operations.
+var Camera Position
 
 // Time returns the amount of time since game was run, as a (fractional) number of seconds
 //
