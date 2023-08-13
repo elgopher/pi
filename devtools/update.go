@@ -17,7 +17,16 @@ func updateDevTools() {
 		}
 	}
 
+	if pauseOnNextFrame {
+		pauseGame()
+		pauseOnNextFrame = false
+	}
+
 	if gamePaused {
+		if key.Btnp(key.N) {
+			resumeUntilNextFrame()
+		}
+
 		inspector.Update()
 	}
 

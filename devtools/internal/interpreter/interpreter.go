@@ -125,7 +125,7 @@ func ensureNameDoesNotClashWithImportedPackages(name string) error {
 	return nil
 }
 
-var allCommandNames = []string{"h", "help", "p", "pause", "r", "resume", "u", "undo"}
+var allCommandNames = []string{"h", "help", "p", "pause", "r", "resume", "u", "undo", "n", "next"}
 
 func ensureNameDoesNotClashWithCommandNames(name string) error {
 	for _, cmd := range allCommandNames {
@@ -185,12 +185,13 @@ func ExportType[T any](i Instance) error {
 type EvalResult int
 
 const (
-	HelpPrinted    EvalResult = 0
-	GoCodeExecuted EvalResult = 1
-	Resumed        EvalResult = 2
-	Paused         EvalResult = 3
-	Undoed         EvalResult = 4
-	Continued      EvalResult = 5
+	HelpPrinted        EvalResult = 0
+	GoCodeExecuted     EvalResult = 1
+	Resumed            EvalResult = 2
+	Paused             EvalResult = 3
+	Undoed             EvalResult = 4
+	Continued          EvalResult = 5
+	NextFrameRequested EvalResult = 6
 )
 
 func (i Instance) Eval(cmd string) (EvalResult, error) {
@@ -199,6 +200,8 @@ func (i Instance) Eval(cmd string) (EvalResult, error) {
 	if isHelpCommand(trimmedCmd) {
 		topic := strings.Trim(strings.TrimLeft(trimmedCmd, "help"), " ")
 		return HelpPrinted, i.printHelp(topic)
+	} else if trimmedCmd == "next" || trimmedCmd == "n" {
+		return NextFrameRequested, nil
 	} else if trimmedCmd == "resume" || trimmedCmd == "r" {
 		return Resumed, nil
 	} else if trimmedCmd == "pause" || trimmedCmd == "p" {

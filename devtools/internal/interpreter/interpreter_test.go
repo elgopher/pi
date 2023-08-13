@@ -85,6 +85,22 @@ func TestEval(t *testing.T) {
 				code:           "resume ",
 				expectedResult: interpreter.Resumed,
 			},
+			"next": {
+				code:           "next",
+				expectedResult: interpreter.NextFrameRequested,
+			},
+			"next with space in the beginning": {
+				code:           " next",
+				expectedResult: interpreter.NextFrameRequested,
+			},
+			"next with space in the end": {
+				code:           "next ",
+				expectedResult: interpreter.NextFrameRequested,
+			},
+			"n": {
+				code:           "n",
+				expectedResult: interpreter.NextFrameRequested,
+			},
 		}
 		for name, testCase := range tests {
 			t.Run(name, func(t *testing.T) {
@@ -273,7 +289,7 @@ func TestExport(t *testing.T) {
 	})
 
 	t.Run("should return error when name clashes with command name", func(t *testing.T) {
-		var allCommandNames = []string{"h", "help", "p", "pause", "r", "resume", "u", "undo"}
+		var allCommandNames = []string{"h", "help", "p", "pause", "r", "resume", "u", "undo", "n", "next"}
 
 		for _, cmd := range allCommandNames {
 			t.Run(cmd, func(t *testing.T) {
