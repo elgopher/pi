@@ -13,34 +13,63 @@ import (
 	"github.com/elgopher/pi/internal/sfmt"
 )
 
-const fontDataSize = 8 * 256
+// Print prints text on the screen using system font. It takes into consideration
+// clipping region and camera position.
+//
+// Only unicode characters with code < 256 are supported. Unsupported chars
+// are printed as question mark. The entire table of available chars can be
+// found here: https://github.com/elgopher/pi/blob/master/internal/system-font.png
+//
+// Print returns the right-most x position that occurred while printing.
+func Print(text string, x, y int, color byte) (rightMostX int) {
+	return systemFont.Print(text, x, y, color)
+}
 
-var (
-	systemFont = Font{
-		Width:        4,
-		SpecialWidth: 8,
-		Height:       6,
+// SystemFont returns Font instance for system font. System font cannot be changed.
+func SystemFont() Font {
+	return systemFont
+}
+
+// CustomFont returns Font instance which can be used for printing text on the screen.
+// CustomFont is loaded from custom-font.png resource file.
+func CustomFont() Font {
+	return customFont
+}
+
+// SetCustomFontWidth sets width (in pixels) for all characters below 128.
+//
+// By default, width is 4. For Width > 8 only 8 pixels are drawn.
+func SetCustomFontWidth(w int) {
+	if w < 0 {
+		w = 0
 	}
-
-	//go:embed internal/system-font.png
-	systemFontPNG []byte
-
-	defaultCustomFont = Font{Width: 4, SpecialWidth: 8, Height: 6}
-
-	customFont = Font{
-		Data:         make([]byte, fontDataSize),
-		Width:        defaultCustomFont.Width,
-		SpecialWidth: defaultCustomFont.SpecialWidth,
-		Height:       defaultCustomFont.Height,
+	if w > 8 {
+		w = 8
 	}
-)
+	customFont.Width = w
+}
 
-func init() {
-	var err error
-	systemFont.Data, err = font.Load(systemFontPNG)
-	if err != nil {
-		panic(err)
+// SetCustomFontSpecialWidth sets width (in pixels) of all special characters (code>=128).
+//
+// By default, width is 8. For SpecialWidth > 8 only 8 pixels are drawn.
+func SetCustomFontSpecialWidth(w int) {
+	if w < 0 {
+		w = 0
 	}
+	if w > 8 {
+		w = 8
+	}
+	customFont.SpecialWidth = w
+}
+
+// SetCustomFontHeight sets height of line (in pixels).
+//
+// By default, height is 6.
+func SetCustomFontHeight(height int) {
+	if height < 0 {
+		height = 0
+	}
+	customFont.Height = height
 }
 
 // Font contains all information about loaded font and  provides method to Print the text.
@@ -55,7 +84,7 @@ type Font struct {
 	Data []byte
 	// Width in pixels for all characters below 128. For Width > 8 only 8 pixels are drawn.
 	Width int
-	// SpecialWidth is a with of all special characters (code>=128)
+	// SpecialWidth is a width of all special characters (code>=128)
 	// For SpecialWidth > 8 only 8 pixels are drawn.
 	SpecialWidth int
 	// Height of line
@@ -133,16 +162,34 @@ func (f Font) String() string {
 		f.Width, f.SpecialWidth, f.Height, sfmt.FormatBigSlice(f.Data, 512))
 }
 
-// Print prints text on the screen using system font. It takes into consideration
-// clipping region and camera position.
-//
-// Only unicode characters with code < 256 are supported. Unsupported chars
-// are printed as question mark. The entire table of available chars can be
-// found here: https://github.com/elgopher/pi/blob/master/internal/system-font.png
-//
-// Print returns the right-most x position that occurred while printing.
-func Print(text string, x, y int, color byte) (rightMostX int) {
-	return systemFont.Print(text, x, y, color)
+const fontDataSize = 8 * 256
+
+var (
+	systemFont = Font{
+		Width:        4,
+		SpecialWidth: 8,
+		Height:       6,
+	}
+
+	//go:embed internal/system-font.png
+	systemFontPNG []byte
+
+	defaultCustomFont = Font{Width: 4, SpecialWidth: 8, Height: 6}
+
+	customFont = Font{
+		Data:         make([]byte, fontDataSize),
+		Width:        defaultCustomFont.Width,
+		SpecialWidth: defaultCustomFont.SpecialWidth,
+		Height:       defaultCustomFont.Height,
+	}
+)
+
+func init() {
+	var err error
+	systemFont.Data, err = font.Load(systemFontPNG)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func loadCustomFont(resources fs.ReadFileFS) error {
@@ -157,39 +204,4 @@ func loadCustomFont(resources fs.ReadFileFS) error {
 
 	customFont.Data, err = font.Load(fileContents)
 	return err
-}
-
-func SystemFont() Font {
-	return systemFont
-}
-
-func CustomFont() Font {
-	return customFont
-}
-
-func SetCustomFontWidth(w int) {
-	if w < 0 {
-		w = 0
-	}
-	if w > 8 {
-		w = 8
-	}
-	customFont.Width = w
-}
-
-func SetCustomFontSpecialWidth(w int) {
-	if w < 0 {
-		w = 0
-	}
-	if w > 8 {
-		w = 8
-	}
-	customFont.SpecialWidth = w
-}
-
-func SetCustomFontHeight(height int) {
-	if height < 0 {
-		height = 0
-	}
-	customFont.Height = height
 }
