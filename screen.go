@@ -32,7 +32,11 @@ func Get(x, y int) byte {
 
 // Clip sets the clipping region in the form of rectangle. All screen drawing operations will not affect any pixels outside the region.
 //
-// Clip returns previous clipping region.
+// Clip returns previous clipping region. Alternatively, to get the previous clipping region as a struct you might want to use:
+//
+//	pi.Scr().Clip()
+//
+// before running the pi.Clip.
 func Clip(x, y, w, h int) (prevX, prevY, prevW, prevH int) {
 	prev := screen.clip
 	screen = screen.WithClip(x, y, w, h)
