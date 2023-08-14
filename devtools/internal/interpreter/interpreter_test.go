@@ -249,6 +249,37 @@ func TestEval(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, "interpreter_test.anotherType: {}\n", swapper.ReadOutput(t))
 	})
+
+	t.Run("should convert error message to exclude invalid character number", func(t *testing.T) {
+		tests := map[string]struct {
+			source             string
+			expectedErrMessage string
+		}{
+			"undefined": {
+				source:             "undefinedVar",
+				expectedErrMessage: "1: undefined: undefinedVar",
+			},
+			"undefined in second line": {
+				source:             "{ \n undefinedVar \n }",
+				expectedErrMessage: "2: undefined: undefinedVar",
+			},
+			"invalid number literal": {
+				source:             "a := 123a123",
+				expectedErrMessage: "1: expected ';', found a123 (and 1 more errors)",
+			},
+			"invalid number literal in second line": {
+				source:             "{ \n a := 123a123 \n }",
+				expectedErrMessage: "2: expected ';', found a123 (and 1 more errors)",
+			},
+		}
+		for name, testCase := range tests {
+			t.Run(name, func(t *testing.T) {
+				_, err := newInterpreterInstance(t).Eval(testCase.source)
+				require.Error(t, err)
+				assert.Equal(t, testCase.expectedErrMessage, err.Error())
+			})
+		}
+	})
 }
 
 func TestExport(t *testing.T) {
