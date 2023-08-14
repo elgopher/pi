@@ -35,14 +35,14 @@ func pauseGame() {
 	}
 	gamePaused = true
 
-	pi.Camera.Reset()
-	x, y, w, h := pi.ClipReset()
-
 	stateCopy = stateWhenGameWasPaused{
 		time:   pi.Time,
 		camera: pi.Camera,
-		clip:   pi.Region{X: x, Y: y, W: w, H: h},
+		clip:   pi.Scr().Clip(),
 	}
+
+	pi.Camera.Reset()
+	pi.ClipReset()
 
 	snapshot.Take()
 }
