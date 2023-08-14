@@ -32,6 +32,11 @@ func TestEval(t *testing.T) {
 				code:           "pi.Spr(0,0,0)",
 				expectedResult: interpreter.GoCodeExecuted,
 			},
+			"var declaration": {
+				code:           "var a string",
+				expectedOutput: "string: \n",
+				expectedResult: interpreter.GoCodeExecuted,
+			},
 			"expression returning a struct": {
 				code:           "struct{}{}",
 				expectedOutput: "struct {}: {}\n",

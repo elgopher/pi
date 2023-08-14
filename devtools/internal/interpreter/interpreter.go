@@ -233,10 +233,7 @@ func (i Instance) runGoCode(source string) (r EvalResult, e error) {
 	// if source is a statement or an expression. If source is a statement and previously source was an expression
 	// then Yaegi returns the same result again. That's why following code overrides last computed result to the value
 	// used as a discriminator for no result.
-	_, err := i.yaegi.Eval("interpreter.noResult{}")
-	if err != nil {
-		return GoCodeExecuted, fmt.Errorf("yaegi Eval failed: %w", err)
-	}
+	source = "interpreter.noResult{}; " + source
 
 	res, err := i.yaegi.Eval(source)
 	if err != nil {
