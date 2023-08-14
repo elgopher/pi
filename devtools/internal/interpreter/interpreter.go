@@ -225,7 +225,7 @@ func (i Instance) runGoCode(source string) (r EvalResult, e error) {
 		err := recover()
 		if err != nil {
 			r = GoCodeExecuted
-			e = fmt.Errorf("panic when running Yaegi: %s", err)
+			e = fmt.Errorf("panic when running Yaegi Go interpreter: %s", err)
 		}
 	}()
 
@@ -244,12 +244,35 @@ func (i Instance) runGoCode(source string) (r EvalResult, e error) {
 			return Continued, nil
 		}
 
-		return GoCodeExecuted, err
+		return GoCodeExecuted, convertYaegiError(err)
 	}
 
 	printResult(res)
 
 	return GoCodeExecuted, nil
+}
+
+var (
+	yaegiCfgErrorPattern     = regexp.MustCompile(`^(\d+:)(\d+:)(.*)`) // control flow graph generation error
+	yaegiScannerErrorPattern = regexp.MustCompile(`^_\.go:(\d+:)(\d+:)(.*)`)
+)
+
+// Yaegi reports wrong character number in error messages. It is better to remove this information completely.
+func convertYaegiError(err error) error {
+	errStr := err.Error()
+
+	switch {
+	case yaegiCfgErrorPattern.MatchString(errStr):
+		return fmt.Errorf(
+			yaegiCfgErrorPattern.ReplaceAllString(errStr, "$1$3"),
+		)
+	case yaegiScannerErrorPattern.MatchString(errStr):
+		return fmt.Errorf(
+			yaegiScannerErrorPattern.ReplaceAllString(errStr, "$1$3"),
+		)
+	default:
+		return err
+	}
 }
 
 // shouldContinueOnError returns true if the error can be safely ignored
