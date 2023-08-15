@@ -65,9 +65,21 @@ var Time float64
 
 var GameLoopStopped bool
 
-// Load loads files like sprite-sheet.png, custom-font.png
+// Load loads files: sprite-sheet.png and custom-font.png from resources parameter.
 //
-// Load looks for resources with specific names in the resources parameter, eg "sprite-sheet.png".
+// Load looks for images with hard-coded names, eg for sprite-sheet it loads "sprite-sheet.png".
+// Your file name must be exactly the same. And it cannot be inside subdirectory.
+//
+// sprite-sheet.png file must have an indexed color mode. This means that pixels in the sprite-sheet
+// file refers to an index of the color defined in a small palette, also attached to the file in a
+// form of mapping: index number->RGB color. Image must have an indexed color mode,
+// because Pi loads the palette from the sprite-sheet.png file itself. Please use a pixel-art editor
+// which supports indexed color mode, such as Aseprite (paid) or LibreSprite (free). Sprite-sheet
+// width and height must be multiplication of 8.
+//
+// custom-font.png must also have an indexed color mode. Color with index 0 is treated as background.
+// Any other color as foreground. The size of the image is fixed. It must be 128x128. Each char is 8x8.
+// Char 0 is in the top-left corner. Char 1 to the right.
 //
 // To acquire the resources object, the easiest way is to include the resources in the game binary
 // by using go:embed directive:
