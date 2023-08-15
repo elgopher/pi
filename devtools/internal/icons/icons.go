@@ -20,6 +20,7 @@ const (
 	RectFillTool = 5
 	CircTool     = 6
 	CircFillTool = 7
+	SprTool      = 8
 )
 
 //go:embed icons.png

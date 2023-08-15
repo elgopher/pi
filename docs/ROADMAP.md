@@ -41,7 +41,8 @@
       * [ ] zoom-in, zoom-out
       * [ ] drawing on the screen using Pi functions
         * [x] Set, shapes
-        * [ ] Spr, Print
+        * [x] Spr
+        * [ ] Print
     * [x] **scripting/REPL** - write Go code **live** when the game is running
     * [ ] palette inspector
       * [ ] display, draw palette

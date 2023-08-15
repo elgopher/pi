@@ -50,6 +50,11 @@ func selectTool(icon byte) {
 			draw: drawCirc("CircFill", pi.CircFill),
 			icon: icons.CircFillTool,
 		}
+	case icons.SprTool:
+		tool = &Spr{
+			icon: icons.SprTool,
+			mode: &sprSelectionMode{},
+		}
 	}
 }
 
