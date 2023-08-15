@@ -6,9 +6,11 @@
 package help_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elgopher/pi/devtools/internal/help"
 	"github.com/elgopher/pi/devtools/internal/test"
@@ -102,5 +104,26 @@ func TestPrintHelp(t *testing.T) {
 				assert.Contains(t, output, expected)
 			})
 		}
+	})
+
+	t.Run("should return error when help is not available because game was run outside the module using Pi", func(t *testing.T) {
+		prevWorkDir, err := os.Getwd()
+		require.NoError(t, err)
+
+		tmpDir, err := os.MkdirTemp("", "")
+		require.NoError(t, err)
+		defer func() {
+			_ = os.RemoveAll(tmpDir)
+		}()
+
+		err = os.Chdir(tmpDir)
+		require.NoError(t, err)
+		defer func() {
+			_ = os.Chdir(prevWorkDir)
+		}()
+		// when
+		err = help.PrintHelp("pi.Spr")
+		// then
+		assert.ErrorIs(t, err, help.NotAvailable)
 	})
 }
