@@ -15,7 +15,10 @@ import (
 	"github.com/elgopher/pi/devtools/internal/lib"
 )
 
-var NotFound = fmt.Errorf("no help found")
+var (
+	NotFound     = fmt.Errorf("no help found")
+	NotAvailable = fmt.Errorf("help for pi module not available outside Go module using Pi")
+)
 
 func PrintHelp(topic string) error {
 	switch topic {
@@ -66,6 +69,9 @@ func goDoc(symbol string) error {
 	if err := command.Run(); err != nil {
 		var exitErr *exec.ExitError
 		if isExitErr := errors.As(err, &exitErr); isExitErr && exitErr.ExitCode() == 1 {
+			if strings.HasPrefix(symbol, "github.com/elgopher/pi") && moduleDoesNotHaveDependencyToPi() {
+				return NotAvailable
+			}
 			return NotFound
 		}
 
@@ -73,6 +79,12 @@ func goDoc(symbol string) error {
 	}
 
 	return nil
+}
+
+func moduleDoesNotHaveDependencyToPi() bool {
+	cmd := exec.Command("go", "list", "-m", "github.com/elgopher/pi")
+	err := cmd.Run()
+	return err != nil
 }
 
 func completeSymbol(symbol string) string {

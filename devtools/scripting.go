@@ -54,7 +54,12 @@ func evaluateNextCommandFromTerminal() {
 	case cmd := <-terminal.Commands:
 		result, err := interpreterInstance.Eval(cmd)
 		if err != nil {
-			fmt.Println(err)
+			switch err {
+			case help.NotAvailable:
+				fmt.Println("Sorry, help for pi module is only available when the game has been started in the directory of the Go module that uses the Pi.")
+			default:
+				fmt.Println(err)
+			}
 			terminal.CommandsProcessed <- terminal.Done
 
 			return
