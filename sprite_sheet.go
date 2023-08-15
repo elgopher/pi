@@ -60,6 +60,8 @@ func SprSheet() PixMap {
 	return sprSheet.PixMap
 }
 
+const maxSpriteSheetSize = 65536
+
 func newSpriteSheet(w int, h int) spriteSheet {
 	if w%8 != 0 || w == 0 {
 		panic(fmt.Sprintf("sprite sheet width %d is not a multiplication of 8", w))
@@ -70,6 +72,10 @@ func newSpriteSheet(w int, h int) spriteSheet {
 
 	size := w * h
 
+	if size > maxSpriteSheetSize {
+		panic(fmt.Sprintf("number of pixels for sprite-sheet resolution %dx%d is higher than maximum %d. Please use a smaller one.", w, h, maxSpriteSheetSize))
+	}
+
 	return spriteSheet{
 		PixMap:          NewPixMap(w, h),
 		numberOfSprites: size / (SpriteWidth * SpriteHeight),
@@ -78,7 +84,7 @@ func newSpriteSheet(w int, h int) spriteSheet {
 }
 
 // UseEmptySpriteSheet initializes empty sprite-sheet with given size. Could be used
-// when you don't have sprite-sheet.png in resources.
+// when you don't have sprite-sheet.png in resources. The maximum number of pixels is 65536 (64KB).
 func UseEmptySpriteSheet(w, h int) {
 	sprSheet = newSpriteSheet(w, h)
 }

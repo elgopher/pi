@@ -75,7 +75,8 @@ var GameLoopStopped bool
 // form of mapping: index number->RGB color. Image must have an indexed color mode,
 // because Pi loads the palette from the sprite-sheet.png file itself. Please use a pixel-art editor
 // which supports indexed color mode, such as Aseprite (paid) or LibreSprite (free). Sprite-sheet
-// width and height must be multiplication of 8.
+// width and height must be multiplication of 8. Each sprite is 8x8 pixels. The maximum number of pixels
+// is 65536 (64KB).
 //
 // custom-font.png must also have an indexed color mode. Color with index 0 is treated as background.
 // Any other color as foreground. The size of the image is fixed. It must be 128x128. Each char is 8x8.
