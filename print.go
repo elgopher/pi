@@ -203,5 +203,9 @@ func loadCustomFont(resources fs.ReadFileFS) error {
 	}
 
 	customFont.Data, err = font.Load(fileContents)
-	return err
+	if err != nil {
+		return fmt.Errorf("invalid custom-font.png: %w", err)
+	}
+
+	return nil
 }
