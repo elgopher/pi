@@ -58,10 +58,10 @@ func SprSheet() PixMap {
 
 func newSpriteSheet(w int, h int) spriteSheet {
 	if w%8 != 0 || w == 0 {
-		panic(fmt.Sprintf("sprite sheet width %d is not a multiplcation of 8", w))
+		panic(fmt.Sprintf("sprite sheet width %d is not a multiplication of 8", w))
 	}
 	if h%8 != 0 || h == 0 {
-		panic(fmt.Sprintf("sprite sheet height %d is not a multiplcation of 8", h))
+		panic(fmt.Sprintf("sprite sheet height %d is not a multiplication of 8", h))
 	}
 
 	size := w * h
