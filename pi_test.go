@@ -225,6 +225,13 @@ func TestLoad(t *testing.T) {
 			})
 		})
 	})
+
+	t.Run("should panic when sprite-sheet total number of pixels is higher than 65536", func(t *testing.T) {
+		pi.Reset()
+		assert.Panics(t, func() {
+			pi.UseEmptySpriteSheet(264, 256)
+		})
+	})
 }
 
 func TestTime(t *testing.T) {

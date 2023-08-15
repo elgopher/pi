@@ -47,4 +47,11 @@ func TestUseEmptySpriteSheet(t *testing.T) {
 		expectedSpriteSheetData := make([]byte, 16*8)
 		assert.Equal(t, expectedSpriteSheetData, pi.SprSheet().Pix())
 	})
+
+	t.Run("should panic when total number of pixels is higher than 65536", func(t *testing.T) {
+		pi.Reset()
+		assert.Panics(t, func() {
+			pi.UseEmptySpriteSheet(256, 264)
+		})
+	})
 }

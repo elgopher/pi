@@ -180,7 +180,7 @@ func (p *Position) Reset() {
 	p.Y = 0
 }
 
-const maxScreenSize = 1024 * 64
+const maxScreenSize = 65536
 
 // SetScreenSize sets the screen size to specified resolution. The maximum number of pixels is 65536 (64KB).
 // Will panic if screen size is too big or width/height are <= 0.
