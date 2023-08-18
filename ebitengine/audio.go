@@ -4,7 +4,7 @@
 package ebitengine
 
 import (
-	"github.com/hajimehoshi/ebiten/v2/audio"
+	"fmt"
 
 	"github.com/elgopher/pi"
 )
@@ -30,23 +30,6 @@ var AudioStream interface {
 	Read(p []float64) (n int, err error)
 }
 
-func startAudio() (stop func(), _ error) {
-	if AudioStream == nil {
-		AudioStream = pi.Audio()
-	}
-
-	audioCtx := audio.NewContext(audioSampleRate)
-	player, err := audioCtx.NewPlayer(&audioStreamReader{})
-	if err != nil {
-		return func() {}, err
-	}
-	player.Play()
-
-	return func() {
-		_ = player.Close()
-	}, nil
-}
-
 // audioStreamReader reads floats from AudioStream and convert them to Ebitengine format -
 // linear PCM (signed 16bits little endian, 2 channel stereo).
 type audioStreamReader struct {
@@ -56,6 +39,7 @@ type audioStreamReader struct {
 }
 
 func (a *audioStreamReader) Read(p []byte) (int, error) {
+	fmt.Println("reader", len(p))
 	if len(p) == 0 {
 		return 0, nil
 	}
