@@ -87,6 +87,8 @@ func init() {
 		"Button":      reflect.ValueOf((*pi.Button)(nil)),
 		"Controller":  reflect.ValueOf((*pi.Controller)(nil)),
 		"Font":        reflect.ValueOf((*pi.Font)(nil)),
+		"Iterator":    reflect.ValueOf((*pi.Iterator)(nil)),
+		"Iterators":   reflect.ValueOf((*pi.Iterators)(nil)),
 		//"Int":         reflect.ValueOf((*pi.Int)(nil)),  // TODO Generic constraints not supported by Yaegi yet
 		"MouseButton":  reflect.ValueOf((*pi.MouseButton)(nil)),
 		"PixMap":       reflect.ValueOf((*pi.PixMap)(nil)),
