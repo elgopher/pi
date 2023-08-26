@@ -25,7 +25,7 @@ func PrintHelp(topic string) error {
 	case "":
 		fmt.Println("This is interactive terminal. " +
 			"You can write Go code here, which will run immediately. " +
-			"You can use all Pi packages: pi, key, state, snap, font, image and " +
+			"You can use all Pi packages: pi, key, state, snap, font, image, audio and " +
 			"selection of standard packages: " + strings.Join(stdPackages(), ", ") + ". " +
 			"\n\n" +
 			"Type help topic for more information. For example: help pi or help pi.Spr" +
@@ -123,6 +123,11 @@ var symbolsWithDetailedDescription = []string{
 	"github.com/elgopher/pi.Button",
 	"github.com/elgopher/pi.MouseButton",
 	"github.com/elgopher/pi/key.Button",
+	"github.com/elgopher/pi/audio.Pitch",
+	"github.com/elgopher/pi/audio.Volume",
+	"github.com/elgopher/pi/audio.Channel",
+	"github.com/elgopher/pi/audio.Effect",
+	"github.com/elgopher/pi/audio.Instrument",
 }
 
 func shouldShowDetailedDescriptionForSymbol(symbol string) bool {
