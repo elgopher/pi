@@ -1,12 +1,16 @@
-// (c) 2022 Jacek Olszak
+// (c) 2022-2023 Jacek Olszak
 // This code is licensed under MIT license (see LICENSE for details)
 
 package ebitengine
 
 import (
-	"github.com/hajimehoshi/ebiten/v2/audio"
+	"fmt"
+	"sync"
+	"time"
 
-	"github.com/elgopher/pi"
+	ebitenaudio "github.com/hajimehoshi/ebiten/v2/audio"
+
+	"github.com/elgopher/pi/audio"
 )
 
 const (
@@ -35,17 +39,120 @@ var AudioStream interface {
 
 func startAudio() (stop func(), _ error) {
 	if AudioStream == nil {
-		AudioStream = pi.Audio()
+		// In the web back-end, Audio Worklets will be used. In the beginning, state will be stored to binary form
+		// and sent over the MessageChannel to processor. Each call to AudioSystem methods will send events to processor
+		// (again via MessageChannel) instead of directly calling synthesizer. Audio Worklet processor will use
+		// pi.Synthesizer. Based on incoming events it will update the pi.Synthesizer.
+
+		state, err := audio.SaveAudio()
+		if err != nil {
+			return stop, fmt.Errorf("problem saving audio state: %w", err)
+		}
+		synth := audio.Synthesizer{}
+		if err = synth.Load(state); err != nil {
+			return stop, fmt.Errorf("problem loading audio state: %w", err)
+		}
+
+		audioSystem := &ebitenPlayerSource{audioSystem: synth}
+		audio.SetAudioSystem(audioSystem) // make audio system concurrency-safe
+		AudioStream = audioSystem
 	}
 
-	audioCtx := audio.NewContext(audioSampleRate)
+	audioCtx := ebitenaudio.NewContext(audioSampleRate)
 	player, err := audioCtx.NewPlayer(AudioStream)
 	if err != nil {
 		return func() {}, err
 	}
+	player.SetBufferSize(23 * time.Millisecond)
 	player.Play()
 
 	return func() {
 		_ = player.Close()
 	}, nil
+}
+
+// ebitenPlayerSource implements Ebitengine Player source.
+//
+// ebitenPlayerSource adds synchronization to all methods.
+// Therefore, it can be called concurrently by Ebitegine and the game loop.
+type ebitenPlayerSource struct {
+	mutex       sync.Mutex
+	audioSystem audio.Synthesizer
+}
+
+// reads floats from AudioStream and convert them to Ebitengine format -
+// linear PCM (signed 16bits little endian, 2 channel stereo).
+func (e *ebitenPlayerSource) Read(p []byte) (n int, err error) {
+	// silence for now :(
+	return len(p), nil
+}
+
+func (e *ebitenPlayerSource) ReadSamples(b []float32) (n int, err error) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	return e.audioSystem.ReadSamples(b)
+}
+
+func (e *ebitenPlayerSource) Sfx(sfxNo int, channel audio.Channel, offset, length int) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	e.audioSystem.Sfx(sfxNo, channel, offset, length)
+}
+
+func (e *ebitenPlayerSource) Music(patterNo int, fadeMs int, channelMask byte) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	e.audioSystem.Music(patterNo, fadeMs, channelMask)
+}
+
+func (e *ebitenPlayerSource) Stat() audio.Stat {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	return e.audioSystem.Stat()
+}
+
+func (e *ebitenPlayerSource) SetSfx(sfxNo int, effect audio.SoundEffect) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	e.audioSystem.SetSfx(sfxNo, effect)
+}
+
+func (e *ebitenPlayerSource) GetSfx(sfxNo int) audio.SoundEffect {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	return e.audioSystem.GetSfx(sfxNo)
+}
+
+func (e *ebitenPlayerSource) SetMusic(patterNo int, pattern audio.Pattern) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	e.audioSystem.SetMusic(patterNo, pattern)
+}
+
+func (e *ebitenPlayerSource) GetMusic(patterNo int) audio.Pattern {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	return e.audioSystem.GetMusic(patterNo)
+}
+
+func (e *ebitenPlayerSource) Save() ([]byte, error) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	return e.audioSystem.Save()
+}
+
+func (e *ebitenPlayerSource) Load(bytes []byte) error {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	return e.audioSystem.Load(bytes)
 }

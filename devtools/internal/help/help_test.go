@@ -88,9 +88,14 @@ func TestPrintHelp(t *testing.T) {
 
 	t.Run("should show detailed help for pi.Button", func(t *testing.T) {
 		tests := map[string]string{
-			"pi.Button":      "Keyboard mappings",
-			"pi.MouseButton": "MouseRight  MouseButton = 2",
-			"key.Button":     "func (b Button) String() string",
+			"pi.Button":        "Keyboard mappings",
+			"pi.MouseButton":   "MouseRight  MouseButton = 2",
+			"key.Button":       "func (b Button) String() string",
+			"audio.Pitch":      "PitchDs5",
+			"audio.Volume":     "VolumeLoudest",
+			"audio.Channel":    "ChannelStop",
+			"audio.Effect":     "EffectArpSlow",
+			"audio.Instrument": "InstrumentSfx7",
 		}
 		for topic, expected := range tests {
 			t.Run(topic, func(t *testing.T) {
