@@ -357,6 +357,20 @@ func TestSynthesizer_Sfx(t *testing.T) {
 		// then
 		assert.NotEqual(t, c0buffer, a3buffer, "buffers for pitch C0 and A3 should be different but are the same")
 	})
+
+	t.Run("should play sound with specified instrument", func(t *testing.T) {
+		const bufferSize = 256
+
+		triangle := validEffect
+		triangle.Notes[0].Instrument = audio.InstrumentTriangle
+		triangleBuffer := generateSamples(triangle, bufferSize)
+
+		organ := validEffect
+		organ.Notes[0].Instrument = audio.InstrumentOrgan
+		organBuffer := generateSamples(organ, bufferSize)
+		// then
+		assert.NotEqual(t, triangleBuffer, organBuffer, "buffers for triangle and organ waves should be different but are the same")
+	})
 }
 
 func clone(s []byte) []byte {

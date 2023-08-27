@@ -29,6 +29,24 @@ func TestOrgan(t *testing.T) {
 	}
 }
 
+func TestTiltedSaw(t *testing.T) {
+	for i := float64(0); i < 3; i += step {
+		fmt.Printf("%f\t%f\n", i, internal.TiltedSaw(i))
+	}
+}
+
+func TestSaw(t *testing.T) {
+	for i := float64(0); i < 3; i += step {
+		fmt.Printf("%f\t%f\n", i, internal.Saw(i))
+	}
+}
+
+func TestSquare(t *testing.T) {
+	for i := float64(0); i < 3; i += step {
+		fmt.Printf("%f\t%f\n", i, internal.Square(i))
+	}
+}
+
 func TestOscillator_Next(t *testing.T) {
 	var o internal.Oscillator
 	o.FreqHz = 440.0
