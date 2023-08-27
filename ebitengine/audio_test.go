@@ -4,6 +4,7 @@
 package ebitengine //nolint
 
 import (
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -116,6 +117,40 @@ func TestEbitenPlayerSource_Read(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 4, n)
 		assert.Len(t, mock.buffer, 1, "one float in the buffer should still be available for reading")
+	})
+}
+
+func TestEbitenPlayerSource_ThreadSafety(t *testing.T) {
+	t.Run("should not fail when run with -race flag", func(t *testing.T) {
+		reader := &ebitenPlayerSource{
+			audioSystem: &audio.Synthesizer{},
+		}
+
+		const goroutines = 100
+
+		var group sync.WaitGroup
+		group.Add(goroutines)
+
+		for i := 0; i < goroutines; i++ {
+			go func() {
+				defer group.Done()
+
+				_, err := reader.Read(make([]byte, 128))
+				require.NoError(t, err)
+				reader.Sfx(0, 0, 0, 0)
+				reader.Music(0, 0, 0)
+				reader.Stat()
+				reader.SetSfx(0, audio.SoundEffect{})
+				reader.GetSfx(0)
+				reader.SetMusic(0, audio.Pattern{})
+				reader.GetMusic(0)
+				_, err = reader.Save()
+				require.NoError(t, err)
+				_ = reader.Load(make([]byte, 128))
+			}()
+		}
+
+		group.Wait()
 	})
 }
 
