@@ -1,6 +1,10 @@
 package audio
 
-import "github.com/elgopher/pi/audio/internal"
+import (
+	"math"
+
+	"github.com/elgopher/pi/audio/internal"
+)
 
 func silence(float64) float64 {
 	return 0
@@ -23,4 +27,11 @@ func oscillatorFunc(instrument Instrument) func(float64) float64 {
 	default:
 		return silence
 	}
+}
+
+// pitchToFreq returns frequency in Hz.
+func pitchToFreq(pitch Pitch) float64 {
+	diff := int(pitch) - int(PitchA2)
+	multiplier := math.Pow(2, float64(diff)/12)
+	return 440 * multiplier
 }
