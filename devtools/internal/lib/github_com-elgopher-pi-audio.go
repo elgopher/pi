@@ -110,15 +110,14 @@ func init() {
 		"PitchGs3":            reflect.ValueOf(audio.PitchGs3),
 		"PitchGs4":            reflect.ValueOf(audio.PitchGs4),
 		"SaveAudio":           reflect.ValueOf(audio.SaveAudio),
-		"SetAudioSystem":      reflect.ValueOf(audio.SetAudioSystem),
 		"SetMusic":            reflect.ValueOf(audio.SetMusic),
 		"SetSfx":              reflect.ValueOf(audio.SetSfx),
+		"SetSystem":           reflect.ValueOf(audio.SetSystem),
 		"Sfx":                 reflect.ValueOf(audio.Sfx),
 		"VolumeLoudest":       reflect.ValueOf(audio.VolumeLoudest),
 		"VolumeQuiet":         reflect.ValueOf(audio.VolumeQuiet),
 
 		// type definitions
-		"AudioSystem": reflect.ValueOf((*audio.AudioSystem)(nil)),
 		"Channel":     reflect.ValueOf((*audio.Channel)(nil)),
 		"Effect":      reflect.ValueOf((*audio.Effect)(nil)),
 		"Instrument":  reflect.ValueOf((*audio.Instrument)(nil)),
@@ -129,15 +128,16 @@ func init() {
 		"SoundEffect": reflect.ValueOf((*audio.SoundEffect)(nil)),
 		"Stat":        reflect.ValueOf((*audio.Stat)(nil)),
 		"Synthesizer": reflect.ValueOf((*audio.Synthesizer)(nil)),
+		"System":      reflect.ValueOf((*audio.System)(nil)),
 		"Volume":      reflect.ValueOf((*audio.Volume)(nil)),
 
 		// interface wrapper definitions
-		"_AudioSystem": reflect.ValueOf((*_github_com_elgopher_pi_audio_AudioSystem)(nil)),
+		"_System": reflect.ValueOf((*_github_com_elgopher_pi_audio_System)(nil)),
 	}
 }
 
-// _github_com_elgopher_pi_audio_AudioSystem is an interface wrapper for AudioSystem type
-type _github_com_elgopher_pi_audio_AudioSystem struct {
+// _github_com_elgopher_pi_audio_System is an interface wrapper for System type
+type _github_com_elgopher_pi_audio_System struct {
 	IValue    interface{}
 	WGetMusic func(patterNo int) audio.Pattern
 	WGetSfx   func(sfxNo int) audio.SoundEffect
@@ -150,30 +150,30 @@ type _github_com_elgopher_pi_audio_AudioSystem struct {
 	WStat     func() audio.Stat
 }
 
-func (W _github_com_elgopher_pi_audio_AudioSystem) GetMusic(patterNo int) audio.Pattern {
+func (W _github_com_elgopher_pi_audio_System) GetMusic(patterNo int) audio.Pattern {
 	return W.WGetMusic(patterNo)
 }
-func (W _github_com_elgopher_pi_audio_AudioSystem) GetSfx(sfxNo int) audio.SoundEffect {
+func (W _github_com_elgopher_pi_audio_System) GetSfx(sfxNo int) audio.SoundEffect {
 	return W.WGetSfx(sfxNo)
 }
-func (W _github_com_elgopher_pi_audio_AudioSystem) Load(a0 []byte) error {
+func (W _github_com_elgopher_pi_audio_System) Load(a0 []byte) error {
 	return W.WLoad(a0)
 }
-func (W _github_com_elgopher_pi_audio_AudioSystem) Music(patterNo int, fadeMs int, channelMask byte) {
+func (W _github_com_elgopher_pi_audio_System) Music(patterNo int, fadeMs int, channelMask byte) {
 	W.WMusic(patterNo, fadeMs, channelMask)
 }
-func (W _github_com_elgopher_pi_audio_AudioSystem) Save() ([]byte, error) {
+func (W _github_com_elgopher_pi_audio_System) Save() ([]byte, error) {
 	return W.WSave()
 }
-func (W _github_com_elgopher_pi_audio_AudioSystem) SetMusic(patternNo int, p audio.Pattern) {
+func (W _github_com_elgopher_pi_audio_System) SetMusic(patternNo int, p audio.Pattern) {
 	W.WSetMusic(patternNo, p)
 }
-func (W _github_com_elgopher_pi_audio_AudioSystem) SetSfx(sfxNo int, e audio.SoundEffect) {
+func (W _github_com_elgopher_pi_audio_System) SetSfx(sfxNo int, e audio.SoundEffect) {
 	W.WSetSfx(sfxNo, e)
 }
-func (W _github_com_elgopher_pi_audio_AudioSystem) Sfx(sfxNo int, channel audio.Channel, offset int, length int) {
+func (W _github_com_elgopher_pi_audio_System) Sfx(sfxNo int, channel audio.Channel, offset int, length int) {
 	W.WSfx(sfxNo, channel, offset, length)
 }
-func (W _github_com_elgopher_pi_audio_AudioSystem) Stat() audio.Stat {
+func (W _github_com_elgopher_pi_audio_System) Stat() audio.Stat {
 	return W.WStat()
 }

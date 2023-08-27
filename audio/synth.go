@@ -11,7 +11,7 @@ import (
 	"github.com/elgopher/pi/audio/internal"
 )
 
-// Synthesizer is used by a back-end. It is an AudioSystem implementation.
+// Synthesizer is used by a back-end. It is an System implementation.
 // Plus it provides method for synthesizing audio samples.
 type Synthesizer struct {
 	sfx      map[byte]SoundEffect
