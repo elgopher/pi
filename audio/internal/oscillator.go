@@ -27,6 +27,40 @@ func Triangle(pos float64) float64 {
 	return value * volume
 }
 
+func TiltedSaw(pos float64) float64 {
+	phase := math.Mod(pos, 1)
+	var v float64
+	if phase < 0.875 {
+		v = phase * 16 / 7
+	} else {
+		v = (1 - phase) * 16
+	}
+	return (v - 1) * volume
+}
+
+func Saw(pos float64) float64 {
+	phase := math.Mod(pos, 1)
+	return (phase - 0.5) * 0.9
+}
+
+func Square(pos float64) float64 {
+	phase := math.Mod(pos, 1)
+	v := -1.0
+	if phase < 0.5 {
+		v = 1.0
+	}
+	return v / 3.0
+}
+
+func Pulse(pos float64) float64 {
+	phase := math.Mod(pos, 1)
+	v := -1.0
+	if phase < 0.3125 {
+		v = 1.0
+	}
+	return v / 3.0
+}
+
 // Organ is triangle / 2
 func Organ(pos float64) float64 {
 	pos = pos * 4
