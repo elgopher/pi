@@ -115,7 +115,7 @@ func init() {
 		"SetSystem":           reflect.ValueOf(audio.SetSystem),
 		"Sfx":                 reflect.ValueOf(audio.Sfx),
 		"VolumeLoudest":       reflect.ValueOf(audio.VolumeLoudest),
-		"VolumeQuiet":         reflect.ValueOf(audio.VolumeQuiet),
+		"VolumeSilence":       reflect.ValueOf(audio.VolumeSilence),
 
 		// type definitions
 		"Channel":     reflect.ValueOf((*audio.Channel)(nil)),

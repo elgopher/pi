@@ -35,3 +35,11 @@ func pitchToFreq(pitch Pitch) float64 {
 	multiplier := math.Pow(2, float64(diff)/12)
 	return 440 * multiplier
 }
+
+func singleNoteSamples(speed byte) int {
+	if speed == 0 {
+		speed = 1
+	}
+
+	return int(speed) * 183
+}

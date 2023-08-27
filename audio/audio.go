@@ -128,7 +128,7 @@ type Note struct {
 type Volume byte
 
 const (
-	VolumeQuiet   Volume = 0
+	VolumeSilence Volume = 0
 	VolumeLoudest Volume = 7
 )
 
