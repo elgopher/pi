@@ -200,12 +200,12 @@ func TestSynthesizer_Read(t *testing.T) {
 	})
 
 	t.Run("should clear the buffer with 0 when no channels are used", func(t *testing.T) {
-		buffer := []float32{1, 2, 3, 4}
+		buffer := []float64{1, 2, 3, 4}
 		s := audio.Synthesizer{}
 		n, err := s.ReadSamples(buffer)
 		require.NotZero(t, n)
 		require.NoError(t, err)
-		expected := make([]float32, n)
+		expected := make([]float64, n)
 		assert.Equal(t, expected, buffer)
 	})
 }

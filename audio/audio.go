@@ -273,7 +273,7 @@ type Synthesizer struct {
 // ReadSamples is (usually) executed concurrently with main game loop. Back-end should add proper synchronization to avoid race conditions.
 // Back-end could decide about buffer size, although the higher the size the higher the lag. Usually the buffer is 512 samples,
 // which is 23ms of audio.
-func (s *Synthesizer) ReadSamples(b []float32) (n int, err error) {
+func (s *Synthesizer) ReadSamples(b []float64) (n int, err error) {
 	if len(b) == 0 {
 		return 0, nil
 	}

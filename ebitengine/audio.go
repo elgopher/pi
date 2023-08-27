@@ -87,7 +87,7 @@ func (e *ebitenPlayerSource) Read(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-func (e *ebitenPlayerSource) ReadSamples(b []float32) (n int, err error) {
+func (e *ebitenPlayerSource) ReadSamples(b []float64) (n int, err error) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 
