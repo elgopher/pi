@@ -3,6 +3,8 @@
 
 package internal
 
+import "math"
+
 const (
 	SampleRate = 22050
 	Channels   = 4
@@ -17,4 +19,11 @@ func (s Samples) Sum() float64 {
 	}
 
 	return sum
+}
+
+// PitchToFreq returns frequency in Hz. See audio.Pitch.
+func PitchToFreq(pitch int) float64 {
+	const pitchA2 = 33
+	multiplier := math.Pow(2, float64(pitch-pitchA2)/12)
+	return 440 * multiplier
 }

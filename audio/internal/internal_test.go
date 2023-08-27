@@ -42,3 +42,17 @@ func TestSamples_Sum(t *testing.T) {
 		})
 	}
 }
+
+func TestPitchToFreq(t *testing.T) {
+	tests := map[int]float64{
+		33: 440,             // a2
+		0:  65.40639132515,  // c0
+		63: 2489.0158697766, // d#5
+		12: 130.8127826503,  // c1
+		24: 261.6255653006,  // c2
+	}
+	for pitch, expectedFreq := range tests {
+		actualFreq := internal.PitchToFreq(pitch)
+		assert.InDelta(t, expectedFreq, actualFreq, 0.000000001)
+	}
+}
