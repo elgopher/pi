@@ -28,3 +28,12 @@ func TestPitchToFreq(t *testing.T) {
 		assert.InDelta(t, expectedFreq, actualFreq, 0.000000001)
 	}
 }
+
+const durationOfNoteWhenSpeedIsOne = 183
+
+func TestSingleNoteSamples(t *testing.T) {
+	assert.Equal(t, durationOfNoteWhenSpeedIsOne, singleNoteSamples(0))
+	assert.Equal(t, durationOfNoteWhenSpeedIsOne, singleNoteSamples(1))
+	assert.Equal(t, 2*durationOfNoteWhenSpeedIsOne, singleNoteSamples(2))
+	assert.Equal(t, 255*durationOfNoteWhenSpeedIsOne, singleNoteSamples(255))
+}

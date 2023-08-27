@@ -15,9 +15,10 @@ import (
 )
 
 const (
-	maxSfxNo     = 63
-	maxPatternNo = 63
-	maxChannels  = 4
+	maxSfxNo                     = 63
+	maxPatternNo                 = 63
+	maxChannels                  = 4
+	durationOfNoteWhenSpeedIsOne = 183
 )
 
 var (
@@ -371,6 +372,89 @@ func TestSynthesizer_Sfx(t *testing.T) {
 		// then
 		assert.NotEqual(t, triangleBuffer, organBuffer, "buffers for triangle and organ waves should be different but are the same")
 	})
+
+	t.Run("should not play first note when volume is 0", func(t *testing.T) {
+		e := validEffect
+		e.Speed = 1
+		e.Notes[0].Volume = 0
+
+		buffer := generateSamples(e, durationOfNoteWhenSpeedIsOne)
+		assertSilence(t, buffer)
+	})
+
+	t.Run("should not play first note when volume is 0 and speed is 2", func(t *testing.T) {
+		e := validEffect
+		e.Speed = 2
+		e.Notes[0].Volume = 0
+		e.Notes[1].Volume = audio.VolumeLoudest
+
+		buffer := generateSamples(e, 2*durationOfNoteWhenSpeedIsOne)
+		assertSilence(t, buffer)
+	})
+
+	t.Run("should not play second note when volume is 0", func(t *testing.T) {
+		for speed := 1; speed <= 2; speed++ {
+			testName := fmt.Sprintf("speed=%d", speed)
+
+			t.Run(testName, func(t *testing.T) {
+				e := validEffect
+				e.Speed = byte(speed)
+				e.Notes[0].Volume = audio.VolumeLoudest
+				e.Notes[1].Volume = audio.VolumeSilence
+				e.Notes[2].Volume = audio.VolumeLoudest
+
+				synth := audio.Synthesizer{}
+				synth.SetSfx(0, e)
+				synth.Sfx(0, audio.Channel0, 0, 31)
+				buffer := make([]float64, speed*durationOfNoteWhenSpeedIsOne)
+				// skip 1st note
+				synth.ReadSamples(buffer)
+				// when
+				synth.ReadSamples(buffer)
+				assertSilence(t, buffer)
+
+				t.Run("and next note with max volume should be played", func(t *testing.T) {
+					synth.ReadSamples(buffer)
+					assertNotSilence(t, buffer)
+				})
+			})
+		}
+	})
+
+	t.Run("should play sfx to the end", func(t *testing.T) {
+		e := validEffect
+		e.Speed = 1
+		for i := 0; i < len(e.Notes); i++ {
+			e.Notes[i].Volume = audio.VolumeLoudest
+		}
+
+		synth := audio.Synthesizer{}
+		synth.SetSfx(0, e)
+		synth.Sfx(0, audio.Channel0, 0, 31)
+
+		buffer := make([]float64, len(e.Notes)*durationOfNoteWhenSpeedIsOne)
+		// read the entire sfx
+		synth.ReadSamples(buffer)
+		// and then read silence
+		synth.ReadSamples(buffer)
+		assertSilence(t, buffer)
+	})
+
+	t.Run("should play sfx from the beginning", func(t *testing.T) {
+		e := validEffect
+		e.Speed = 1
+		synth := audio.Synthesizer{}
+		synth.SetSfx(0, e)
+		synth.Sfx(0, audio.Channel0, 0, 31) // first call to Sfx
+		buffer1 := make([]float64, len(e.Notes)*durationOfNoteWhenSpeedIsOne)
+		synth.ReadSamples(buffer1) // read entire sound
+		// when
+		synth.Sfx(0, audio.Channel0, 0, 31)
+		// then
+		buffer2 := make([]float64, len(e.Notes)*durationOfNoteWhenSpeedIsOne)
+		synth.ReadSamples(buffer2)
+		// no assertion because generated samples are different because of phase shift
+	})
 }
 
 func clone(s []byte) []byte {
@@ -382,6 +466,11 @@ func clone(s []byte) []byte {
 func assertSilence(t *testing.T, buffer []float64) {
 	zeroBuffer := make([]float64, len(buffer))
 	assert.Equal(t, zeroBuffer, buffer, "buffer should have zeroes only (silence)")
+}
+
+func assertNotSilence(t *testing.T, buffer []float64) {
+	zeroBuffer := make([]float64, len(buffer))
+	assert.NotEqual(t, zeroBuffer, buffer, "buffer should not have zeroes only (no silence)")
 }
 
 func assertAllValuesDifferent(t *testing.T, buffer []float64) {

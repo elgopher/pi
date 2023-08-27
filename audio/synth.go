@@ -38,7 +38,18 @@ func (s *Synthesizer) ReadSamples(buffer []float64) {
 
 		for channelIdx, ch := range s.channels {
 			if ch.playing {
-				samples[channelIdx] = ch.oscillator.NextSample()
+				sfx := s.GetSfx(ch.sfxNo)
+				volume := float64(sfx.Notes[ch.noteNo].Volume)
+				samples[channelIdx] = ch.oscillator.NextSample() * volume
+				ch.sampleNo += 1
+				noteHasEnded := ch.sampleNo == ch.noteEndSample
+				if noteHasEnded {
+					ch.noteEndSample += singleNoteSamples(sfx.Speed)
+					ch.noteNo++
+					if ch.noteNo == len(sfx.Notes) {
+						ch.playing = false
+					}
+				}
 			} else {
 				samples[channelIdx] = 0
 			}
@@ -68,6 +79,9 @@ func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
 
 	s.channels[ch].oscillator.Func = oscillatorFunc(note0.Instrument)
 	s.channels[ch].oscillator.FreqHz = pitchToFreq(note0.Pitch)
+	s.channels[ch].noteNo = 0
+	s.channels[ch].sampleNo = 0
+	s.channels[ch].noteEndSample = singleNoteSamples(sfx.Speed)
 }
 
 func (s *Synthesizer) Music(patterNo int, fadeMs int, channelMask byte) {
@@ -274,8 +288,10 @@ func boolToByte(b bool) byte {
 }
 
 type channel struct {
-	sfxNo      int     //nolint
-	offset     float64 // time offset in seconds //nolint
-	oscillator internal.Oscillator
-	playing    bool
+	sfxNo         int //nolint
+	noteNo        int
+	sampleNo      int
+	noteEndSample int
+	oscillator    internal.Oscillator
+	playing       bool
 }
