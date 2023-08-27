@@ -309,13 +309,9 @@ func TestSynthesizer_Sfx(t *testing.T) {
 	})
 
 	t.Run("should sum samples from all channels", func(t *testing.T) {
-		s := audio.Synthesizer{}
-		s.SetSfx(0, validEffect)
-		singleChannelBuffer := make([]float64, 1)
-		s.Sfx(0, audio.Channel0, 0, 1)
-		s.ReadSamples(singleChannelBuffer)
+		singleChannelBuffer := generateSamples(validEffect, 1)
 
-		s = audio.Synthesizer{}
+		s := audio.Synthesizer{}
 		s.SetSfx(0, validEffect)
 		// when
 		for ch := 0; ch < maxChannels; ch++ {
@@ -353,19 +349,11 @@ func TestSynthesizer_Sfx(t *testing.T) {
 
 		c0 := validEffect
 		c0.Notes[0].Pitch = audio.PitchC0
-		synth := audio.Synthesizer{}
-		synth.SetSfx(0, c0)
-		synth.Sfx(0, audio.Channel0, 0, 31)
-		c0buffer := make([]float64, bufferSize)
-		synth.ReadSamples(c0buffer)
+		c0buffer := generateSamples(c0, bufferSize)
 
 		a3 := validEffect
 		a3.Notes[0].Pitch = audio.PitchA3
-		synth = audio.Synthesizer{}
-		synth.SetSfx(0, a3)
-		synth.Sfx(0, audio.Channel3, 0, 31)
-		a3buffer := make([]float64, bufferSize)
-		synth.ReadSamples(a3buffer)
+		a3buffer := generateSamples(a3, bufferSize)
 		// then
 		assert.NotEqual(t, c0buffer, a3buffer, "buffers for pitch C0 and A3 should be different but are the same")
 	})
@@ -388,4 +376,13 @@ func assertAllValuesDifferent(t *testing.T, buffer []float64) {
 		require.NotEqualf(t, current, buffer[i], "adjacent buffer values at %d and %d are the same but should be different", i-1, i)
 		current = buffer[i]
 	}
+}
+
+func generateSamples(e audio.SoundEffect, bufferSize int) []float64 {
+	synth := audio.Synthesizer{}
+	synth.SetSfx(0, e)
+	synth.Sfx(0, audio.Channel0, 0, 31)
+	buffer := make([]float64, bufferSize)
+	synth.ReadSamples(buffer)
+	return buffer
 }
