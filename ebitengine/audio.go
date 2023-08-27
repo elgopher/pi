@@ -92,6 +92,9 @@ type ebitenPlayerSource struct {
 // reads floats from AudioStream and convert them to Ebitengine format -
 // linear PCM (signed 16bits little endian, 2 channel stereo).
 func (e *ebitenPlayerSource) Read(p []byte) (int, error) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
 	const (
 		uint16Bytes = 2
 		sampleLen   = channelCount * uint16Bytes
