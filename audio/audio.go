@@ -21,7 +21,7 @@ package audio
 //
 // length is the number of notes to play (0-31).
 func Sfx(sfxNo int, channel Channel, offset, length int) {
-	audioSystem.Sfx(sfxNo, channel, offset, length)
+	system.Sfx(sfxNo, channel, offset, length)
 }
 
 // Music starts playing music with given patterNo.
@@ -35,12 +35,12 @@ func Sfx(sfxNo int, channel Channel, offset, length int) {
 // channelMask is a bitfield indicating which of the four sound channels
 // should be reserved for music.
 func Music(patterNo int, fadeMs int, channelMask byte) {
-	audioSystem.Music(patterNo, fadeMs, channelMask)
+	system.Music(patterNo, fadeMs, channelMask)
 }
 
 // GetStat returns information about currently played sound effects and music.
 func GetStat() Stat {
-	return audioSystem.Stat()
+	return system.Stat()
 }
 
 // SetSfx updates the sound effect. sfxNo is 0-63. Updating sfx number which
@@ -49,13 +49,13 @@ func GetStat() Stat {
 // SoundEffect parameters are clamped when out of range.
 // For example, sfx note volume equal 8 will be silently clamped to 7.
 func SetSfx(sfxNo int, e SoundEffect) {
-	audioSystem.SetSfx(sfxNo, e)
+	system.SetSfx(sfxNo, e)
 }
 
 // GetSfx returns sfx with given number. sfxNo is 0-63. Trying to get
 // sfx number higher than 63 will result in returning empty SoundEffect (zero-value).
 func GetSfx(sfxNo int) SoundEffect {
-	return audioSystem.GetSfx(sfxNo)
+	return system.GetSfx(sfxNo)
 }
 
 // SetMusic updates the music pattern. patternNo is 0-63. Updating pattern number which
@@ -64,28 +64,28 @@ func GetSfx(sfxNo int) SoundEffect {
 // Pattern parameters are clamped when out of range.
 // For example, pattern sfx number equal 64 will be silently clamped to 63.
 func SetMusic(patternNo int, p Pattern) {
-	audioSystem.SetMusic(patternNo, p)
+	system.SetMusic(patternNo, p)
 }
 
 // GetMusic returns music pattern with given number. patterNo is 0-63. Trying to get
 // pattern number higher than 63 will result in returning empty Pattern (zero-value).
 func GetMusic(patterNo int) Pattern {
-	return audioSystem.GetMusic(patterNo)
+	return system.GetMusic(patterNo)
 }
 
 // SaveAudio stores audio system state to byte slice. State is stored in binary form.
 // The format is described in Synthesizer.Save source code.
 func SaveAudio() ([]byte, error) {
-	return audioSystem.Save()
+	return system.Save()
 }
 
 // LoadAudio restores audio system state from byte slice. State is restored from binary form.
 // The format is described in Synthesizer.Save source code.
 func LoadAudio(b []byte) error {
-	return audioSystem.Load(b)
+	return system.Load(b)
 }
 
-var audioSystem AudioSystem = &Synthesizer{}
+var system System = &Synthesizer{}
 
 type Channel int8
 
@@ -257,12 +257,12 @@ func byteToBool(b byte) bool {
 	return b == 1
 }
 
-// SetAudioSystem is executed by the back-end to replace audio system with his own implementation.
-func SetAudioSystem(s AudioSystem) {
-	audioSystem = s
+// SetSystem is executed by the back-end to replace audio system with his own implementation.
+func SetSystem(s System) {
+	system = s
 }
 
-type AudioSystem interface {
+type System interface {
 	Sfx(sfxNo int, channel Channel, offset, length int)
 	Music(patterNo int, fadeMs int, channelMask byte)
 	Stat() Stat
