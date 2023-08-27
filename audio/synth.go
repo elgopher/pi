@@ -16,7 +16,7 @@ import (
 type Synthesizer struct {
 	sfx      map[byte]SoundEffect
 	pattern  map[byte]Pattern
-	channels [4]channel
+	channels [internal.Channels]channel
 }
 
 // ReadSamples method is used by a back-end to read generated audio samples and play them back to the user. The sample rate is 22050.
@@ -25,20 +25,27 @@ type Synthesizer struct {
 // ReadSamples is (usually) executed concurrently with main game loop. Back-end should add proper synchronization to avoid race conditions.
 // Back-end could decide about buffer size, although the higher the size the higher the lag. Usually the buffer is 512 samples,
 // which is 23ms of audio.
+//
+// Values written to the buffer are usually in range between -1.0 and 1.0, but sometimes they can exceed the range
+// (for example due to audio channels summing).
 func (s *Synthesizer) ReadSamples(buffer []float64) {
 	if len(buffer) == 0 {
 		return
 	}
 
 	for i := 0; i < len(buffer); i++ {
-		ch := s.channels[0]
-		if ch.playing {
-			sample := ch.oscillator.NextSample()
-			buffer[i] = sample
-		} else {
-			buffer[i] = 0
+		var samples internal.Samples
+
+		for channelIdx, ch := range s.channels {
+			if ch.playing {
+				samples[channelIdx] = ch.oscillator.NextSample()
+			} else {
+				samples[channelIdx] = 0
+			}
+			s.channels[channelIdx] = ch
 		}
-		s.channels[0] = ch
+
+		buffer[i] = samples.Sum()
 	}
 }
 
@@ -46,6 +53,11 @@ func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
 	fmt.Println("Sfx is not implemented yet. Sorry...")
 
 	if ch < 0 || ch > Channel3 {
+		return
+	}
+
+	if sfxNo == -1 {
+		s.channels[ch].playing = false
 		return
 	}
 
