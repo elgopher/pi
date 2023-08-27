@@ -63,7 +63,9 @@ func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
 
 	s.channels[ch].playing = true
 	s.channels[ch].oscillator.Func = internal.Organ
-	s.channels[ch].oscillator.FreqHz = 440
+
+	pitch := s.GetSfx(sfxNo).Notes[0].Pitch
+	s.channels[ch].oscillator.FreqHz = internal.PitchToFreq(int(pitch))
 }
 
 func (s *Synthesizer) Music(patterNo int, fadeMs int, channelMask byte) {

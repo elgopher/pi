@@ -347,6 +347,28 @@ func TestSynthesizer_Sfx(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("should play sound with specified pitch", func(t *testing.T) {
+		const bufferSize = 256
+
+		c0 := validEffect
+		c0.Notes[0].Pitch = audio.PitchC0
+		synth := audio.Synthesizer{}
+		synth.SetSfx(0, c0)
+		synth.Sfx(0, audio.Channel0, 0, 31)
+		c0buffer := make([]float64, bufferSize)
+		synth.ReadSamples(c0buffer)
+
+		a3 := validEffect
+		a3.Notes[0].Pitch = audio.PitchA3
+		synth = audio.Synthesizer{}
+		synth.SetSfx(0, a3)
+		synth.Sfx(0, audio.Channel3, 0, 31)
+		a3buffer := make([]float64, bufferSize)
+		synth.ReadSamples(a3buffer)
+		// then
+		assert.NotEqual(t, c0buffer, a3buffer, "buffers for pitch C0 and A3 should be different but are the same")
+	})
 }
 
 func clone(s []byte) []byte {
