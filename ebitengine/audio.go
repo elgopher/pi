@@ -87,11 +87,11 @@ func (e *ebitenPlayerSource) Read(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-func (e *ebitenPlayerSource) ReadSamples(b []float64) (n int, err error) {
+func (e *ebitenPlayerSource) ReadSamples(b []float64) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 
-	return e.audioSystem.ReadSamples(b)
+	e.audioSystem.ReadSamples(b)
 }
 
 func (e *ebitenPlayerSource) Sfx(sfxNo int, channel audio.Channel, offset, length int) {

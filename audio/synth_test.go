@@ -191,25 +191,6 @@ func TestSynthesizer_GetMusic(t *testing.T) {
 	})
 }
 
-func TestSynthesizer_Read(t *testing.T) {
-	t.Run("should read 0 bytes when buffer is empty", func(t *testing.T) {
-		s := audio.Synthesizer{}
-		n, err := s.ReadSamples(nil)
-		assert.Zero(t, n)
-		assert.NoError(t, err)
-	})
-
-	t.Run("should clear the buffer with 0 when no channels are used", func(t *testing.T) {
-		buffer := []float64{1, 2, 3, 4}
-		s := audio.Synthesizer{}
-		n, err := s.ReadSamples(buffer)
-		require.NotZero(t, n)
-		require.NoError(t, err)
-		expected := make([]float64, n)
-		assert.Equal(t, expected, buffer)
-	})
-}
-
 //go:embed "internal/valid-save"
 var validSave []byte
 
@@ -273,6 +254,68 @@ func TestSynthesizer_Load(t *testing.T) {
 		// then
 		require.NoError(t, err)
 		assert.Equal(t, byte(63), s.GetMusic(0).Sfx[0].SfxNo)
+	})
+}
+
+func TestSynthesizer_ReadSamples(t *testing.T) {
+	t.Run("should not do anything when buffer has 0 length", func(t *testing.T) {
+		s := audio.Synthesizer{}
+		buffer := make([]float64, 0)
+		s.ReadSamples(buffer)
+	})
+
+	t.Run("when no sound is playing ReadSamples should return silence", func(t *testing.T) {
+		s := audio.Synthesizer{}
+		buffer := []float64{1, 2, 3, 4}
+		s.ReadSamples(buffer)
+		assert.Equal(t, make([]float64, len(buffer)), buffer, "buffer should have zeroes only")
+	})
+
+	t.Run("should generate samples after Sfx is called", func(t *testing.T) {
+		s := audio.Synthesizer{}
+		const bufferSize = 4
+		buffer := make([]float64, bufferSize)
+
+		s.SetSfx(0, audio.SoundEffect{
+			Notes: [32]audio.Note{
+				{
+					Pitch:      audio.PitchC4,
+					Instrument: audio.InstrumentOrgan,
+					Volume:     7,
+				},
+			},
+			Speed: 1,
+		})
+		s.Sfx(0, audio.Channel0, 0, 1)
+		// when
+		s.ReadSamples(buffer)
+		// then
+		for _, f := range buffer {
+			assert.NotZero(t, f)
+		}
+		// and all values different
+		current := buffer[0]
+		for i := 1; i < len(buffer); i++ {
+			assert.NotEqual(t, current, buffer[i])
+			current = buffer[i]
+		}
+	})
+}
+
+func TestSynthesizer_Sfx(t *testing.T) {
+	t.Run("should not panic when channel is not in range 0-3", func(t *testing.T) {
+		channels := []audio.Channel{
+			audio.ChannelStop - 1, audio.ChannelStop, audio.ChannelAny, audio.Channel3 + 1,
+		}
+
+		for _, ch := range channels {
+			assert.NotPanics(t, func() {
+				s := audio.Synthesizer{}
+				// when
+				s.Sfx(0, ch, 0, 0)
+				s.ReadSamples(make([]float64, 256))
+			})
+		}
 	})
 }
 

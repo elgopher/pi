@@ -8,13 +8,15 @@ import (
 	"fmt"
 
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/audio/internal"
 )
 
 // Synthesizer is used by a back-end. It is an AudioSystem implementation.
 // Plus it provides method for synthesizing audio samples.
 type Synthesizer struct {
-	sfx     map[byte]SoundEffect
-	pattern map[byte]Pattern
+	sfx      map[byte]SoundEffect
+	pattern  map[byte]Pattern
+	channels [4]channel
 }
 
 // ReadSamples method is used by a back-end to read generated audio samples and play them back to the user. The sample rate is 22050.
@@ -23,21 +25,33 @@ type Synthesizer struct {
 // ReadSamples is (usually) executed concurrently with main game loop. Back-end should add proper synchronization to avoid race conditions.
 // Back-end could decide about buffer size, although the higher the size the higher the lag. Usually the buffer is 512 samples,
 // which is 23ms of audio.
-func (s *Synthesizer) ReadSamples(b []float64) (n int, err error) {
-	if len(b) == 0 {
-		return 0, nil
+func (s *Synthesizer) ReadSamples(buffer []float64) {
+	if len(buffer) == 0 {
+		return
 	}
 
-	// generate silence for now
-	for i := 0; i < len(b); i++ {
-		b[i] = 0
+	for i := 0; i < len(buffer); i++ {
+		ch := s.channels[0]
+		if ch.playing {
+			sample := ch.oscillator.NextSample()
+			buffer[i] = sample
+		} else {
+			buffer[i] = 0
+		}
+		s.channels[0] = ch
 	}
-
-	return len(b), nil
 }
 
-func (s *Synthesizer) Sfx(sfxNo int, channel Channel, offset, length int) {
+func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
 	fmt.Println("Sfx is not implemented yet. Sorry...")
+
+	if ch < 0 || ch > Channel3 {
+		return
+	}
+
+	s.channels[ch].playing = true
+	s.channels[ch].oscillator.Func = internal.Organ
+	s.channels[ch].oscillator.FreqHz = 440
 }
 
 func (s *Synthesizer) Music(patterNo int, fadeMs int, channelMask byte) {
@@ -241,4 +255,11 @@ func boolToByte(b bool) byte {
 	}
 
 	return 0
+}
+
+type channel struct {
+	sfxNo      int     //nolint
+	offset     float64 // time offset in seconds //nolint
+	oscillator internal.Oscillator
+	playing    bool
 }
