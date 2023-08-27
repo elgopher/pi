@@ -210,7 +210,7 @@ func TestSynthesizer_Read(t *testing.T) {
 	})
 }
 
-//go:embed "valid-save"
+//go:embed "internal/valid-save"
 var validSave []byte
 
 func TestSynthesizer_Save(t *testing.T) {
