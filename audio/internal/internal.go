@@ -5,4 +5,16 @@ package internal
 
 const (
 	SampleRate = 22050
+	Channels   = 4
 )
+
+type Samples [Channels]float64
+
+func (s Samples) Sum() float64 {
+	sum := 0.0
+	for _, channelSample := range s {
+		sum += channelSample
+	}
+
+	return sum
+}

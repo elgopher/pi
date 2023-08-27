@@ -5,6 +5,7 @@ package audio_test
 
 import (
 	_ "embed"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,6 +17,7 @@ import (
 const (
 	maxSfxNo     = 63
 	maxPatternNo = 63
+	maxChannels  = 4
 )
 
 var (
@@ -268,37 +270,7 @@ func TestSynthesizer_ReadSamples(t *testing.T) {
 		s := audio.Synthesizer{}
 		buffer := []float64{1, 2, 3, 4}
 		s.ReadSamples(buffer)
-		assert.Equal(t, make([]float64, len(buffer)), buffer, "buffer should have zeroes only")
-	})
-
-	t.Run("should generate samples after Sfx is called", func(t *testing.T) {
-		s := audio.Synthesizer{}
-		const bufferSize = 4
-		buffer := make([]float64, bufferSize)
-
-		s.SetSfx(0, audio.SoundEffect{
-			Notes: [32]audio.Note{
-				{
-					Pitch:      audio.PitchC4,
-					Instrument: audio.InstrumentOrgan,
-					Volume:     7,
-				},
-			},
-			Speed: 1,
-		})
-		s.Sfx(0, audio.Channel0, 0, 1)
-		// when
-		s.ReadSamples(buffer)
-		// then
-		for _, f := range buffer {
-			assert.NotZero(t, f)
-		}
-		// and all values different
-		current := buffer[0]
-		for i := 1; i < len(buffer); i++ {
-			assert.NotEqual(t, current, buffer[i])
-			current = buffer[i]
-		}
+		assertSilence(t, buffer)
 	})
 }
 
@@ -317,10 +289,81 @@ func TestSynthesizer_Sfx(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("should play sound on a given channel", func(t *testing.T) {
+		for channelNo := 0; channelNo < maxChannels; channelNo++ {
+			testName := fmt.Sprintf("channel %d", channelNo)
+
+			t.Run(testName, func(t *testing.T) {
+				s := audio.Synthesizer{}
+				s.SetSfx(0, validEffect)
+
+				buffer := make([]float64, 32)
+				// when
+				s.Sfx(0, audio.Channel(channelNo), 0, 1)
+				// then
+				s.ReadSamples(buffer)
+				assertAllValuesDifferent(t, buffer)
+			})
+		}
+	})
+
+	t.Run("should sum samples from all channels", func(t *testing.T) {
+		s := audio.Synthesizer{}
+		s.SetSfx(0, validEffect)
+		singleChannelBuffer := make([]float64, 1)
+		s.Sfx(0, audio.Channel0, 0, 1)
+		s.ReadSamples(singleChannelBuffer)
+
+		s = audio.Synthesizer{}
+		s.SetSfx(0, validEffect)
+		// when
+		for ch := 0; ch < maxChannels; ch++ {
+			s.Sfx(0, audio.Channel(ch), 0, 1)
+		}
+		// then
+		allChannelBuffer := make([]float64, 1)
+		s.ReadSamples(allChannelBuffer)
+
+		expectedSample := singleChannelBuffer[0] * maxChannels
+		assert.InDelta(t, expectedSample, allChannelBuffer[0], 0.0000001)
+	})
+
+	t.Run("should stop playing on a given channel", func(t *testing.T) {
+		for channelNo := audio.Channel(0); channelNo < maxChannels; channelNo++ {
+			testName := fmt.Sprintf("channel %d", channelNo)
+
+			t.Run(testName, func(t *testing.T) {
+				s := audio.Synthesizer{}
+				s.SetSfx(0, validEffect)
+				s.Sfx(0, channelNo, 0, 31)
+				s.ReadSamples(make([]float64, 1))
+				// when
+				s.Sfx(-1, channelNo, 0, 0)
+				// then
+				buffer := make([]float64, 16)
+				s.ReadSamples(buffer)
+				assertSilence(t, buffer)
+			})
+		}
+	})
 }
 
 func clone(s []byte) []byte {
 	cloned := make([]byte, len(s))
 	copy(cloned, s)
 	return cloned
+}
+
+func assertSilence(t *testing.T, buffer []float64) {
+	zeroBuffer := make([]float64, len(buffer))
+	assert.Equal(t, zeroBuffer, buffer, "buffer should have zeroes only (silence)")
+}
+
+func assertAllValuesDifferent(t *testing.T, buffer []float64) {
+	current := buffer[0]
+	for i := 1; i < len(buffer); i++ {
+		require.NotEqualf(t, current, buffer[i], "adjacent buffer values at %d and %d are the same but should be different", i-1, i)
+		current = buffer[i]
+	}
 }
