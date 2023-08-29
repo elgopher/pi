@@ -5,6 +5,7 @@ package ebitengine
 
 import (
 	"fmt"
+	"math"
 	"sync"
 	"time"
 
@@ -65,7 +66,6 @@ func startAudio() (stop func(), _ error) {
 	if err != nil {
 		return func() {}, err
 	}
-	player.SetBufferSize(60 * time.Millisecond)
 	player.Play()
 
 	return func() {
@@ -84,6 +84,7 @@ type ebitenPlayerSource struct {
 		ReadSamples(p []float64)
 	}
 
+	lastTimeAsked  time.Time
 	singleSample   []byte    // singleSample in Ebitengine format - first two bytes left channel, next two bytes right
 	remainingBytes int       // number of bytes from singleSample still not copied to p
 	floatBuffer    []float64 // reused buffer to avoid allocation on each Read request
@@ -100,10 +101,6 @@ func (e *ebitenPlayerSource) Read(p []byte) (int, error) {
 		sampleLen   = channelCount * uint16Bytes
 	)
 
-	if len(p) == 0 {
-		return 0, nil
-	}
-
 	if e.remainingBytes > 0 {
 		n := copy(p, e.singleSample[sampleLen-e.remainingBytes:])
 		e.remainingBytes = 0
@@ -112,6 +109,29 @@ func (e *ebitenPlayerSource) Read(p []byte) (int, error) {
 
 	if e.singleSample == nil {
 		e.singleSample = make([]byte, sampleLen)
+	}
+
+	// first calculate how many samples should be generated till now
+	now := time.Now()
+	var elapsedSeconds float64
+
+	zeroTime := time.Time{}
+	if e.lastTimeAsked == zeroTime {
+		elapsedSeconds = 0.0
+	} else {
+		elapsedSeconds = now.Sub(e.lastTimeAsked).Seconds()
+	}
+	e.lastTimeAsked = now
+
+	bufferSizeNeeded := int(math.Ceil(elapsedSeconds * audioSampleRate * sampleLen))
+	if bufferSizeNeeded < len(p) {
+		fmt.Println("truncating buffer", now.UnixMilli(), len(p), bufferSizeNeeded, elapsedSeconds)
+		p = p[:bufferSizeNeeded]
+		// if buffer was truncated to 0 then Ebitengine will sleep 1ms
+	}
+
+	if len(p) == 0 {
+		return 0, nil
 	}
 
 	samples := len(p) / sampleLen
