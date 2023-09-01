@@ -39,7 +39,7 @@ var AudioStream interface {
 	Read(p []byte) (n int, err error)
 }
 
-func startAudio() (stop func(), _ error) {
+func startAudio() (stop func(), ready <-chan struct{}, _ error) {
 	if AudioStream == nil {
 		// In the web back-end, Audio Worklets will be used. In the beginning, state will be stored to binary form
 		// and sent over the MessageChannel to processor. Each call to System methods will send events to processor
@@ -48,11 +48,11 @@ func startAudio() (stop func(), _ error) {
 
 		state, err := audio.SaveAudio()
 		if err != nil {
-			return stop, fmt.Errorf("problem saving audio state: %w", err)
+			return stop, nil, fmt.Errorf("problem saving audio state: %w", err)
 		}
 		synth := &audio.Synthesizer{}
 		if err = synth.Load(state); err != nil {
-			return stop, fmt.Errorf("problem loading audio state: %w", err)
+			return stop, nil, fmt.Errorf("problem loading audio state: %w", err)
 		}
 
 		audioSystem := &ebitenPlayerSource{audioSystem: synth}
@@ -63,14 +63,25 @@ func startAudio() (stop func(), _ error) {
 	audioCtx := ebitenaudio.NewContext(audioSampleRate)
 	player, err := audioCtx.NewPlayer(AudioStream)
 	if err != nil {
-		return func() {}, err
+		return func() {}, nil, err
 	}
 	player.SetBufferSize(60 * time.Millisecond)
 	player.Play()
 
+	readyChan := make(chan struct{})
+	go func() {
+		for {
+			if audioCtx.IsReady() {
+				close(readyChan)
+				return
+			}
+			time.Sleep(time.Millisecond)
+		}
+	}()
+
 	return func() {
 		_ = player.Close()
-	}, nil
+	}, readyChan, nil
 }
 
 // ebitenPlayerSource implements Ebitengine Player source.

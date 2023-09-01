@@ -4,6 +4,8 @@
 package ebitengine
 
 import (
+	_ "embed"
+	"sync/atomic"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -13,12 +15,17 @@ import (
 )
 
 type game struct {
+	ready              atomic.Bool
 	screenDataRGBA     []byte // reused RGBA pixels
 	screenChanged      bool
 	shouldSkipNextDraw bool
 }
 
 func (e *game) Update() error {
+	if !e.ready.Load() {
+		return nil
+	}
+
 	updateStartedTime := time.Now()
 
 	updateTime()
@@ -65,6 +72,11 @@ func handleKeyboardShortcuts() {
 }
 
 func (e *game) Draw(screen *ebiten.Image) {
+	if !e.ready.Load() {
+		e.drawNotReady(screen)
+		return
+	}
+
 	// Ebitengine executes Draw based on display frequency.
 	// But the screen is changed at most 30 times per second.
 	// That's why there is no need to write pixels more often
