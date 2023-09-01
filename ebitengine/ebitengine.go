@@ -5,6 +5,7 @@
 package ebitengine
 
 import (
+	_ "embed"
 	"errors"
 	"fmt"
 	"math"
@@ -22,7 +23,7 @@ const tps = 30
 // Run opens the window and runs the game loop. It must be
 // called from the main thread.
 func Run() error {
-	stopAudio, err := startAudio()
+	stopAudio, audioReady, err := startAudio()
 	if err != nil {
 		return err
 	}
@@ -42,7 +43,14 @@ func Run() error {
 	ebiten.SetWindowFloating(true)
 	ebiten.SetWindowTitle("Pi Game")
 
-	if err := ebiten.RunGame(&game{}); err != nil {
+	theGame := &game{}
+
+	go func() {
+		<-audioReady
+		theGame.ready.Store(true)
+	}()
+
+	if err := ebiten.RunGame(theGame); err != nil {
 		if err == gameStoppedErr {
 			return nil
 		}
