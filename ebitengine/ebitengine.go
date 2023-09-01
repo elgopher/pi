@@ -39,7 +39,8 @@ func Run() error {
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowSize(screen.Width()*scale(), screen.Height()*scale())
 	ebiten.SetWindowSizeLimits(screen.Width(), screen.Height(), -1, -1)
-	ebiten.SetCursorMode(ebiten.CursorModeHidden)
+	ebiten.SetCursorMode(ebiten.CursorModeVisible)
+	ebiten.SetCursorShape(ebiten.CursorShapePointer)
 	ebiten.SetWindowFloating(true)
 	ebiten.SetWindowTitle("Pi Game")
 
@@ -48,6 +49,7 @@ func Run() error {
 	go func() {
 		<-audioReady
 		theGame.ready.Store(true)
+		ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	}()
 
 	if err := ebiten.RunGame(theGame); err != nil {
