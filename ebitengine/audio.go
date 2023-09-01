@@ -158,13 +158,6 @@ func (e *ebitenPlayerSource) ensureFloatBufferIsBigEnough(size int) {
 	}
 }
 
-func (e *ebitenPlayerSource) ReadSamples(b []float64) {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
-	e.audioSystem.ReadSamples(b)
-}
-
 func (e *ebitenPlayerSource) Sfx(sfxNo int, channel audio.Channel, offset, length int) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
