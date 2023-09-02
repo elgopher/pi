@@ -61,18 +61,22 @@ func startAudio() (stop func(), ready <-chan struct{}, _ error) {
 	}
 
 	audioCtx := ebitenaudio.NewContext(audioSampleRate)
+
 	player, err := audioCtx.NewPlayer(AudioStream)
 	if err != nil {
 		return func() {}, nil, err
 	}
 	player.SetBufferSize(60 * time.Millisecond)
-	player.Play()
 
 	readyChan := make(chan struct{})
+
 	go func() {
 		for {
 			if audioCtx.IsReady() {
 				close(readyChan)
+
+				player.Play()
+
 				return
 			}
 			time.Sleep(time.Millisecond)
