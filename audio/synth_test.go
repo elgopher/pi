@@ -479,6 +479,26 @@ func TestSynthesizer_Sfx(t *testing.T) {
 		// then
 		assert.True(t, dominantFrequency(buffer1) < dominantFrequency(buffer2), "frequency of pitch C1 must be smaller than D#5")
 	})
+
+	t.Run("should generate different wave when second note has a different instrument", func(t *testing.T) {
+		e := audio.SoundEffect{
+			Notes: [32]audio.Note{
+				{Instrument: audio.InstrumentTriangle, Volume: audio.VolumeLoudest},
+				{Instrument: audio.InstrumentSaw, Volume: audio.VolumeLoudest},
+			},
+			Speed: 32,
+		}
+		synth := audio.Synthesizer{}
+		synth.SetSfx(0, e)
+		synth.Sfx(0, 0, 0, 31)
+		buffer1 := make([]float64, 32*durationOfNoteWhenSpeedIsOne)
+		synth.ReadSamples(buffer1)
+		buffer2 := make([]float64, 32*durationOfNoteWhenSpeedIsOne)
+		// when
+		synth.ReadSamples(buffer2)
+		// then
+		assertDifferentShape(t, buffer1, buffer2)
+	})
 }
 
 func clone(s []byte) []byte {
@@ -561,4 +581,36 @@ func hfft(input []float64, freqs []complex128, n, step int) {
 		e := cmplx.Rect(1, a) * freqs[k+h]
 		freqs[k], freqs[k+h] = freqs[k]+e, freqs[k]-e
 	}
+}
+
+func assertDifferentShape(t *testing.T, buffer1, buffer2 []float64) {
+	dtw := dtwDistance(buffer1, buffer2)
+	assert.Truef(t, dtw >= 30.00, "Waves should have different shape, but dtw distance = %f. Must be >= 30.00", dtw)
+}
+
+// dtwDistance calculates dynamic time warping distance between two signals
+func dtwDistance(signal1, signal2 []float64) float64 {
+	len1, len2 := len(signal1), len(signal2)
+	dtw := make([][]float64, len1+1)
+	for i := range dtw {
+		dtw[i] = make([]float64, len2+1)
+	}
+
+	for i := 1; i <= len1; i++ {
+		for j := 1; j <= len2; j++ {
+			cost := math.Abs(signal1[i-1] - signal2[j-1])
+			dtw[i][j] = cost + min3(dtw[i-1][j], dtw[i][j-1], dtw[i-1][j-1])
+		}
+	}
+
+	return dtw[len1][len2]
+}
+
+func min3(a, b, c float64) float64 {
+	if a <= b && a <= c {
+		return a
+	} else if b <= a && b <= c {
+		return b
+	}
+	return c
 }

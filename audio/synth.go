@@ -51,7 +51,7 @@ func (s *Synthesizer) ReadSamples(buffer []float64) {
 					if ch.noteNo == len(sfx.Notes) {
 						ch.playing = false
 					} else {
-						//ch.oscillator.Func = oscillatorFunc(sfx.Notes[ch.noteNo].Instrument)
+						ch.oscillator.Func = oscillatorFunc(sfx.Notes[ch.noteNo].Instrument)
 						ch.oscillator.FreqHz = pitchToFreq(sfx.Notes[ch.noteNo].Pitch)
 					}
 				}
