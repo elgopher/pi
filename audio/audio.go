@@ -19,7 +19,9 @@ package audio
 //
 // offset is the note position to start playing (0-31). Offset is clamped to [0,31].
 //
-// length is the number of notes to play (1-32). Length <= 0 is automatically updated to 32.
+// length is the number of notes to play. If length <= 0 and sfx has no loop
+// then entire sfx is played. If length < sfx length then only fraction of sfx is
+// played. If length <= 0 and sfx has loop then sfx is played infinitely.
 func Sfx(sfxNo int, channel Channel, offset, length int) {
 	system.Sfx(sfxNo, channel, offset, length)
 }
@@ -116,6 +118,14 @@ type SoundEffect struct {
 	Dampen    byte // 0 (disabled), 1 or 2
 	Noiz      bool
 	Buzz      bool
+}
+
+func (s SoundEffect) noteAt(no int) Note {
+	var note Note
+	if no < len(s.Notes) {
+		note = s.Notes[no]
+	}
+	return note
 }
 
 type Note struct {
