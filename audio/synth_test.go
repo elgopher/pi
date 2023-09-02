@@ -304,6 +304,7 @@ func TestSynthesizer_Sfx(t *testing.T) {
 				s.Sfx(0, audio.Channel(channelNo), 0, 1)
 				// then
 				s.ReadSamples(buffer)
+				assertAllValuesBetween(t, -1.0, 1.0, buffer)
 				assertAllValuesDifferent(t, buffer)
 			})
 		}
@@ -324,6 +325,7 @@ func TestSynthesizer_Sfx(t *testing.T) {
 
 		expectedSample := singleChannelBuffer[0] * maxChannels
 		assert.InDelta(t, expectedSample, allChannelBuffer[0], 0.0000001)
+		assertAllValuesBetween(t, -4.0, 4.0, allChannelBuffer)
 	})
 
 	t.Run("should stop playing on a given channel", func(t *testing.T) {
@@ -488,4 +490,10 @@ func generateSamples(e audio.SoundEffect, bufferSize int) []float64 {
 	buffer := make([]float64, bufferSize)
 	synth.ReadSamples(buffer)
 	return buffer
+}
+
+func assertAllValuesBetween(t *testing.T, minInclusive, maxInclusive float64, buffer []float64) {
+	for i, b := range buffer {
+		require.Truef(t, b >= minInclusive && b <= maxInclusive, "buffer[%d] is not between [%f,%f]", i, minInclusive, maxInclusive)
+	}
 }
