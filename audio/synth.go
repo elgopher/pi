@@ -59,11 +59,11 @@ func (c *channel) readSample(sfx SoundEffect) float64 {
 
 	var sample float64
 
-	volume := float64(sfx.Notes[c.noteNo].Volume) / 7
+	volume := float64(sfx.noteAt(c.noteNo).Volume) / 7
 	sample = c.oscillator.NextSample() * volume
 
-	c.sampleNo += 1
-	noteHasEnded := c.sampleNo == c.noteEndSample
+	c.frame += 1
+	noteHasEnded := c.frame == c.noteEndFrame
 	if noteHasEnded {
 		c.moveToNextNote(sfx)
 	}
@@ -72,16 +72,23 @@ func (c *channel) readSample(sfx SoundEffect) float64 {
 }
 
 func (c *channel) moveToNextNote(sfx SoundEffect) {
+	c.notesToGo--
 	c.noteNo++
 
-	if c.noteNo == c.lastNoteNo {
+	if c.noteNo == int(sfx.LoopStop) {
+		c.noteNo = int(sfx.LoopStart)
+	}
+
+	maxLenReached := sfx.LoopStop == 0 && int(sfx.LoopStart) == c.noteNo
+	if c.notesToGo == 0 || maxLenReached {
 		c.playing = false
 		return
 	}
 
-	c.noteEndSample += singleNoteSamples(sfx.Speed)
+	c.noteEndFrame += singleNoteSamples(sfx.Speed)
 
-	note := sfx.Notes[c.noteNo]
+	note := sfx.noteAt(c.noteNo)
+
 	c.oscillator.Func = oscillatorFunc(note.Instrument)
 	c.oscillator.FreqHz = pitchToFreq(note.Pitch)
 }
@@ -100,19 +107,15 @@ func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
 
 	offset = pi.MidInt(offset, 0, 31)
 
-	if length <= 0 {
-		length = 32
-	}
-
 	s.channels[ch].playing = true
 
 	sfx := s.GetSfx(sfxNo)
 
-	s.channels[ch].sampleNo = 0
+	s.channels[ch].frame = 0
 	s.channels[ch].noteNo = offset
-	s.channels[ch].lastNoteNo = length
+	s.channels[ch].notesToGo = length
 
-	s.channels[ch].noteEndSample = singleNoteSamples(sfx.Speed)
+	s.channels[ch].noteEndFrame = singleNoteSamples(sfx.Speed)
 
 	note0 := sfx.Notes[offset]
 	s.channels[ch].oscillator.Func = oscillatorFunc(note0.Instrument)
@@ -323,11 +326,11 @@ func boolToByte(b bool) byte {
 }
 
 type channel struct {
-	sfxNo         int
-	noteNo        int
-	lastNoteNo    int
-	sampleNo      int
-	noteEndSample int
-	oscillator    internal.Oscillator
-	playing       bool
+	sfxNo        int
+	noteNo       int
+	notesToGo    int
+	frame        int
+	noteEndFrame int
+	oscillator   internal.Oscillator
+	playing      bool
 }
