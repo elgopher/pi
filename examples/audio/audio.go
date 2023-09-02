@@ -10,9 +10,9 @@ func main() {
 	sfx := audio.SoundEffect{
 		Notes: [32]audio.Note{
 			{
-				Pitch:      audio.PitchC1,
+				Pitch:      audio.PitchC2,
 				Instrument: audio.InstrumentTriangle,
-				Volume:     1,
+				Volume:     4,
 			},
 		},
 		Speed: 255,
@@ -21,28 +21,28 @@ func main() {
 
 	pi.Update = func() {
 		if pi.Btnp(pi.X) {
-			audio.Sfx(0, audio.Channel0, 0, 31)
+			audio.Sfx(0, audio.Channel0, 0, 0)
 		}
 
 		if pi.Btnp(pi.Up) && sfx.Notes[0].Pitch < 255 {
 			sfx.Notes[0].Pitch += 1
 			audio.SetSfx(0, sfx)
-			audio.Sfx(0, audio.Channel0, 0, 31)
+			audio.Sfx(0, audio.Channel0, 0, 0)
 		}
 		if pi.Btnp(pi.Down) && sfx.Notes[0].Pitch > 0 {
 			sfx.Notes[0].Pitch -= 1
 			audio.SetSfx(0, sfx)
-			audio.Sfx(0, audio.Channel0, 0, 31)
+			audio.Sfx(0, audio.Channel0, 0, 0)
 		}
 		if pi.Btnp(pi.Right) && sfx.Notes[0].Instrument < audio.InstrumentOrgan {
 			sfx.Notes[0].Instrument += 1
 			audio.SetSfx(0, sfx)
-			audio.Sfx(0, audio.Channel0, 0, 31)
+			audio.Sfx(0, audio.Channel0, 0, 0)
 		}
 		if pi.Btnp(pi.Left) && sfx.Notes[0].Instrument > 0 {
 			sfx.Notes[0].Instrument -= 1
 			audio.SetSfx(0, sfx)
-			audio.Sfx(0, audio.Channel0, 0, 31)
+			audio.Sfx(0, audio.Channel0, 0, 0)
 		}
 	}
 

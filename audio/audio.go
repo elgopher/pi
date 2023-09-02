@@ -19,7 +19,7 @@ package audio
 //
 // offset is the note position to start playing (0-31). Offset is clamped to [0,31].
 //
-// length is the number of notes to play (0-31).
+// length is the number of notes to play (1-32). Length <= 0 is automatically updated to 32.
 func Sfx(sfxNo int, channel Channel, offset, length int) {
 	system.Sfx(sfxNo, channel, offset, length)
 }
