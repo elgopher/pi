@@ -29,7 +29,7 @@ type Synthesizer struct {
 // which is 23ms of audio.
 //
 // Values written to the buffer are usually in range between -1.0 and 1.0, but sometimes they can exceed the range
-// (for example due to audio channels summing).
+// (for example due to audio channels summing). Min is -4.0, max is 4.0 inclusive.
 func (s *Synthesizer) ReadSamples(buffer []float64) {
 	if len(buffer) == 0 {
 		return
@@ -41,7 +41,7 @@ func (s *Synthesizer) ReadSamples(buffer []float64) {
 		for channelIdx, ch := range s.channels {
 			if ch.playing {
 				sfx := s.GetSfx(ch.sfxNo)
-				volume := float64(sfx.Notes[ch.noteNo].Volume)
+				volume := float64(sfx.Notes[ch.noteNo].Volume) / 7
 				samples[channelIdx] = ch.oscillator.NextSample() * volume
 				ch.sampleNo += 1
 				noteHasEnded := ch.sampleNo == ch.noteEndSample
