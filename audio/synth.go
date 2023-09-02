@@ -74,7 +74,7 @@ func (c *channel) readSample(sfx SoundEffect) float64 {
 func (c *channel) moveToNextNote(sfx SoundEffect) {
 	c.noteNo++
 
-	if c.noteNo == len(sfx.Notes) {
+	if c.noteNo == c.lastNoteNo {
 		c.playing = false
 		return
 	}
@@ -100,12 +100,17 @@ func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
 
 	offset = pi.MidInt(offset, 0, 31)
 
+	if length <= 0 {
+		length = 32
+	}
+
 	s.channels[ch].playing = true
 
 	sfx := s.GetSfx(sfxNo)
 
 	s.channels[ch].sampleNo = 0
 	s.channels[ch].noteNo = offset
+	s.channels[ch].lastNoteNo = length
 
 	s.channels[ch].noteEndSample = singleNoteSamples(sfx.Speed)
 
@@ -320,6 +325,7 @@ func boolToByte(b bool) byte {
 type channel struct {
 	sfxNo         int
 	noteNo        int
+	lastNoteNo    int
 	sampleNo      int
 	noteEndSample int
 	oscillator    internal.Oscillator
