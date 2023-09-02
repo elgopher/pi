@@ -39,6 +39,8 @@ var AudioStream interface {
 	Read(p []byte) (n int, err error)
 }
 
+const playerBufferSize = 60 * time.Millisecond
+
 func startAudio() (stop func(), ready <-chan struct{}, _ error) {
 	if AudioStream == nil {
 		// In the web back-end, Audio Worklets will be used. In the beginning, state will be stored to binary form
@@ -55,7 +57,15 @@ func startAudio() (stop func(), ready <-chan struct{}, _ error) {
 			return stop, nil, fmt.Errorf("problem loading audio state: %w", err)
 		}
 
-		audioSystem := &ebitenPlayerSource{audioSystem: synth}
+		liveReader := &audio.LiveReader{
+			ReadSamplesFunc: synth.ReadSamples,
+			BufferSize:      playerBufferSize * (audio.SampleRate / audioSampleRate),
+			Now:             time.Now,
+		}
+		audioSystem := &ebitenPlayerSource{
+			audioSystem: synth,
+			readSamples: liveReader.ReadSamples,
+		}
 		audio.SetSystem(audioSystem) // make audio system concurrency-safe
 		AudioStream = audioSystem
 	}
@@ -66,7 +76,7 @@ func startAudio() (stop func(), ready <-chan struct{}, _ error) {
 	if err != nil {
 		return func() {}, nil, err
 	}
-	player.SetBufferSize(60 * time.Millisecond)
+	player.SetBufferSize(playerBufferSize)
 
 	readyChan := make(chan struct{})
 
@@ -94,10 +104,8 @@ func startAudio() (stop func(), ready <-chan struct{}, _ error) {
 // Therefore, it can be called concurrently by Ebitegine and the game loop.
 type ebitenPlayerSource struct {
 	mutex       sync.Mutex
-	audioSystem interface {
-		audio.System
-		ReadSamples(p []float64)
-	}
+	audioSystem audio.System
+	readSamples func(buf []float64) int
 
 	singleSample   []byte    // singleSample in Ebitengine format - first two bytes left channel, next two bytes right
 	remainingBytes int       // number of bytes from singleSample still not copied to p
@@ -112,7 +120,7 @@ func (e *ebitenPlayerSource) Read(p []byte) (int, error) {
 
 	const (
 		uint16Bytes = 2
-		sampleLen   = channelCount * uint16Bytes
+		sampleLen   = channelCount * uint16Bytes * (audioSampleRate / audio.SampleRate)
 	)
 
 	if len(p) == 0 {
@@ -139,7 +147,11 @@ func (e *ebitenPlayerSource) Read(p []byte) (int, error) {
 
 	bytesRead := 0
 
-	e.audioSystem.ReadSamples(e.floatBuffer[:samples])
+	samples = e.readSamples(e.floatBuffer[:samples])
+	if samples < 10 { // ebitengine asks too frequently. Slow him down
+		time.Sleep(playerBufferSize / 10)
+	}
+
 	for i := 0; i < samples; i++ {
 		floatSample := pi.Mid(e.floatBuffer[i], -1, 1)
 		sample := int16(floatSample * 0x7FFF) // actually the full int16 range is -0x8000 to 0x7FFF (therefore -0x8000 will never be returned)
@@ -147,6 +159,7 @@ func (e *ebitenPlayerSource) Read(p []byte) (int, error) {
 		e.singleSample[0] = byte(sample)
 		e.singleSample[1] = byte(sample >> 8)
 		copy(e.singleSample[2:], e.singleSample[:2]) // copy left to right channel
+		copy(e.singleSample[4:], e.singleSample[:4]) // duplicate frame, because Ebitengine is using 44100, but Pi 22050
 
 		copiedBytes := copy(p, e.singleSample)
 		p = p[copiedBytes:]
