@@ -12,7 +12,7 @@ import (
 	"github.com/elgopher/pi/audio"
 )
 
-const frameDuration = time.Second / audio.SampleRate
+const sampleDuration = time.Second / audio.SampleRate
 
 func TestLiveReader_ReadSamples(t *testing.T) {
 	t.Run("should not read anything on first call", func(t *testing.T) {
@@ -33,7 +33,7 @@ func TestLiveReader_ReadSamples(t *testing.T) {
 	t.Run("should read one sample", func(t *testing.T) {
 		c := newClock()
 		r := prepareLiveReader(c)
-		c.advance(frameDuration)
+		c.advance(sampleDuration)
 		buf := make([]float64, 1)
 		// when
 		n := r.ReadSamples(buf)
@@ -45,7 +45,7 @@ func TestLiveReader_ReadSamples(t *testing.T) {
 	t.Run("should read two samples", func(t *testing.T) {
 		c := newClock()
 		r := prepareLiveReader(c)
-		c.advance(2 * frameDuration)
+		c.advance(2 * sampleDuration)
 		buf := make([]float64, 2)
 		// when
 		n := r.ReadSamples(buf)
@@ -57,7 +57,7 @@ func TestLiveReader_ReadSamples(t *testing.T) {
 	t.Run("should read only one sample even though buffer is bigger because its to early", func(t *testing.T) {
 		c := newClock()
 		r := prepareLiveReader(c)
-		c.advance(frameDuration) // only one frame elapsed, so only one sample will be read
+		c.advance(sampleDuration) // only one sample elapsed, so only one sample will be read
 		buf := make([]float64, 2)
 		// when
 		n := r.ReadSamples(buf)
@@ -69,7 +69,7 @@ func TestLiveReader_ReadSamples(t *testing.T) {
 	t.Run("should read samples up to the buffer size", func(t *testing.T) {
 		c := newClock()
 		r := prepareLiveReader(c)
-		c.advance(2 * frameDuration) // two frames elapsed, but buffer is not big enough to read all
+		c.advance(2 * sampleDuration) // two samples elapsed, but buffer is not big enough to read all
 		buf := make([]float64, 1)
 		// when
 		n := r.ReadSamples(buf)
@@ -81,7 +81,7 @@ func TestLiveReader_ReadSamples(t *testing.T) {
 	t.Run("should read all samples in two calls", func(t *testing.T) {
 		c := newClock()
 		r := prepareLiveReader(c)
-		c.advance(2 * frameDuration) // two frames elapsed, but buffer is not big enough to read all
+		c.advance(2 * sampleDuration) // two samples elapsed, but buffer is not big enough to read all
 		buf := make([]float64, 1)
 		r.ReadSamples(buf)
 		// when
@@ -94,7 +94,7 @@ func TestLiveReader_ReadSamples(t *testing.T) {
 	t.Run("should not read anything when its to early and previously samples were read", func(t *testing.T) {
 		c := newClock()
 		r := prepareLiveReader(c)
-		c.advance(frameDuration)
+		c.advance(sampleDuration)
 		r.ReadSamples(make([]float64, 1))
 		buf := make([]float64, 1)
 		// when
@@ -104,10 +104,10 @@ func TestLiveReader_ReadSamples(t *testing.T) {
 		assertSilence(t, buf)
 	})
 
-	t.Run("should drop frame when its too late", func(t *testing.T) {
+	t.Run("should drop sample when its too late", func(t *testing.T) {
 		c := newClock()
-		r := prepareLiveReaderWithBufferSize(c, frameDuration)
-		c.advance(2 * frameDuration) // advance two frames, but because buffer size is one frame then first frame will be dropped
+		r := prepareLiveReaderWithBufferSize(c, sampleDuration)
+		c.advance(2 * sampleDuration) // advance two samples, but because buffer size is one sample then first sample will be dropped
 		buf := make([]float64, 1)
 		// when
 		n := r.ReadSamples(buf)
@@ -116,10 +116,24 @@ func TestLiveReader_ReadSamples(t *testing.T) {
 		assert.Equal(t, []float64{2}, buf)
 	})
 
-	t.Run("should drop huge number of frames", func(t *testing.T) {
+	t.Run("should continue reading samples after dropping some", func(t *testing.T) {
 		c := newClock()
-		r := prepareLiveReaderWithBufferSize(c, frameDuration)
-		c.advance(65537 * frameDuration) // 65536 frames to drop
+		r := prepareLiveReaderWithBufferSize(c, sampleDuration)
+		c.advance(2 * sampleDuration)     // advance two samples, but because buffer size is one sample then first sample will be dropped
+		r.ReadSamples(make([]float64, 1)) // sample = 2
+		buf := make([]float64, 1)
+		c.advance(sampleDuration)
+		// when
+		n := r.ReadSamples(buf) // should read sample = 3 (should not drop any more samples)
+		// then
+		assert.Equal(t, 1, n)
+		assert.Equal(t, []float64{3}, buf)
+	})
+
+	t.Run("should drop huge number of samples", func(t *testing.T) {
+		c := newClock()
+		r := prepareLiveReaderWithBufferSize(c, sampleDuration)
+		c.advance(65537 * sampleDuration) // 65536 samples to drop
 		buf := make([]float64, 1)
 		// when
 		n := r.ReadSamples(buf)
