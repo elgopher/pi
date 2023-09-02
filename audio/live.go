@@ -11,17 +11,17 @@ import (
 	"github.com/elgopher/pi/audio/internal"
 )
 
-const frameDuration = time.Second / internal.SampleRate
+const sampleDuration = time.Second / internal.SampleRate
 
 // LiveReader is used by backend to read samples live taking into consideration current time.
-// It drops frames when ReadSamples was called too late, and limits how much frames can be read.
+// It drops samples when ReadSamples was called too late, and limits how much samples can be read.
 type LiveReader struct {
 	BufferSize      time.Duration
 	ReadSamplesFunc func([]float64)
 	Now             func() time.Time
 
 	started      time.Time
-	lastFrame    int
+	lastSample   int
 	reusedBuffer []float64
 }
 
@@ -33,33 +33,35 @@ func (l *LiveReader) ReadSamples(buf []float64) int {
 		return 0
 	}
 
-	maxRealFrame := int(now.Sub(l.started) / frameDuration)
-	maxCallerFrame := l.lastFrame + len(buf)
-	maxFrame := pi.MinInt(maxRealFrame, maxCallerFrame)
+	maxRealSample := int(now.Sub(l.started) / sampleDuration)
+	maxCallerSample := l.lastSample + len(buf)
 
-	framesToDrop := maxRealFrame - maxCallerFrame - int(l.BufferSize/frameDuration) + 1
-	if framesToDrop > 0 {
-		l.dropFrames(framesToDrop)
+	maxSample := pi.MinInt(maxRealSample, maxCallerSample)
+	samplesToRead := maxSample - l.lastSample
+
+	samplesToDrop := maxRealSample - maxCallerSample - int(l.BufferSize/sampleDuration) + 1
+	if samplesToDrop > 0 {
+		l.dropSamples(samplesToDrop)
+		maxSample += samplesToDrop
 	}
 
-	n := maxFrame - l.lastFrame
-	l.ReadSamplesFunc(buf[:n])
+	l.ReadSamplesFunc(buf[:samplesToRead])
 
-	l.lastFrame = maxFrame
+	l.lastSample = maxSample
 
-	return n
+	return samplesToRead
 }
 
-func (l *LiveReader) dropFrames(framesToDrop int) {
-	fmt.Printf("dropping %d audio frames\n", framesToDrop)
+func (l *LiveReader) dropSamples(samplesToDrop int) {
+	fmt.Printf("dropping %d audio samples\n", samplesToDrop)
 
 	if l.reusedBuffer == nil {
 		l.reusedBuffer = make([]float64, 1024)
 	}
 
-	for framesToDrop > 0 {
-		n := pi.MinInt(framesToDrop, len(l.reusedBuffer))
+	for samplesToDrop > 0 {
+		n := pi.MinInt(samplesToDrop, len(l.reusedBuffer))
 		l.ReadSamplesFunc(l.reusedBuffer[:n])
-		framesToDrop -= n
+		samplesToDrop -= n
 	}
 }
