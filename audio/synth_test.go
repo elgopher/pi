@@ -6,6 +6,8 @@ package audio_test
 import (
 	_ "embed"
 	"fmt"
+	"math"
+	"math/cmplx"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -455,7 +457,27 @@ func TestSynthesizer_Sfx(t *testing.T) {
 		// then
 		buffer2 := make([]float64, len(e.Notes)*durationOfNoteWhenSpeedIsOne)
 		synth.ReadSamples(buffer2)
-		// no assertion because generated samples are different because of phase shift
+		assert.True(t, dominantFrequency(buffer1) == dominantFrequency(buffer2), "frequency should be the same")
+	})
+
+	t.Run("should change oscillator frequency when second note has different pitch", func(t *testing.T) {
+		e := audio.SoundEffect{
+			Notes: [32]audio.Note{
+				{Pitch: audio.PitchC0, Volume: audio.VolumeLoudest},
+				{Pitch: audio.PitchDs5, Volume: audio.VolumeLoudest},
+			},
+			Speed: 255,
+		}
+		synth := audio.Synthesizer{}
+		synth.SetSfx(0, e)
+		synth.Sfx(0, 0, 0, 31)
+		buffer1 := make([]float64, 255*durationOfNoteWhenSpeedIsOne)
+		synth.ReadSamples(buffer1)
+		buffer2 := make([]float64, 255*durationOfNoteWhenSpeedIsOne)
+		// when
+		synth.ReadSamples(buffer2)
+		// then
+		assert.True(t, dominantFrequency(buffer1) < dominantFrequency(buffer2), "frequency of pitch C1 must be smaller than D#5")
 	})
 }
 
@@ -495,5 +517,48 @@ func generateSamples(e audio.SoundEffect, bufferSize int) []float64 {
 func assertAllValuesBetween(t *testing.T, minInclusive, maxInclusive float64, buffer []float64) {
 	for i, b := range buffer {
 		require.Truef(t, b >= minInclusive && b <= maxInclusive, "buffer[%d] is not between [%f,%f]", i, minInclusive, maxInclusive)
+	}
+}
+
+func dominantFrequency(input []float64) int {
+	maxAmplitude := 0.0
+	dominantFrequencyIndex := 0
+
+	for i, value := range fft(input) {
+		amplitude := cmplx.Abs(value)
+		if amplitude > maxAmplitude {
+			maxAmplitude = amplitude
+			dominantFrequencyIndex = i
+		}
+	}
+
+	return int(
+		float64(dominantFrequencyIndex) * audio.SampleRate / float64(len(input)),
+	)
+}
+
+// fft runs Fast Fourier Transform on given input.
+func fft(input []float64) []complex128 {
+	freqs := make([]complex128, len(input))
+	hfft(input, freqs, len(input), 1)
+	return freqs
+}
+
+// code by Dylan Meeus, from GoAudio library: https://github.com/DylanMeeus/GoAudio
+func hfft(input []float64, freqs []complex128, n, step int) {
+	if n == 1 {
+		freqs[0] = complex(input[0], 0)
+		return
+	}
+
+	h := n / 2
+
+	hfft(input, freqs, h, 2*step)
+	hfft(input[step:], freqs[h:], h, 2*step)
+
+	for k := 0; k < h; k++ {
+		a := -2 * math.Pi * float64(k) * float64(n)
+		e := cmplx.Rect(1, a) * freqs[k+h]
+		freqs[k], freqs[k+h] = freqs[k]+e, freqs[k]-e
 	}
 }
