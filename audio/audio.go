@@ -17,7 +17,7 @@ package audio
 // channel automatically. Channel=-2 stops playing the given sound effect
 // on any channel. See pi.Channel.
 //
-// offset is the note position to start playing (0-31).
+// offset is the note position to start playing (0-31). Offset is clamped to [0,31].
 //
 // length is the number of notes to play (0-31).
 func Sfx(sfxNo int, channel Channel, offset, length int) {
