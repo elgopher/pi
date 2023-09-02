@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math"
 	"math/cmplx"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -498,6 +499,79 @@ func TestSynthesizer_Sfx(t *testing.T) {
 		synth.ReadSamples(buffer2)
 		// then
 		assertDifferentShape(t, buffer1, buffer2)
+	})
+
+	t.Run("should play first note when offset is negative", func(t *testing.T) {
+		offsets := []int{-1, math.MinInt}
+
+		for _, offset := range offsets {
+			testName := strconv.Itoa(offset)
+
+			t.Run(testName, func(t *testing.T) {
+				e := audio.SoundEffect{
+					Notes: [32]audio.Note{
+						{Volume: audio.VolumeLoudest},
+					},
+					Speed: 1,
+				}
+				synth := audio.Synthesizer{}
+				synth.SetSfx(0, e)
+
+				synth.Sfx(0, 0, offset, 31)
+
+				buffer := make([]float64, durationOfNoteWhenSpeedIsOne)
+				// when
+				synth.ReadSamples(buffer)
+				// then
+				assertNotSilence(t, buffer)
+			})
+		}
+	})
+
+	t.Run("should play note starting at given offset", func(t *testing.T) {
+		e := audio.SoundEffect{
+			Notes: [32]audio.Note{
+				{Volume: audio.VolumeSilence},
+				{Volume: audio.VolumeLoudest},
+			},
+			Speed: 1,
+		}
+		synth := audio.Synthesizer{}
+		synth.SetSfx(0, e)
+
+		offset := 1
+		synth.Sfx(0, 0, offset, 30)
+
+		buffer := make([]float64, durationOfNoteWhenSpeedIsOne)
+		// when
+		synth.ReadSamples(buffer)
+		// then
+		assertNotSilence(t, buffer)
+	})
+
+	t.Run("should play last note when offset is > 31", func(t *testing.T) {
+		offsets := []int{32, math.MaxInt}
+
+		for _, offset := range offsets {
+			testName := strconv.Itoa(offset)
+
+			t.Run(testName, func(t *testing.T) {
+				var e audio.SoundEffect
+				e.Speed = 1
+				e.Notes[31].Volume = audio.VolumeLoudest
+
+				synth := audio.Synthesizer{}
+				synth.SetSfx(0, e)
+
+				synth.Sfx(0, 0, offset, 31)
+
+				buffer := make([]float64, durationOfNoteWhenSpeedIsOne)
+				// when
+				synth.ReadSamples(buffer)
+				// then
+				assertNotSilence(t, buffer)
+			})
+		}
 	})
 }
 

@@ -98,16 +98,18 @@ func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
 		return
 	}
 
+	offset = pi.MidInt(offset, 0, 31)
+
 	s.channels[ch].playing = true
 
 	sfx := s.GetSfx(sfxNo)
 
 	s.channels[ch].sampleNo = 0
-	s.channels[ch].noteNo = 0
+	s.channels[ch].noteNo = offset
 
 	s.channels[ch].noteEndSample = singleNoteSamples(sfx.Speed)
 
-	note0 := sfx.Notes[0]
+	note0 := sfx.Notes[offset]
 	s.channels[ch].oscillator.Func = oscillatorFunc(note0.Instrument)
 	s.channels[ch].oscillator.FreqHz = pitchToFreq(note0.Pitch)
 }
