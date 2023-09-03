@@ -75,7 +75,7 @@ func (c *channel) moveToNextNote(sfx SoundEffect) {
 	c.notesToGo--
 	c.noteNo++
 
-	if c.noteNo == int(sfx.LoopStop) {
+	if c.noteNo == int(sfx.LoopStop) && !c.loopingDisabled {
 		c.noteNo = int(sfx.LoopStart)
 	}
 
@@ -94,7 +94,10 @@ func (c *channel) moveToNextNote(sfx SoundEffect) {
 }
 
 func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
-	fmt.Println("Sfx is not implemented yet. Sorry...")
+	if sfxNo == -2 {
+		s.disableLooping(ch)
+		return
+	}
 
 	if ch >= ChannelStop && ch <= Channel3 {
 		s.stopSfx(sfxNo)
@@ -129,6 +132,19 @@ func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
 	note0 := sfx.Notes[offset]
 	s.channels[ch].oscillator.Func = oscillatorFunc(note0.Instrument)
 	s.channels[ch].oscillator.FreqHz = pitchToFreq(note0.Pitch)
+}
+
+func (s *Synthesizer) disableLooping(ch Channel) {
+	if ch == ChannelAny || ch == ChannelStop {
+		for i := range s.channels {
+			s.channels[i].loopingDisabled = true
+		}
+		return
+	}
+
+	if ch >= Channel0 && ch <= Channel3 {
+		s.channels[ch].loopingDisabled = true
+	}
 }
 
 func (s *Synthesizer) stopSfx(no int) {
@@ -364,11 +380,12 @@ func boolToByte(b bool) byte {
 }
 
 type channel struct {
-	sfxNo        int
-	noteNo       int
-	notesToGo    int
-	frame        int
-	noteEndFrame int
-	oscillator   internal.Oscillator
-	playing      bool
+	sfxNo           int
+	noteNo          int
+	notesToGo       int
+	frame           int
+	noteEndFrame    int
+	oscillator      internal.Oscillator
+	playing         bool
+	loopingDisabled bool
 }

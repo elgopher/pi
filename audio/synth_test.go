@@ -564,7 +564,6 @@ func TestSynthesizer_Sfx(t *testing.T) {
 				assertNotSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))
 			})
 		}
-
 	})
 
 	sfxOffsetLengthTest(t)
@@ -817,6 +816,77 @@ func sfxLoopTest(t *testing.T) {
 				for i := 0; i < len(e.Notes)*2; i++ {
 					assertNotSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))
 				}
+			})
+		}
+	})
+
+	t.Run("should stop the loop on given channel", func(t *testing.T) {
+		channels := []audio.Channel{audio.Channel0, audio.Channel1, audio.Channel2, audio.Channel3}
+
+		for _, ch := range channels {
+			testName := fmt.Sprintf("%d", ch)
+
+			t.Run(testName, func(t *testing.T) {
+				var e audio.SoundEffect
+				e.Notes[0].Volume = audio.VolumeLoudest
+				e.Speed = 1
+				e.LoopStart = 0
+				e.LoopStop = 1
+
+				synth := &audio.Synthesizer{}
+				synth.SetSfx(0, e)
+
+				synth.Sfx(0, ch, 0, 32)
+				// when
+				synth.Sfx(-2, ch, 0, 0)
+				// then
+				assertNotSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne)) // wait until entire sfx is played
+				assertSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))    // wait until entire sfx is played
+			})
+		}
+	})
+
+	t.Run("should stop the loop on all channels", func(t *testing.T) {
+		channels := []audio.Channel{audio.ChannelAny, audio.ChannelStop}
+
+		for _, ch := range channels {
+			testName := fmt.Sprintf("%d", ch)
+
+			t.Run(testName, func(t *testing.T) {
+				var e audio.SoundEffect
+				e.Notes[0].Volume = audio.VolumeLoudest
+				e.Speed = 1
+				e.LoopStart = 0
+				e.LoopStop = 1
+
+				synth := &audio.Synthesizer{}
+				synth.SetSfx(0, e)
+
+				synth.Sfx(0, audio.Channel0, 0, 32)
+				synth.Sfx(0, audio.Channel1, 0, 32)
+				synth.Sfx(0, audio.Channel2, 0, 32)
+				synth.Sfx(0, audio.Channel3, 0, 32)
+				// when
+				synth.Sfx(-2, ch, 0, 0)
+				// then
+				assertNotSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne)) // wait until entire sfx is played
+				assertSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))    // wait until entire sfx is played
+			})
+		}
+	})
+
+	t.Run("should not panic when trying to stop the loop with invalid channel", func(t *testing.T) {
+		channels := []audio.Channel{-3, 4}
+
+		for _, ch := range channels {
+			testName := fmt.Sprintf("%d", ch)
+
+			t.Run(testName, func(t *testing.T) {
+				synth := &audio.Synthesizer{}
+
+				assert.NotPanics(t, func() {
+					synth.Sfx(-2, ch, 0, 0)
+				})
 			})
 		}
 	})
