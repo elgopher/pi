@@ -96,13 +96,15 @@ func (c *channel) moveToNextNote(sfx SoundEffect) {
 func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
 	fmt.Println("Sfx is not implemented yet. Sorry...")
 
-	s.stopSfx(sfxNo)
+	if ch >= ChannelStop && ch <= Channel3 {
+		s.stopSfx(sfxNo)
+	}
 
 	if ch == ChannelAny {
 		ch = s.findAvailableChannel()
 	}
 
-	if ch < 0 || ch > Channel3 {
+	if ch < Channel0 || ch > Channel3 {
 		return
 	}
 

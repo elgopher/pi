@@ -525,6 +525,48 @@ func TestSynthesizer_Sfx(t *testing.T) {
 		assert.Equal(t, expectedSignal, signal)
 	})
 
+	t.Run("should stop playing sfx when channel is -2", func(t *testing.T) {
+		synth := &audio.Synthesizer{}
+		var e audio.SoundEffect
+		e.Speed = 1
+		e.Notes[0].Volume = audio.VolumeLoudest
+		synth.SetSfx(0, e)
+
+		synth.Sfx(0, audio.Channel0, 0, 1)
+		// when
+		synth.Sfx(0, audio.ChannelStop, 0, 1)
+		// then
+		stat := synth.Stat()
+		assert.Equal(t, -1, stat.Sfx[0])
+		// and
+		assertSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))
+	})
+
+	t.Run("should not stop playing sfx when channel is", func(t *testing.T) {
+		channels := []audio.Channel{math.MinInt8, -3, 4, math.MaxInt8}
+
+		for _, ch := range channels {
+			testName := fmt.Sprintf("%d", ch)
+			t.Run(testName, func(t *testing.T) {
+				synth := &audio.Synthesizer{}
+				var e audio.SoundEffect
+				e.Speed = 1
+				e.Notes[0].Volume = audio.VolumeLoudest
+				synth.SetSfx(0, e)
+
+				synth.Sfx(0, audio.Channel0, 0, 1)
+				// when
+				synth.Sfx(0, ch, 0, 1)
+				// then
+				stat := synth.Stat()
+				assert.Equal(t, 0, stat.Sfx[0])
+				// and
+				assertNotSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))
+			})
+		}
+
+	})
+
 	sfxOffsetLengthTest(t)
 	sfxLoopTest(t)
 	sfxLengthTest(t)
