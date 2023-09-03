@@ -11,7 +11,7 @@ func main() {
 		Notes: [32]audio.Note{
 			{
 				Pitch:      audio.PitchG3,
-				Instrument: audio.InstrumentOrgan,
+				Instrument: audio.InstrumentNoise,
 				Volume:     7,
 			},
 		},
@@ -34,7 +34,7 @@ func main() {
 			audio.SetSfx(0, sfx)
 			audio.Sfx(0, audio.Channel0, 0, 0)
 		}
-		if pi.Btnp(pi.Right) && sfx.Notes[0].Instrument < audio.InstrumentOrgan {
+		if pi.Btnp(pi.Right) && sfx.Notes[0].Instrument < audio.InstrumentPhaser {
 			sfx.Notes[0].Instrument += 1
 			audio.SetSfx(0, sfx)
 			audio.Sfx(0, audio.Channel0, 0, 0)
