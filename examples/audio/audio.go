@@ -10,9 +10,9 @@ func main() {
 	sfx := audio.SoundEffect{
 		Notes: [32]audio.Note{
 			{
-				Pitch:      audio.PitchC2,
-				Instrument: audio.InstrumentTriangle,
-				Volume:     4,
+				Pitch:      audio.PitchG3,
+				Instrument: audio.InstrumentOrgan,
+				Volume:     7,
 			},
 		},
 		Speed: 255,
