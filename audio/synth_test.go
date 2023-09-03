@@ -890,6 +890,25 @@ func sfxLoopTest(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("should loop sfx after it the loop was stopped previously", func(t *testing.T) {
+		var e audio.SoundEffect
+		e.Notes[0].Volume = audio.VolumeLoudest
+		e.Speed = 1
+		e.LoopStart = 0
+		e.LoopStop = 1
+
+		synth := &audio.Synthesizer{}
+		synth.SetSfx(0, e)
+		synth.Sfx(0, 0, 0, 2)  // start the loop
+		synth.Sfx(-2, 0, 0, 0) // stop the loop
+		// when
+		synth.Sfx(0, 0, 0, 2) // start the loop again
+		// then
+		assertNotSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne)) // play note 0
+		assertNotSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne)) // play note 0 again
+		assertSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))
+	})
 }
 
 func sfxLengthTest(t *testing.T) {
