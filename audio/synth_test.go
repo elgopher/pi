@@ -317,10 +317,12 @@ func TestSynthesizer_Sfx(t *testing.T) {
 		singleChannelBuffer := generateSamples(validEffect, 1)
 
 		s := audio.Synthesizer{}
-		s.SetSfx(0, validEffect)
+		for ch := 0; ch < maxChannels; ch++ {
+			s.SetSfx(ch, validEffect)
+		}
 		// when
 		for ch := 0; ch < maxChannels; ch++ {
-			s.Sfx(0, audio.Channel(ch), 0, 1)
+			s.Sfx(ch, audio.Channel(ch), 0, 1)
 		}
 		// then
 		allChannelBuffer := make([]float64, 1)
@@ -331,7 +333,7 @@ func TestSynthesizer_Sfx(t *testing.T) {
 		assertAllValuesBetween(t, -4.0, 4.0, allChannelBuffer)
 	})
 
-	t.Run("should stop playing on a given channel", func(t *testing.T) {
+	t.Run("should stop playing on a given channel when sfx is -1", func(t *testing.T) {
 		for channelNo := audio.Channel(0); channelNo < maxChannels; channelNo++ {
 			testName := fmt.Sprintf("channel %d", channelNo)
 
@@ -462,6 +464,65 @@ func TestSynthesizer_Sfx(t *testing.T) {
 		synth.ReadSamples(buffer2)
 		// then
 		assertDifferentShape(t, buffer1, buffer2)
+	})
+
+	t.Run("should play on any available channel", func(t *testing.T) {
+		synth := &audio.Synthesizer{}
+		var e audio.SoundEffect
+		e.Speed = 1
+		e.Notes[0].Volume = audio.VolumeLoudest
+		const sfxNo = 3
+		synth.SetSfx(sfxNo, e)
+
+		synth.Sfx(0, audio.Channel0, 0, 1)
+		synth.Sfx(1, audio.Channel1, 0, 1)
+		synth.Sfx(2, audio.Channel2, 0, 1)
+		// when
+		synth.Sfx(sfxNo, audio.ChannelAny, 0, 1)
+		// then
+		stat := synth.Stat()
+		assert.Equal(t, sfxNo, stat.Sfx[3])
+		assertNotSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))
+	})
+
+	t.Run("when no channels are available play on channel 3", func(t *testing.T) {
+		synth := &audio.Synthesizer{}
+		var e audio.SoundEffect
+		e.Speed = 1
+		e.Notes[0].Volume = audio.VolumeLoudest
+		const sfxNo = 4
+		synth.SetSfx(sfxNo, e)
+
+		synth.Sfx(0, audio.Channel0, 0, 1)
+		synth.Sfx(1, audio.Channel1, 0, 1)
+		synth.Sfx(2, audio.Channel2, 0, 1)
+		synth.Sfx(3, audio.Channel3, 0, 1)
+		// when
+		synth.Sfx(sfxNo, audio.ChannelAny, 0, 1)
+		// then
+		stat := synth.Stat()
+		assert.Equal(t, sfxNo, stat.Sfx[3])
+		assertNotSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))
+	})
+
+	t.Run("should stop playing sfx on a different channel", func(t *testing.T) {
+		synth := &audio.Synthesizer{}
+		var e audio.SoundEffect
+		e.Speed = 1
+		e.Notes[0].Volume = audio.VolumeLoudest
+		synth.SetSfx(0, e)
+
+		synth.Sfx(0, audio.Channel0, 1, 1)
+		// when
+		synth.Sfx(0, audio.Channel1, 0, 1)
+		// then
+		stat := synth.Stat()
+		assert.Equal(t, -1, stat.Sfx[0])
+		assert.Equal(t, 0, stat.Sfx[1])
+		// and
+		signal := readSamples(synth, durationOfNoteWhenSpeedIsOne)
+		expectedSignal := generateSamples(e, durationOfNoteWhenSpeedIsOne)
+		assert.Equal(t, expectedSignal, signal)
 	})
 
 	sfxOffsetLengthTest(t)
