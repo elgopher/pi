@@ -27,6 +27,10 @@ func oscillatorFunc(instrument Instrument) func(float64) float64 {
 		return internal.Pulse
 	case InstrumentOrgan:
 		return internal.Organ
+	case InstrumentNoise:
+		return internal.Noise()
+	case InstrumentPhaser:
+		return internal.Phaser
 	default:
 		return silence
 	}
