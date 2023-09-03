@@ -18,7 +18,14 @@
         * [x] rectangles, lines, circles
         * [ ] fill patterns
     * [ ] stretching sprites
-    * [ ] map API
+* [ ] Audio
+    * [x] playing sound effects
+    * [x] updating sound effects and music when the game is run
+    * [ ] SFX notes effects
+    * [ ] SFX modifiers
+    * [ ] ADSR (envelopes)
+    * [ ] playing music
+* [ ] map API
 * [ ] math API
     * [x] Cos, Sin, Atan2
     * [x] Min, Max, Mid for integers
@@ -51,7 +58,9 @@
     * [ ] sound editor
     * [ ] music editor
 * [ ] Documentation
-    * [ ] Go docs
+    * [x] Go docs
+    * [ ] More detailed Go docs
+    * [ ] Tutorials
 * [ ] Support for different platforms
   * [x] Windows, Linux, macOS
   * [x] Web browsers (WASM)
