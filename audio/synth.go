@@ -96,6 +96,12 @@ func (c *channel) moveToNextNote(sfx SoundEffect) {
 func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
 	fmt.Println("Sfx is not implemented yet. Sorry...")
 
+	s.stopSfx(sfxNo)
+
+	if ch == ChannelAny {
+		ch = s.findAvailableChannel()
+	}
+
 	if ch < 0 || ch > Channel3 {
 		return
 	}
@@ -111,6 +117,7 @@ func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
 
 	sfx := s.GetSfx(sfxNo)
 
+	s.channels[ch].sfxNo = sfxNo
 	s.channels[ch].frame = 0
 	s.channels[ch].noteNo = offset
 	s.channels[ch].notesToGo = length
@@ -122,13 +129,42 @@ func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
 	s.channels[ch].oscillator.FreqHz = pitchToFreq(note0.Pitch)
 }
 
+func (s *Synthesizer) stopSfx(no int) {
+	for i, c := range s.channels {
+		if c.playing && c.sfxNo == no {
+			c.playing = false
+			s.channels[i] = c
+			return
+		}
+	}
+}
+
+func (s *Synthesizer) findAvailableChannel() Channel {
+	for i, c := range s.channels {
+		if !c.playing {
+			return Channel(i)
+		}
+	}
+
+	return Channel3
+}
+
 func (s *Synthesizer) Music(patterNo int, fadeMs int, channelMask byte) {
 	fmt.Println("Music is not implemented yet. Sorry...")
 }
 
 func (s *Synthesizer) Stat() Stat {
 	fmt.Println("Stat is not implemented yet. Sorry...")
-	return Stat{}
+
+	stat := Stat{}
+	for i, c := range s.channels {
+		if c.playing {
+			stat.Sfx[i] = c.sfxNo
+		} else {
+			stat.Sfx[i] = -1
+		}
+	}
+	return stat
 }
 
 const maxSfxNo = 63
