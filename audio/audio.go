@@ -36,6 +36,8 @@ func Sfx(sfxNo int, channel Channel, offset, length int) {
 //
 // channelMask is a bitfield indicating which of the four sound channels
 // should be reserved for music.
+//
+// Not implemented yet.
 func Music(patterNo int, fadeMs int, channelMask byte) {
 	system.Music(patterNo, fadeMs, channelMask)
 }
@@ -102,10 +104,10 @@ const (
 
 type Stat struct {
 	Sfx           [4]int // -1 means no sfx on channel
-	Note          [4]int // -1 means no sfx on channel
-	Pattern       int    // currently played music pattern
-	PatternsCount int    // the number of music patterns played since the most recent call to Music().
-	TicksCount    int    // the number of ticks (notes or rests) played on the current pattern.
+	Note          [4]int // -1 means no sfx on channel. Not implemented yet.
+	Pattern       int    // currently played music pattern. Not implemented yet.
+	PatternsCount int    // the number of music patterns played since the most recent call to Music(). Not implemented yet.
+	TicksCount    int    // the number of ticks (notes or rests) played on the current pattern. Not implemented yet.
 }
 
 type SoundEffect struct {
@@ -113,11 +115,11 @@ type SoundEffect struct {
 	Speed     byte // 1 is the fastest (~8.33ms). For 120 the length of one note becomes 1 second. 0 means SoundEffect takes no time.
 	LoopStart byte // 0-63. Notes 32-63 are silent.
 	LoopStop  byte // 0-63. Notes 32-63 are silent.
-	Detune    byte // 0 (disabled), 1 or 2
-	Reverb    byte // 0 (disabled), 1 or 2
-	Dampen    byte // 0 (disabled), 1 or 2
-	Noiz      bool
-	Buzz      bool
+	Detune    byte // 0 (disabled), 1 or 2. Not implemented yet.
+	Reverb    byte // 0 (disabled), 1 or 2. Not implemented yet.
+	Dampen    byte // 0 (disabled), 1 or 2. Not implemented yet.
+	Noiz      bool // Not implemented yet.
+	Buzz      bool // Not implemented yet.
 }
 
 func (s SoundEffect) noteAt(no int) Note {
@@ -132,7 +134,7 @@ type Note struct {
 	Pitch      Pitch      // 0-63
 	Instrument Instrument // 0-15
 	Volume     Volume     // 0-7
-	Effect     Effect     // 0-7
+	Effect     Effect     // 0-7. Not implemented yet.
 }
 
 type Volume byte
@@ -225,42 +227,42 @@ const (
 	InstrumentSquare    Instrument = 3
 	InstrumentPulse     Instrument = 4
 	InstrumentOrgan     Instrument = 5
-	InstrumentNoise     Instrument = 6
-	InstrumentPhaser    Instrument = 7
-	InstrumentSfx0      Instrument = 8
-	InstrumentSfx1      Instrument = 9
-	InstrumentSfx2      Instrument = 10
-	InstrumentSfx3      Instrument = 11
-	InstrumentSfx4      Instrument = 12
-	InstrumentSfx5      Instrument = 13
-	InstrumentSfx6      Instrument = 14
-	InstrumentSfx7      Instrument = 15
+	InstrumentNoise     Instrument = 6  // Not implemented yet.
+	InstrumentPhaser    Instrument = 7  // Not implemented yet.
+	InstrumentSfx0      Instrument = 8  // Not implemented yet.
+	InstrumentSfx1      Instrument = 9  // Not implemented yet.
+	InstrumentSfx2      Instrument = 10 // Not implemented yet.
+	InstrumentSfx3      Instrument = 11 // Not implemented yet.
+	InstrumentSfx4      Instrument = 12 // Not implemented yet.
+	InstrumentSfx5      Instrument = 13 // Not implemented yet.
+	InstrumentSfx6      Instrument = 14 // Not implemented yet.
+	InstrumentSfx7      Instrument = 15 // Not implemented yet.
 )
 
-type Effect byte
+type Effect byte // Not implemented yet.
 
 const (
-	EffectNoEffect Effect = 0
-	EffectSlide    Effect = 1
-	EffectVibrato  Effect = 2
-	EffectDrop     Effect = 3
-	EffectFadeIn   Effect = 4
-	EffectFadeOut  Effect = 5
-	EffectArpFast  Effect = 6
-	EffectArpSlow  Effect = 7
+	EffectNoEffect Effect = 0 // Not implemented yet.
+	EffectSlide    Effect = 1 // Not implemented yet.
+	EffectVibrato  Effect = 2 // Not implemented yet.
+	EffectDrop     Effect = 3 // Not implemented yet.
+	EffectFadeIn   Effect = 4 // Not implemented yet.
+	EffectFadeOut  Effect = 5 // Not implemented yet.
+	EffectArpFast  Effect = 6 // Not implemented yet.
+	EffectArpSlow  Effect = 7 // Not implemented yet.
 )
 
 // Pattern is a music pattern
 type Pattern struct {
-	Sfx          [4]PatternSfx
-	BeginLoop    bool
-	EndLoop      bool
-	StopAtTheEnd bool
+	Sfx          [4]PatternSfx // Not implemented yet.
+	BeginLoop    bool          // Not implemented yet.
+	EndLoop      bool          // Not implemented yet.
+	StopAtTheEnd bool          // Not implemented yet.
 }
 
 type PatternSfx struct {
-	SfxNo   byte // 0-63
-	Enabled bool
+	SfxNo   byte // 0-63. Not implemented yet.
+	Enabled bool // Not implemented yet.
 }
 
 func byteToBool(b byte) bool {
