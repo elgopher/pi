@@ -126,6 +126,7 @@ func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
 	s.channels[ch].frame = 0
 	s.channels[ch].noteNo = offset
 	s.channels[ch].notesToGo = length
+	s.channels[ch].loopingDisabled = false
 
 	s.channels[ch].noteEndFrame = singleNoteSamples(sfx.Speed)
 
