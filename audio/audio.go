@@ -227,8 +227,8 @@ const (
 	InstrumentSquare    Instrument = 3
 	InstrumentPulse     Instrument = 4
 	InstrumentOrgan     Instrument = 5
-	InstrumentNoise     Instrument = 6  // Not implemented yet.
-	InstrumentPhaser    Instrument = 7  // Not implemented yet.
+	InstrumentNoise     Instrument = 6
+	InstrumentPhaser    Instrument = 7
 	InstrumentSfx0      Instrument = 8  // Not implemented yet.
 	InstrumentSfx1      Instrument = 9  // Not implemented yet.
 	InstrumentSfx2      Instrument = 10 // Not implemented yet.
