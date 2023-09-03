@@ -11,11 +11,16 @@ func main() {
 		Notes: [32]audio.Note{
 			{
 				Pitch:      audio.PitchG3,
-				Instrument: audio.InstrumentNoise,
+				Instrument: audio.InstrumentTriangle,
+				Volume:     7,
+			},
+			{
+				Pitch:      audio.PitchD3,
+				Instrument: audio.InstrumentTriangle,
 				Volume:     7,
 			},
 		},
-		Speed: 255,
+		Speed: 120,
 	}
 	audio.SetSfx(0, sfx)
 

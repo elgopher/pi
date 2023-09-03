@@ -61,6 +61,8 @@ func (c *channel) readSample(sfx SoundEffect) float64 {
 
 	volume := float64(sfx.noteAt(c.noteNo).Volume) / 7
 	sample = c.oscillator.NextSample() * volume
+	sample = c.attack(sample)
+	sample = c.release(sample)
 
 	c.frame += 1
 	noteHasEnded := c.frame == c.noteEndFrame
@@ -68,6 +70,20 @@ func (c *channel) readSample(sfx SoundEffect) float64 {
 		c.moveToNextNote(sfx)
 	}
 
+	return sample
+}
+
+func (c *channel) attack(sample float64) float64 {
+	if c.frame-c.noteStartFrame < 100 {
+		sample *= float64(c.frame-c.noteStartFrame) / 100.0
+	}
+	return sample
+}
+
+func (c *channel) release(sample float64) float64 {
+	if c.noteEndFrame-c.frame < 100 {
+		sample *= float64(c.noteEndFrame-c.frame) / 100.0
+	}
 	return sample
 }
 
@@ -85,6 +101,7 @@ func (c *channel) moveToNextNote(sfx SoundEffect) {
 		return
 	}
 
+	c.noteStartFrame = c.frame
 	c.noteEndFrame += singleNoteSamples(sfx.Speed)
 
 	note := sfx.noteAt(c.noteNo)
@@ -128,6 +145,7 @@ func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
 	s.channels[ch].notesToGo = length
 	s.channels[ch].loopingDisabled = false
 
+	s.channels[ch].noteStartFrame = 0
 	s.channels[ch].noteEndFrame = singleNoteSamples(sfx.Speed)
 
 	note0 := sfx.Notes[offset]
@@ -385,6 +403,7 @@ type channel struct {
 	noteNo          int
 	notesToGo       int
 	frame           int
+	noteStartFrame  int
 	noteEndFrame    int
 	oscillator      internal.Oscillator
 	playing         bool
