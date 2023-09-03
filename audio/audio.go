@@ -96,7 +96,7 @@ const (
 	Channel1    Channel = 1
 	Channel2    Channel = 2
 	Channel3    Channel = 3
-	ChannelAny  Channel = -1
+	ChannelAny  Channel = -1 // Rename - it means all channels for Sfx(-2, ...)
 	ChannelStop Channel = -2
 )
 
