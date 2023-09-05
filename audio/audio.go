@@ -7,6 +7,8 @@
 // Sound effects and music can be changed using functions: SetSfx and SetMusic.
 package audio
 
+import "fmt"
+
 // Sfx starts playing sound effect with given sfxNo on specified channel.
 //
 // sfxNo is the number of sound effect to play (0-63). sfxNo=-1 stops
@@ -45,36 +47,6 @@ func Music(patterNo int, fadeMs int, channelMask byte) {
 // GetStat returns information about currently played sound effects and music.
 func GetStat() Stat {
 	return system.Stat()
-}
-
-// SetSfx updates the sound effect. sfxNo is 0-63. Updating sfx number which
-// is higher than 63 does not do anything.
-//
-// SoundEffect parameters are clamped when out of range.
-// For example, sfx note volume equal 8 will be silently clamped to 7.
-func SetSfx(sfxNo int, e SoundEffect) {
-	system.SetSfx(sfxNo, e)
-}
-
-// GetSfx returns sfx with given number. sfxNo is 0-63. Trying to get
-// sfx number higher than 63 will result in returning empty SoundEffect (zero-value).
-func GetSfx(sfxNo int) SoundEffect {
-	return system.GetSfx(sfxNo)
-}
-
-// SetMusic updates the music pattern. patternNo is 0-63. Updating pattern number which
-// is higher than 63 does not do anything.
-//
-// Pattern parameters are clamped when out of range.
-// For example, pattern sfx number equal 64 will be silently clamped to 63.
-func SetMusic(patternNo int, p Pattern) {
-	system.SetMusic(patternNo, p)
-}
-
-// GetMusic returns music pattern with given number. patterNo is 0-63. Trying to get
-// pattern number higher than 63 will result in returning empty Pattern (zero-value).
-func GetMusic(patterNo int) Pattern {
-	return system.GetMusic(patterNo)
 }
 
 // SaveAudio stores audio system state to byte slice. State is stored in binary form.
@@ -120,6 +92,12 @@ type SoundEffect struct {
 	Dampen    byte // 0 (disabled), 1 or 2. Not implemented yet.
 	Noiz      bool // Not implemented yet.
 	Buzz      bool // Not implemented yet.
+}
+
+func (s SoundEffect) String() string {
+	return fmt.Sprintf(
+		"{Speed:%d LoopStart:%d LoopStop:%d Detune:%d Reverb:%d Dampen:%d Noiz:%t Buzz:%t Notes:(%d)[%+v %+v %+v ...]}",
+		s.Speed, s.LoopStart, s.LoopStop, s.Detune, s.Reverb, s.Dampen, s.Noiz, s.Buzz, len(s.Notes), s.Notes[0], s.Notes[1], s.Notes[2])
 }
 
 func (s SoundEffect) noteAt(no int) Note {
@@ -278,9 +256,23 @@ type System interface {
 	Sfx(sfxNo int, channel Channel, offset, length int)
 	Music(patterNo int, fadeMs int, channelMask byte)
 	Stat() Stat
+	// SetSfx updates the sound effect. sfxNo is 0-63. Updating sfx number which
+	// is higher than 63 does not do anything.
+	//
+	// SoundEffect parameters are clamped when out of range.
+	// For example, sfx note volume equal 8 will be silently clamped to 7.
 	SetSfx(sfxNo int, e SoundEffect)
+	// GetSfx returns sfx with given number. sfxNo is 0-63. Trying to get
+	// sfx number higher than 63 will result in returning empty SoundEffect (zero-value).
 	GetSfx(sfxNo int) SoundEffect
+	// SetMusic updates the music pattern. patternNo is 0-63. Updating pattern number which
+	// is higher than 63 does not do anything.
+	//
+	// Pattern parameters are clamped when out of range.
+	// For example, pattern sfx number equal 64 will be silently clamped to 63.
 	SetMusic(patternNo int, _ Pattern)
+	// GetMusic returns music pattern with given number. patterNo is 0-63. Trying to get
+	// pattern number higher than 63 will result in returning empty Pattern (zero-value).
 	GetMusic(patterNo int) Pattern
 	Save() ([]byte, error)
 	Load([]byte) error
