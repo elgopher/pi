@@ -175,11 +175,32 @@ func (e *ebitenPlayerSource) ensureFloatBufferIsBigEnough(size int) {
 	}
 }
 
-func (e *ebitenPlayerSource) Sfx(sfxNo int, channel audio.Channel, offset, length int) {
+func (e *ebitenPlayerSource) Play(sfxNo, channel, offset, length int) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 
-	e.audioSystem.Sfx(sfxNo, channel, offset, length)
+	e.audioSystem.Play(sfxNo, channel, offset, length)
+}
+
+func (e *ebitenPlayerSource) Stop(sfxNo int) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	e.audioSystem.Stop(sfxNo)
+}
+
+func (e *ebitenPlayerSource) StopLoop(channel int) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	e.audioSystem.StopLoop(channel)
+}
+
+func (e *ebitenPlayerSource) StopChan(channel int) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	e.audioSystem.StopChan(channel)
 }
 
 func (e *ebitenPlayerSource) Music(patterNo int, fadeMs int, channelMask byte) {

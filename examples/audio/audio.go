@@ -19,7 +19,7 @@ func main() {
 
 	pi.Update = func() {
 		if pi.Btnp(pi.X) {
-			audio.Sfx(0, audio.Channel0, 0, 0)
+			audio.Play(0, 0, 0, 0)
 		}
 
 		if pi.Btnp(pi.Up) && sfxNote0.Pitch < 255 {
@@ -45,5 +45,5 @@ func main() {
 
 func playSfx0() {
 	audio.Sync() // first send changed sfx to audio system
-	audio.Sfx(0, audio.Channel0, 0, 0)
+	audio.Play(0, 0, 0, 0)
 }

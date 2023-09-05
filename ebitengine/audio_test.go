@@ -167,7 +167,10 @@ func TestEbitenPlayerSource_ThreadSafety(t *testing.T) {
 
 				_, err := reader.Read(make([]byte, 128))
 				require.NoError(t, err)
-				reader.Sfx(0, 0, 0, 0)
+				reader.Play(0, 0, 0, 0)
+				reader.Stop(0)
+				reader.StopLoop(0)
+				reader.StopChan(0)
 				reader.Music(0, 0, 0)
 				reader.Stat()
 				reader.SetSfx(0, audio.SoundEffect{})
@@ -194,8 +197,11 @@ func (m *audioSystemMock) ReadSamples(buffer []float64) int {
 	return n
 }
 
-func (m *audioSystemMock) Sfx(sfxNo int, channel audio.Channel, offset, length int) {}
-func (m *audioSystemMock) Music(patterNo int, fadeMs int, channelMask byte)         {}
+func (m *audioSystemMock) Play(sfxNo, channel, offset, length int)          {}
+func (m *audioSystemMock) Stop(sfxNo int)                                   {}
+func (m *audioSystemMock) StopLoop(channel int)                             {}
+func (m *audioSystemMock) StopChan(channel int)                             {}
+func (m *audioSystemMock) Music(patterNo int, fadeMs int, channelMask byte) {}
 
 func (m *audioSystemMock) Stat() audio.Stat {
 	return audio.Stat{}

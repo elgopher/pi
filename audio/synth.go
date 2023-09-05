@@ -93,21 +93,21 @@ func (c *channel) moveToNextNote(sfx SoundEffect) {
 	c.oscillator.FreqHz = pitchToFreq(note.Pitch)
 }
 
-func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
+func (s *Synthesizer) Play(sfxNo, ch, offset, length int) {
 	if sfxNo == -2 {
 		s.disableLooping(ch)
 		return
 	}
 
-	if ch >= ChannelStop && ch <= Channel3 {
-		s.stopSfx(sfxNo)
+	if ch >= -2 && ch <= 3 {
+		s.Stop(sfxNo)
 	}
 
-	if ch == ChannelAny {
+	if ch == -1 {
 		ch = s.findAvailableChannel()
 	}
 
-	if ch < Channel0 || ch > Channel3 {
+	if ch < 0 || ch > 3 {
 		return
 	}
 
@@ -135,22 +135,17 @@ func (s *Synthesizer) Sfx(sfxNo int, ch Channel, offset, length int) {
 	s.channels[ch].oscillator.FreqHz = pitchToFreq(note0.Pitch)
 }
 
-func (s *Synthesizer) disableLooping(ch Channel) {
-	if ch == ChannelAny || ch == ChannelStop {
-		for i := range s.channels {
-			s.channels[i].loopingDisabled = true
+func (s *Synthesizer) Stop(sfxNo int) {
+	if sfxNo == -1 {
+		for i, c := range s.channels {
+			c.playing = false
+			s.channels[i] = c
 		}
 		return
 	}
 
-	if ch >= Channel0 && ch <= Channel3 {
-		s.channels[ch].loopingDisabled = true
-	}
-}
-
-func (s *Synthesizer) stopSfx(no int) {
 	for i, c := range s.channels {
-		if c.playing && c.sfxNo == no {
+		if c.playing && c.sfxNo == sfxNo {
 			c.playing = false
 			s.channels[i] = c
 			return
@@ -158,14 +153,52 @@ func (s *Synthesizer) stopSfx(no int) {
 	}
 }
 
-func (s *Synthesizer) findAvailableChannel() Channel {
+func (s *Synthesizer) StopChan(channel int) {
+	if channel == -1 {
+		s.Stop(-1)
+		return
+	}
+	if channel < 0 || channel > 3 {
+		return
+	}
+
+	s.channels[channel].playing = false
+}
+
+func (s *Synthesizer) StopLoop(channel int) {
+	if channel == -1 {
+		for i := range s.channels {
+			s.channels[i].loopingDisabled = true
+		}
+		return
+	}
+
+	if channel >= 0 && channel <= 3 {
+		s.channels[channel].loopingDisabled = true
+	}
+}
+
+func (s *Synthesizer) disableLooping(ch int) {
+	if ch == -1 || ch == -2 {
+		for i := range s.channels {
+			s.channels[i].loopingDisabled = true
+		}
+		return
+	}
+
+	if ch >= 0 && ch <= 0 {
+		s.channels[ch].loopingDisabled = true
+	}
+}
+
+func (s *Synthesizer) findAvailableChannel() int {
 	for i, c := range s.channels {
 		if !c.playing {
-			return Channel(i)
+			return i
 		}
 	}
 
-	return Channel3
+	return 3
 }
 
 func (s *Synthesizer) Music(patterNo int, fadeMs int, channelMask byte) {

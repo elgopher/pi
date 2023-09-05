@@ -9,23 +9,37 @@ package audio
 
 import "fmt"
 
-// Sfx starts playing sound effect with given sfxNo on specified channel.
+// Play starts playing sound effect with given sfxNo on specified channel.
 //
-// sfxNo is the number of sound effect to play (0-63). sfxNo=-1 stops
-// playing sound on the given channel. sfxNo=-2 releases the sound
-// of the given channel from looping.
+// sfxNo is the number of sound effect to play (0-63).
 //
-// channel is the channel number from 0-3. Channel=-1 chooses available
-// channel automatically. Channel=-2 stops playing the given sound effect
-// on any channel. See pi.Channel.
+// channel is the channel number from 0-3. -1 chooses available
+// channel automatically.
 //
 // offset is the note position to start playing (0-31). Offset is clamped to [0,31].
 //
 // length is the number of notes to play. If length <= 0 and sfx has no loop
 // then entire sfx is played. If length < sfx length then only fraction of sfx is
 // played. If length <= 0 and sfx has loop then sfx is played infinitely.
-func Sfx(sfxNo int, channel Channel, offset, length int) {
-	system.Sfx(sfxNo, channel, offset, length)
+func Play(sfxNo int, channel, offset, length int) {
+	system.Play(sfxNo, channel, offset, length)
+}
+
+// Stop stops playing sound effect with given sfxNo. -1 stops all sounds.
+//
+// sfxNo is the number of sound effect to stop (0-63).
+func Stop(sfxNo int) {
+	system.Stop(sfxNo)
+}
+
+// channel is the channel number from 0-3. -1 stops loop on all channels.
+func StopLoop(channel int) {
+	system.StopLoop(channel)
+}
+
+// channel is the channel number from 0-3. -1 stops all channels.
+func StopChan(channel int) {
+	system.StopChan(channel)
 }
 
 // Music starts playing music with given patterNo.
@@ -62,17 +76,6 @@ func LoadAudio(b []byte) error {
 }
 
 var system System = &Synthesizer{}
-
-type Channel int8
-
-const (
-	Channel0    Channel = 0
-	Channel1    Channel = 1
-	Channel2    Channel = 2
-	Channel3    Channel = 3
-	ChannelAny  Channel = -1 // Rename - it means all channels for Sfx(-2, ...)
-	ChannelStop Channel = -2
-)
 
 type Stat struct {
 	Sfx           [4]int // -1 means no sfx on channel
@@ -253,7 +256,10 @@ func SetSystem(s System) {
 }
 
 type System interface {
-	Sfx(sfxNo int, channel Channel, offset, length int)
+	Play(sfxNo, channel, offset, length int)
+	Stop(sfxNo int)
+	StopChan(channel int)
+	StopLoop(channel int)
 	Music(patterNo int, fadeMs int, channelMask byte)
 	Stat() Stat
 	// SetSfx updates the sound effect. sfxNo is 0-63. Updating sfx number which
