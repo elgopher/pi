@@ -125,7 +125,6 @@ var symbolsWithDetailedDescription = []string{
 	"github.com/elgopher/pi/key.Button",
 	"github.com/elgopher/pi/audio.Pitch",
 	"github.com/elgopher/pi/audio.Volume",
-	"github.com/elgopher/pi/audio.Channel",
 	"github.com/elgopher/pi/audio.Effect",
 	"github.com/elgopher/pi/audio.Instrument",
 }

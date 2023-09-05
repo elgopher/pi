@@ -12,12 +12,6 @@ import (
 func init() {
 	Symbols["github.com/elgopher/pi/audio/audio"] = map[string]reflect.Value{
 		// function, constant and variable definitions
-		"Channel0":            reflect.ValueOf(audio.Channel0),
-		"Channel1":            reflect.ValueOf(audio.Channel1),
-		"Channel2":            reflect.ValueOf(audio.Channel2),
-		"Channel3":            reflect.ValueOf(audio.Channel3),
-		"ChannelAny":          reflect.ValueOf(audio.ChannelAny),
-		"ChannelStop":         reflect.ValueOf(audio.ChannelStop),
 		"EffectArpFast":       reflect.ValueOf(audio.EffectArpFast),
 		"EffectArpSlow":       reflect.ValueOf(audio.EffectArpSlow),
 		"EffectDrop":          reflect.ValueOf(audio.EffectDrop),
@@ -110,17 +104,19 @@ func init() {
 		"PitchGs2":            reflect.ValueOf(audio.PitchGs2),
 		"PitchGs3":            reflect.ValueOf(audio.PitchGs3),
 		"PitchGs4":            reflect.ValueOf(audio.PitchGs4),
+		"Play":                reflect.ValueOf(audio.Play),
 		"SFX":                 reflect.ValueOf(&audio.SFX).Elem(),
 		"SampleRate":          reflect.ValueOf(constant.MakeFromLiteral("22050", token.INT, 0)),
 		"SaveAudio":           reflect.ValueOf(audio.SaveAudio),
 		"SetSystem":           reflect.ValueOf(audio.SetSystem),
-		"Sfx":                 reflect.ValueOf(audio.Sfx),
+		"Stop":                reflect.ValueOf(audio.Stop),
+		"StopChan":            reflect.ValueOf(audio.StopChan),
+		"StopLoop":            reflect.ValueOf(audio.StopLoop),
 		"Sync":                reflect.ValueOf(audio.Sync),
 		"VolumeLoudest":       reflect.ValueOf(audio.VolumeLoudest),
 		"VolumeSilence":       reflect.ValueOf(audio.VolumeSilence),
 
 		// type definitions
-		"Channel":     reflect.ValueOf((*audio.Channel)(nil)),
 		"Effect":      reflect.ValueOf((*audio.Effect)(nil)),
 		"Instrument":  reflect.ValueOf((*audio.Instrument)(nil)),
 		"LiveReader":  reflect.ValueOf((*audio.LiveReader)(nil)),
@@ -146,11 +142,14 @@ type _github_com_elgopher_pi_audio_System struct {
 	WGetSfx   func(sfxNo int) audio.SoundEffect
 	WLoad     func(a0 []byte) error
 	WMusic    func(patterNo int, fadeMs int, channelMask byte)
+	WPlay     func(sfxNo int, channel int, offset int, length int)
 	WSave     func() ([]byte, error)
 	WSetMusic func(patternNo int, _ audio.Pattern)
 	WSetSfx   func(sfxNo int, e audio.SoundEffect)
-	WSfx      func(sfxNo int, channel audio.Channel, offset int, length int)
 	WStat     func() audio.Stat
+	WStop     func(sfxNo int)
+	WStopChan func(channel int)
+	WStopLoop func(channel int)
 }
 
 func (W _github_com_elgopher_pi_audio_System) GetMusic(patterNo int) audio.Pattern {
@@ -165,6 +164,9 @@ func (W _github_com_elgopher_pi_audio_System) Load(a0 []byte) error {
 func (W _github_com_elgopher_pi_audio_System) Music(patterNo int, fadeMs int, channelMask byte) {
 	W.WMusic(patterNo, fadeMs, channelMask)
 }
+func (W _github_com_elgopher_pi_audio_System) Play(sfxNo int, channel int, offset int, length int) {
+	W.WPlay(sfxNo, channel, offset, length)
+}
 func (W _github_com_elgopher_pi_audio_System) Save() ([]byte, error) {
 	return W.WSave()
 }
@@ -174,9 +176,15 @@ func (W _github_com_elgopher_pi_audio_System) SetMusic(patternNo int, p audio.Pa
 func (W _github_com_elgopher_pi_audio_System) SetSfx(sfxNo int, e audio.SoundEffect) {
 	W.WSetSfx(sfxNo, e)
 }
-func (W _github_com_elgopher_pi_audio_System) Sfx(sfxNo int, channel audio.Channel, offset int, length int) {
-	W.WSfx(sfxNo, channel, offset, length)
-}
 func (W _github_com_elgopher_pi_audio_System) Stat() audio.Stat {
 	return W.WStat()
+}
+func (W _github_com_elgopher_pi_audio_System) Stop(sfxNo int) {
+	W.WStop(sfxNo)
+}
+func (W _github_com_elgopher_pi_audio_System) StopChan(channel int) {
+	W.WStopChan(channel)
+}
+func (W _github_com_elgopher_pi_audio_System) StopLoop(channel int) {
+	W.WStopLoop(channel)
 }

@@ -93,7 +93,6 @@ func TestPrintHelp(t *testing.T) {
 			"key.Button":       "func (b Button) String() string",
 			"audio.Pitch":      "PitchDs5",
 			"audio.Volume":     "VolumeLoudest",
-			"audio.Channel":    "ChannelStop",
 			"audio.Effect":     "EffectArpSlow",
 			"audio.Instrument": "InstrumentSfx7",
 		}
