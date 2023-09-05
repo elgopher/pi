@@ -7,44 +7,43 @@ import (
 )
 
 func main() {
-	sfx := audio.SoundEffect{
-		Notes: [32]audio.Note{
-			{
-				Pitch:      audio.PitchG3,
-				Instrument: audio.InstrumentNoise,
-				Volume:     7,
-			},
-		},
-		Speed: 255,
+	audio.SFX[0].Notes[0] = audio.Note{
+		Pitch:      audio.PitchG3,
+		Instrument: audio.InstrumentNoise,
+		Volume:     7,
 	}
-	audio.SetSfx(0, sfx)
+	audio.SFX[0].Speed = 255
+	audio.Sync()
+
+	sfxNote0 := &audio.SFX[0].Notes[0]
 
 	pi.Update = func() {
 		if pi.Btnp(pi.X) {
 			audio.Sfx(0, audio.Channel0, 0, 0)
 		}
 
-		if pi.Btnp(pi.Up) && sfx.Notes[0].Pitch < 255 {
-			sfx.Notes[0].Pitch += 1
-			audio.SetSfx(0, sfx)
-			audio.Sfx(0, audio.Channel0, 0, 0)
+		if pi.Btnp(pi.Up) && sfxNote0.Pitch < 255 {
+			sfxNote0.Pitch += 1
+			playSfx0()
 		}
-		if pi.Btnp(pi.Down) && sfx.Notes[0].Pitch > 0 {
-			sfx.Notes[0].Pitch -= 1
-			audio.SetSfx(0, sfx)
-			audio.Sfx(0, audio.Channel0, 0, 0)
+		if pi.Btnp(pi.Down) && sfxNote0.Pitch > 0 {
+			sfxNote0.Pitch -= 1
+			playSfx0()
 		}
-		if pi.Btnp(pi.Right) && sfx.Notes[0].Instrument < audio.InstrumentPhaser {
-			sfx.Notes[0].Instrument += 1
-			audio.SetSfx(0, sfx)
-			audio.Sfx(0, audio.Channel0, 0, 0)
+		if pi.Btnp(pi.Right) && sfxNote0.Instrument < audio.InstrumentPhaser {
+			sfxNote0.Instrument += 1
+			playSfx0()
 		}
-		if pi.Btnp(pi.Left) && sfx.Notes[0].Instrument > 0 {
-			sfx.Notes[0].Instrument -= 1
-			audio.SetSfx(0, sfx)
-			audio.Sfx(0, audio.Channel0, 0, 0)
+		if pi.Btnp(pi.Left) && sfxNote0.Instrument > 0 {
+			sfxNote0.Instrument -= 1
+			playSfx0()
 		}
 	}
 
 	ebitengine.MustRun()
+}
+
+func playSfx0() {
+	audio.Sync() // first send changed sfx to audio system
+	audio.Sfx(0, audio.Channel0, 0, 0)
 }

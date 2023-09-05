@@ -5,7 +5,7 @@ package devtools
 
 import (
 	"fmt"
-
+	"github.com/elgopher/pi/audio"
 	"github.com/elgopher/pi/devtools/internal/help"
 	"github.com/elgopher/pi/devtools/internal/interpreter"
 	"github.com/elgopher/pi/devtools/internal/snapshot"
@@ -67,6 +67,7 @@ func evaluateNextCommandFromTerminal() {
 
 		switch result {
 		case interpreter.GoCodeExecuted:
+			audio.Sync() // Quality Of Live
 			snapshot.Take()
 		case interpreter.Resumed:
 			resumeGame()

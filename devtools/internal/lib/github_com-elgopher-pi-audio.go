@@ -4,6 +4,8 @@ package lib
 
 import (
 	"github.com/elgopher/pi/audio"
+	"go/constant"
+	"go/token"
 	"reflect"
 )
 
@@ -24,8 +26,6 @@ func init() {
 		"EffectNoEffect":      reflect.ValueOf(audio.EffectNoEffect),
 		"EffectSlide":         reflect.ValueOf(audio.EffectSlide),
 		"EffectVibrato":       reflect.ValueOf(audio.EffectVibrato),
-		"GetMusic":            reflect.ValueOf(audio.GetMusic),
-		"GetSfx":              reflect.ValueOf(audio.GetSfx),
 		"GetStat":             reflect.ValueOf(audio.GetStat),
 		"InstrumentNoise":     reflect.ValueOf(audio.InstrumentNoise),
 		"InstrumentOrgan":     reflect.ValueOf(audio.InstrumentOrgan),
@@ -45,6 +45,7 @@ func init() {
 		"InstrumentTriangle":  reflect.ValueOf(audio.InstrumentTriangle),
 		"LoadAudio":           reflect.ValueOf(audio.LoadAudio),
 		"Music":               reflect.ValueOf(audio.Music),
+		"Pat":                 reflect.ValueOf(&audio.Pat).Elem(),
 		"PitchA0":             reflect.ValueOf(audio.PitchA0),
 		"PitchA1":             reflect.ValueOf(audio.PitchA1),
 		"PitchA2":             reflect.ValueOf(audio.PitchA2),
@@ -109,11 +110,12 @@ func init() {
 		"PitchGs2":            reflect.ValueOf(audio.PitchGs2),
 		"PitchGs3":            reflect.ValueOf(audio.PitchGs3),
 		"PitchGs4":            reflect.ValueOf(audio.PitchGs4),
+		"SFX":                 reflect.ValueOf(&audio.SFX).Elem(),
+		"SampleRate":          reflect.ValueOf(constant.MakeFromLiteral("22050", token.INT, 0)),
 		"SaveAudio":           reflect.ValueOf(audio.SaveAudio),
-		"SetMusic":            reflect.ValueOf(audio.SetMusic),
-		"SetSfx":              reflect.ValueOf(audio.SetSfx),
 		"SetSystem":           reflect.ValueOf(audio.SetSystem),
 		"Sfx":                 reflect.ValueOf(audio.Sfx),
+		"Sync":                reflect.ValueOf(audio.Sync),
 		"VolumeLoudest":       reflect.ValueOf(audio.VolumeLoudest),
 		"VolumeSilence":       reflect.ValueOf(audio.VolumeSilence),
 
@@ -121,6 +123,7 @@ func init() {
 		"Channel":     reflect.ValueOf((*audio.Channel)(nil)),
 		"Effect":      reflect.ValueOf((*audio.Effect)(nil)),
 		"Instrument":  reflect.ValueOf((*audio.Instrument)(nil)),
+		"LiveReader":  reflect.ValueOf((*audio.LiveReader)(nil)),
 		"Note":        reflect.ValueOf((*audio.Note)(nil)),
 		"Pattern":     reflect.ValueOf((*audio.Pattern)(nil)),
 		"PatternSfx":  reflect.ValueOf((*audio.PatternSfx)(nil)),
