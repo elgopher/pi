@@ -4,10 +4,12 @@
 package audio
 
 var (
-	Sfx [64]SoundEffect
-	Pat [64]Pattern
+	Sfx [64]SoundEffect // Sound effects
+	Pat [64]Pattern     // Music patterns
 )
 
+// Sync is required for changes made to Sfx and Pat to be audible.
+// Sync is automatically run after each command issued via devtools terminal.
 func Sync() {
 	for i, sfx := range Sfx {
 		system.SetSfx(i, sfx)
