@@ -7,15 +7,15 @@ import (
 )
 
 func main() {
-	audio.SFX[0].Notes[0] = audio.Note{
+	audio.Sfx[0].Notes[0] = audio.Note{
 		Pitch:      audio.PitchG3,
-		Instrument: audio.InstrumentNoise,
+		Instrument: audio.InstrumentPhaser,
 		Volume:     7,
 	}
-	audio.SFX[0].Speed = 255
+	audio.Sfx[0].Speed = 255
 	audio.Sync()
 
-	sfxNote0 := &audio.SFX[0].Notes[0]
+	sfxNote0 := &audio.Sfx[0].Notes[0]
 
 	pi.Update = func() {
 		if pi.Btnp(pi.X) {

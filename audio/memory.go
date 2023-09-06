@@ -4,12 +4,12 @@
 package audio
 
 var (
-	SFX [64]SoundEffect
+	Sfx [64]SoundEffect
 	Pat [64]Pattern
 )
 
 func Sync() {
-	for i, sfx := range SFX {
+	for i, sfx := range Sfx {
 		system.SetSfx(i, sfx)
 	}
 	for i, pattern := range Pat {
