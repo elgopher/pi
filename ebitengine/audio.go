@@ -48,7 +48,7 @@ func startAudio() (stop func(), ready <-chan struct{}, _ error) {
 		// (again via MessageChannel) instead of directly calling synthesizer. Audio Worklet processor will use
 		// pi.Synthesizer. Based on incoming events it will update the pi.Synthesizer.
 
-		state, err := audio.SaveAudio()
+		state, err := audio.Save()
 		if err != nil {
 			return stop, nil, fmt.Errorf("problem saving audio state: %w", err)
 		}

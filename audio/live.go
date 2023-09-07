@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/audio/internal"
 )
 
@@ -36,7 +35,7 @@ func (l *LiveReader) ReadSamples(buf []float64) int {
 	maxRealSample := int(now.Sub(l.started) / sampleDuration)
 	maxCallerSample := l.lastSample + len(buf)
 
-	maxSample := pi.MinInt(maxRealSample, maxCallerSample)
+	maxSample := minInt(maxRealSample, maxCallerSample)
 	samplesToRead := maxSample - l.lastSample
 
 	samplesToDrop := maxRealSample - maxCallerSample - int(l.BufferSize/sampleDuration) + 1
@@ -60,7 +59,7 @@ func (l *LiveReader) dropSamples(samplesToDrop int) {
 	}
 
 	for samplesToDrop > 0 {
-		n := pi.MinInt(samplesToDrop, len(l.reusedBuffer))
+		n := minInt(samplesToDrop, len(l.reusedBuffer))
 		l.ReadSamplesFunc(l.reusedBuffer[:n])
 		samplesToDrop -= n
 	}
