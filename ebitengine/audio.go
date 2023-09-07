@@ -216,23 +216,9 @@ func (e *ebitenPlayerSource) SetSfx(sfxNo int, effect audio.SoundEffect) {
 	e.audioSystem.SetSfx(sfxNo, effect)
 }
 
-func (e *ebitenPlayerSource) GetSfx(sfxNo int) audio.SoundEffect {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
-	return e.audioSystem.GetSfx(sfxNo)
-}
-
 func (e *ebitenPlayerSource) SetMusic(patterNo int, pattern audio.Pattern) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 
 	e.audioSystem.SetMusic(patterNo, pattern)
-}
-
-func (e *ebitenPlayerSource) GetMusic(patterNo int) audio.Pattern {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
-	return e.audioSystem.GetMusic(patterNo)
 }

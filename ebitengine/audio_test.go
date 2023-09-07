@@ -174,9 +174,7 @@ func TestEbitenPlayerSource_ThreadSafety(t *testing.T) {
 				reader.Music(0, 0, 0)
 				reader.Stat()
 				reader.SetSfx(0, audio.SoundEffect{})
-				reader.GetSfx(0)
 				reader.SetMusic(0, audio.Pattern{})
-				reader.GetMusic(0)
 			}()
 		}
 

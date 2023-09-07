@@ -254,16 +254,10 @@ type System interface {
 	// SoundEffect parameters are clamped when out of range.
 	// For example, sfx note volume equal 8 will be silently clamped to 7.
 	SetSfx(sfxNo int, e SoundEffect)
-	// GetSfx returns sfx with given number. sfxNo is 0-63. Trying to get
-	// sfx number higher than 63 will result in returning empty SoundEffect (zero-value).
-	GetSfx(sfxNo int) SoundEffect
 	// SetMusic updates the music pattern. patternNo is 0-63. Updating pattern number which
 	// is higher than 63 does not do anything.
 	//
 	// Pattern parameters are clamped when out of range.
 	// For example, pattern sfx number equal 64 will be silently clamped to 63.
 	SetMusic(patternNo int, _ Pattern)
-	// GetMusic returns music pattern with given number. patterNo is 0-63. Trying to get
-	// pattern number higher than 63 will result in returning empty Pattern (zero-value).
-	GetMusic(patterNo int) Pattern
 }
