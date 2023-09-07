@@ -50,3 +50,27 @@ func singleNoteSamples(speed byte) int {
 
 	return int(speed) * 183
 }
+
+func minInt[T ~int | ~uint8](x, y T) T {
+	if x < y {
+		return x
+	}
+
+	return y
+}
+
+func midInt[T ~int](x, y, z T) T {
+	if x > y {
+		x, y = y, x
+	}
+
+	if y > z {
+		y = z
+	}
+
+	if x > y {
+		y = x
+	}
+
+	return y
+}

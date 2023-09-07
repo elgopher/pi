@@ -7,7 +7,6 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/audio/internal"
 )
 
@@ -108,7 +107,7 @@ func (s *Synthesizer) Play(sfxNo, ch, offset, length int) {
 		ch = s.findAvailableChannel()
 	}
 
-	offset = pi.MidInt(offset, 0, 31)
+	offset = midInt(offset, 0, 31)
 
 	s.channels[ch].playing = true
 
@@ -209,24 +208,24 @@ func (s *Synthesizer) SetSfx(sfxNo int, effect SoundEffect) {
 		s.sfx = map[byte]SoundEffect{}
 	}
 
-	effect.LoopStart = pi.MinInt(63, effect.LoopStart)
-	effect.LoopStop = pi.MinInt(63, effect.LoopStop)
-	effect.Detune = pi.MinInt(2, effect.Detune)
-	effect.Reverb = pi.MinInt(2, effect.Reverb)
-	effect.Dampen = pi.MinInt(2, effect.Dampen)
+	effect.LoopStart = minInt(63, effect.LoopStart)
+	effect.LoopStop = minInt(63, effect.LoopStop)
+	effect.Detune = minInt(2, effect.Detune)
+	effect.Reverb = minInt(2, effect.Reverb)
+	effect.Dampen = minInt(2, effect.Dampen)
 
 	for i := 0; i < len(effect.Notes); i++ {
 		volume := effect.Notes[i].Volume
-		effect.Notes[i].Volume = pi.MinInt(7, volume)
+		effect.Notes[i].Volume = minInt(7, volume)
 
 		pitch := effect.Notes[i].Pitch
-		effect.Notes[i].Pitch = pi.MinInt(63, pitch)
+		effect.Notes[i].Pitch = minInt(63, pitch)
 
 		instrument := effect.Notes[i].Instrument
-		effect.Notes[i].Instrument = pi.MinInt(15, instrument)
+		effect.Notes[i].Instrument = minInt(15, instrument)
 
 		eff := effect.Notes[i].Effect
-		effect.Notes[i].Effect = pi.MinInt(7, eff)
+		effect.Notes[i].Effect = minInt(7, eff)
 	}
 
 	s.sfx[byte(sfxNo)] = effect
@@ -253,7 +252,7 @@ func (s *Synthesizer) SetMusic(patternNo int, pattern Pattern) {
 
 	for i := 0; i < len(pattern.Sfx); i++ {
 		sfxNo := pattern.Sfx[i].SfxNo
-		pattern.Sfx[i].SfxNo = pi.MinInt(maxSfxNo, sfxNo)
+		pattern.Sfx[i].SfxNo = minInt(maxSfxNo, sfxNo)
 	}
 
 	s.pattern[byte(patternNo)] = pattern
@@ -345,6 +344,10 @@ func (s *Synthesizer) Load(state []byte) error {
 	}
 
 	return nil
+}
+
+func byteToBool(b byte) bool {
+	return b == 1
 }
 
 func (s *Synthesizer) Save() ([]byte, error) {

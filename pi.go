@@ -35,8 +35,11 @@ package pi
 
 import (
 	_ "embed"
+	"errors"
+	"fmt"
 	"io/fs"
 
+	"github.com/elgopher/pi/audio"
 	"github.com/elgopher/pi/font"
 )
 
@@ -65,7 +68,7 @@ var Time float64
 
 var GameLoopStopped bool
 
-// Load loads files: sprite-sheet.png and custom-font.png from resources parameter.
+// Load loads files: sprite-sheet.png, custom-font.png and audio.sfx from resources parameter.
 //
 // Load looks for images with hard-coded names, eg for sprite-sheet it loads "sprite-sheet.png".
 // Your file name must be exactly the same. And it cannot be inside subdirectory.
@@ -122,6 +125,23 @@ func loadGameResources(resources fs.ReadFileFS) error {
 
 	if err := loadCustomFont(resources); err != nil {
 		return err
+	}
+
+	if err := loadAudio(resources); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func loadAudio(resources fs.ReadFileFS) error {
+	fileContents, err := resources.ReadFile("audio.sfx")
+	if errors.Is(err, fs.ErrNotExist) {
+		return nil
+	}
+
+	if err = audio.Load(fileContents); err != nil {
+		return fmt.Errorf("error loading audio.sfx: %w", err)
 	}
 
 	return nil

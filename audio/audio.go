@@ -63,16 +63,28 @@ func GetStat() Stat {
 	return system.Stat()
 }
 
-// SaveAudio stores audio system state to byte slice. State is stored in binary form.
+// Save stores audio system state to byte slice. State is stored in binary form.
 // The format is described in Synthesizer.Save source code.
-func SaveAudio() ([]byte, error) {
+func Save() ([]byte, error) {
 	return system.Save()
 }
 
-// LoadAudio restores audio system state from byte slice. State is restored from binary form.
+// Load restores audio system state from byte slice. State is restored from binary form.
 // The format is described in Synthesizer.Save source code.
-func LoadAudio(b []byte) error {
-	return system.Load(b)
+func Load(b []byte) error {
+	if err := system.Load(b); err != nil {
+		return err
+	}
+
+	for sfxNo := range Sfx {
+		Sfx[sfxNo] = system.GetSfx(sfxNo)
+	}
+
+	for patternNo := range Pat {
+		Pat[patternNo] = system.GetMusic(patternNo)
+	}
+
+	return nil
 }
 
 var system System = &Synthesizer{}
@@ -244,10 +256,6 @@ type Pattern struct {
 type PatternSfx struct {
 	SfxNo   byte // 0-63. Not implemented yet.
 	Enabled bool // Not implemented yet.
-}
-
-func byteToBool(b byte) bool {
-	return b == 1
 }
 
 // SetSystem is executed by the back-end to replace audio system with his own implementation.
