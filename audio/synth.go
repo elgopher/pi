@@ -94,26 +94,18 @@ func (c *channel) moveToNextNote(sfx SoundEffect) {
 }
 
 func (s *Synthesizer) Play(sfxNo, ch, offset, length int) {
-	if sfxNo == -2 {
-		s.disableLooping(ch)
+	if ch < -1 || ch > 3 {
 		return
 	}
 
-	if ch >= -2 && ch <= 3 {
-		s.Stop(sfxNo)
+	if sfxNo < 0 || sfxNo > maxSfxNo {
+		return
 	}
+
+	s.Stop(sfxNo)
 
 	if ch == -1 {
 		ch = s.findAvailableChannel()
-	}
-
-	if ch < 0 || ch > 3 {
-		return
-	}
-
-	if sfxNo == -1 {
-		s.channels[ch].playing = false
-		return
 	}
 
 	offset = pi.MidInt(offset, 0, 31)
@@ -175,19 +167,6 @@ func (s *Synthesizer) StopLoop(channel int) {
 
 	if channel >= 0 && channel <= 3 {
 		s.channels[channel].loopingDisabled = true
-	}
-}
-
-func (s *Synthesizer) disableLooping(ch int) {
-	if ch == -1 || ch == -2 {
-		for i := range s.channels {
-			s.channels[i].loopingDisabled = true
-		}
-		return
-	}
-
-	if ch >= 0 && ch <= 0 {
-		s.channels[ch].loopingDisabled = true
 	}
 }
 

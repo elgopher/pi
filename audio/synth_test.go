@@ -595,6 +595,30 @@ func TestSynthesizer_PlayStop(t *testing.T) {
 		}
 	})
 
+	t.Run("should not stop playing sfx when sfx is invalid", func(t *testing.T) {
+		sfxNumbers := []int{math.MinInt, -1, maxSfxNo + 1, math.MaxInt}
+
+		for _, sfxNo := range sfxNumbers {
+			testName := fmt.Sprintf("%d", sfxNo)
+			t.Run(testName, func(t *testing.T) {
+				synth := &audio.Synthesizer{}
+				var e audio.SoundEffect
+				e.Speed = 1
+				e.Notes[0].Volume = audio.VolumeLoudest
+				synth.SetSfx(0, e)
+
+				synth.Play(0, 0, 0, 1)
+				// when
+				synth.Play(sfxNo, 0, 0, 1)
+				// then
+				stat := synth.Stat()
+				assert.Equal(t, 0, stat.Sfx[0])
+				// and
+				assertNotSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))
+			})
+		}
+	})
+
 	sfxOffsetLengthTest(t)
 	sfxLoopTest(t)
 	sfxLengthTest(t)
