@@ -197,72 +197,6 @@ func TestSynthesizer_GetMusic(t *testing.T) {
 	})
 }
 
-//go:embed "internal/valid-save"
-var validSave []byte
-
-func TestSynthesizer_Save(t *testing.T) {
-	t.Run("should save in binary format", func(t *testing.T) {
-		s := audio.Synthesizer{}
-		s.SetSfx(3, validEffect)
-		s.SetMusic(4, validPattern)
-		bytes, err := s.Save()
-		require.NoError(t, err)
-		assert.Equal(t, validSave, bytes)
-	})
-}
-
-func TestSynthesizer_Load(t *testing.T) {
-	t.Run("should load state", func(t *testing.T) {
-		s := audio.Synthesizer{}
-		err := s.Load(validSave)
-		require.NoError(t, err)
-		assert.Equal(t, validEffect, s.GetSfx(3))
-		assert.Equal(t, validPattern, s.GetMusic(4))
-	})
-
-	t.Run("should return error when state is empty", func(t *testing.T) {
-		s := audio.Synthesizer{}
-		err := s.Load([]byte{})
-		assert.Error(t, err)
-	})
-
-	t.Run("should return error when version is not supported", func(t *testing.T) {
-		s := audio.Synthesizer{}
-		err := s.Load([]byte{2})
-		assert.Error(t, err)
-	})
-
-	t.Run("should return error when state has invalid length", func(t *testing.T) {
-		s := audio.Synthesizer{}
-		err := s.Load([]byte{1, 0, 0, 0})
-		assert.Error(t, err)
-	})
-
-	t.Run("should clamp sfx when sfx parameter is out of range", func(t *testing.T) {
-		save := clone(validSave)
-		const sfx0note0pitch = 1
-		save[sfx0note0pitch] = 64
-		s := audio.Synthesizer{}
-		// when
-		err := s.Load(save)
-		// then
-		require.NoError(t, err)
-		assert.Equal(t, audio.Pitch(63), s.GetSfx(0).Notes[0].Pitch)
-	})
-
-	t.Run("should clamp pattern when pattern parameter is out of range", func(t *testing.T) {
-		save := clone(validSave)
-		const pattern0sfx0sfxNo = 8705 // 1 byte for version, 8704 bytes for sound effects
-		save[pattern0sfx0sfxNo] = 64
-		s := audio.Synthesizer{}
-		// when
-		err := s.Load(save)
-		// then
-		require.NoError(t, err)
-		assert.Equal(t, byte(63), s.GetMusic(0).Sfx[0].SfxNo)
-	})
-}
-
 func TestSynthesizer_ReadSamples(t *testing.T) {
 	t.Run("should not do anything when buffer has 0 length", func(t *testing.T) {
 		s := audio.Synthesizer{}
@@ -998,12 +932,6 @@ func readSamples(synth *audio.Synthesizer, size int) []float64 {
 	buffer := make([]float64, size)
 	synth.ReadSamples(buffer)
 	return buffer
-}
-
-func clone(s []byte) []byte {
-	cloned := make([]byte, len(s))
-	copy(cloned, s)
-	return cloned
 }
 
 func assertSilence(t *testing.T, buffer []float64) {
