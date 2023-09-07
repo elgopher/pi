@@ -4,7 +4,6 @@
 package ebitengine
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -48,15 +47,7 @@ func startAudio() (stop func(), ready <-chan struct{}, _ error) {
 		// (again via MessageChannel) instead of directly calling synthesizer. Audio Worklet processor will use
 		// pi.Synthesizer. Based on incoming events it will update the pi.Synthesizer.
 
-		state, err := audio.Save()
-		if err != nil {
-			return stop, nil, fmt.Errorf("problem saving audio state: %w", err)
-		}
 		synth := &audio.Synthesizer{}
-		if err = synth.Load(state); err != nil {
-			return stop, nil, fmt.Errorf("problem loading audio state: %w", err)
-		}
-
 		liveReader := &audio.LiveReader{
 			ReadSamplesFunc: synth.ReadSamples,
 			BufferSize:      playerBufferSize * (audio.SampleRate / audioSampleRate),
@@ -67,6 +58,7 @@ func startAudio() (stop func(), ready <-chan struct{}, _ error) {
 			readSamples: liveReader.ReadSamples,
 		}
 		audio.SetSystem(audioSystem) // make audio system concurrency-safe
+		audio.Sync()
 		AudioStream = audioSystem
 	}
 
@@ -243,18 +235,4 @@ func (e *ebitenPlayerSource) GetMusic(patterNo int) audio.Pattern {
 	defer e.mutex.Unlock()
 
 	return e.audioSystem.GetMusic(patterNo)
-}
-
-func (e *ebitenPlayerSource) Save() ([]byte, error) {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
-	return e.audioSystem.Save()
-}
-
-func (e *ebitenPlayerSource) Load(bytes []byte) error {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
-	return e.audioSystem.Load(bytes)
 }

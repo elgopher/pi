@@ -7,7 +7,9 @@
 // Sound effects and music can be changed using functions: SetSfx and SetMusic.
 package audio
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // Play starts playing sound effect with given sfxNo on specified channel.
 //
@@ -61,30 +63,6 @@ func Music(patterNo int, fadeMs int, channelMask byte) {
 // GetStat returns information about currently played sound effects and music.
 func GetStat() Stat {
 	return system.Stat()
-}
-
-// Save stores audio system state to byte slice. State is stored in binary form.
-// The format is described in Synthesizer.Save source code.
-func Save() ([]byte, error) {
-	return system.Save()
-}
-
-// Load restores audio system state from byte slice. State is restored from binary form.
-// The format is described in Synthesizer.Save source code.
-func Load(b []byte) error {
-	if err := system.Load(b); err != nil {
-		return err
-	}
-
-	for sfxNo := range Sfx {
-		Sfx[sfxNo] = system.GetSfx(sfxNo)
-	}
-
-	for patternNo := range Pat {
-		Pat[patternNo] = system.GetMusic(patternNo)
-	}
-
-	return nil
 }
 
 var system System = &Synthesizer{}
@@ -288,6 +266,4 @@ type System interface {
 	// GetMusic returns music pattern with given number. patterNo is 0-63. Trying to get
 	// pattern number higher than 63 will result in returning empty Pattern (zero-value).
 	GetMusic(patterNo int) Pattern
-	Save() ([]byte, error)
-	Load([]byte) error
 }
