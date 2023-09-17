@@ -68,11 +68,16 @@ func GetStat() Stat {
 var system System = &Synthesizer{}
 
 type Stat struct {
-	Sfx           [4]int // -1 means no sfx on channel
-	Note          [4]int // -1 means no sfx on channel. Not implemented yet.
-	Pattern       int    // currently played music pattern. Not implemented yet.
-	PatternsCount int    // the number of music patterns played since the most recent call to Music(). Not implemented yet.
-	TicksCount    int    // the number of ticks (notes or rests) played on the current pattern. Not implemented yet.
+	Sfx           [4]SfxStat
+	Pattern       int // currently played music pattern. Not implemented yet.
+	PatternsCount int // the number of music patterns played since the most recent call to Music(). Not implemented yet.
+	TicksCount    int // the number of ticks (notes or rests) played on the current pattern. Not implemented yet.
+}
+
+type SfxStat struct {
+	SfxNo     int // -1 means no sfx on channel
+	Note      int // current note in sfx
+	Remaining int // number of remaining notes in sfx. -1 if loop
 }
 
 type SoundEffect struct {
@@ -99,6 +104,18 @@ func (s SoundEffect) noteAt(no int) Note {
 		note = s.Notes[no]
 	}
 	return note
+}
+
+func (s SoundEffect) hasLoop() bool {
+	return s.LoopStop > s.LoopStart
+}
+
+func (s SoundEffect) hasLength() bool {
+	return s.LoopStart > s.LoopStop
+}
+
+func (s SoundEffect) length() int {
+	return int(s.LoopStart - s.LoopStop)
 }
 
 type Note struct {
