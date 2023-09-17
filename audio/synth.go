@@ -115,6 +115,12 @@ func (s *Synthesizer) Play(sfxNo, ch, offset, length int) {
 	s.channels[ch].sfxNo = sfxNo
 	s.channels[ch].frame = 0
 	s.channels[ch].noteNo = offset
+	if length <= 0 && sfx.LoopStop <= sfx.LoopStart {
+		length = 32
+	}
+	if length > 32 {
+		length = 32
+	}
 	s.channels[ch].notesToGo = length
 	s.channels[ch].loopingDisabled = false
 
@@ -183,14 +189,29 @@ func (s *Synthesizer) Music(patterNo int, fadeMs int, channelMask byte) {
 }
 
 func (s *Synthesizer) Stat() Stat {
-	fmt.Println("Stat is not implemented yet. Sorry...")
+	fmt.Println("Stat is not fully implemented yet. Sorry...")
 
 	stat := Stat{}
 	for i, c := range s.channels {
 		if c.playing {
-			stat.Sfx[i] = c.sfxNo
+			sfxStat := SfxStat{
+				SfxNo:     c.sfxNo,
+				Note:      c.noteNo,
+				Remaining: c.notesToGo,
+			}
+			sfx := s.GetSfx(c.sfxNo)
+			if sfx.hasLoop() {
+				sfxStat.Remaining = -1
+			} else if sfx.hasLength() {
+				sfxStat.Remaining = minInt(sfx.length(), c.notesToGo)
+			}
+			stat.Sfx[i] = sfxStat
 		} else {
-			stat.Sfx[i] = -1
+			stat.Sfx[i] = SfxStat{
+				SfxNo:     -1,
+				Note:      -1,
+				Remaining: 0,
+			}
 		}
 	}
 	return stat

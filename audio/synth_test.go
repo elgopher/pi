@@ -353,6 +353,7 @@ func TestSynthesizer_PlayStop(t *testing.T) {
 				assertSilence(t, buffer)
 
 				t.Run("and next note with max volume should be played", func(t *testing.T) {
+					assert.Equal(t, 2, synth.Stat().Sfx[0].Note)
 					synth.ReadSamples(buffer)
 					assertNotSilence(t, buffer)
 				})
@@ -415,7 +416,7 @@ func TestSynthesizer_PlayStop(t *testing.T) {
 		synth.Play(sfxNo, -1, 0, 1)
 		// then
 		stat := synth.Stat()
-		assert.Equal(t, sfxNo, stat.Sfx[3])
+		assert.Equal(t, sfxNo, stat.Sfx[3].SfxNo)
 		assertNotSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))
 	})
 
@@ -435,7 +436,7 @@ func TestSynthesizer_PlayStop(t *testing.T) {
 		synth.Play(sfxNo, -1, 0, 1)
 		// then
 		stat := synth.Stat()
-		assert.Equal(t, sfxNo, stat.Sfx[3])
+		assert.Equal(t, sfxNo, stat.Sfx[3].SfxNo)
 		assertNotSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))
 	})
 
@@ -451,8 +452,8 @@ func TestSynthesizer_PlayStop(t *testing.T) {
 		synth.Play(0, 1, 0, 1)
 		// then
 		stat := synth.Stat()
-		assert.Equal(t, -1, stat.Sfx[0])
-		assert.Equal(t, 0, stat.Sfx[1])
+		assert.Equal(t, -1, stat.Sfx[0].SfxNo)
+		assert.Equal(t, 0, stat.Sfx[1].SfxNo)
 		// and
 		signal := readSamples(synth, durationOfNoteWhenSpeedIsOne)
 		expectedSignal := generateSamples(e, durationOfNoteWhenSpeedIsOne)
@@ -477,7 +478,7 @@ func TestSynthesizer_PlayStop(t *testing.T) {
 		synth.Stop(-1)
 		// then
 		stat := synth.Stat()
-		assert.Equal(t, -1, stat.Sfx[0])
+		assert.Equal(t, -1, stat.Sfx[0].SfxNo)
 		// and
 		assertSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))
 	})
@@ -500,7 +501,7 @@ func TestSynthesizer_PlayStop(t *testing.T) {
 		synth.StopChan(-1)
 		// then
 		stat := synth.Stat()
-		assert.Equal(t, -1, stat.Sfx[0])
+		assert.Equal(t, -1, stat.Sfx[0].SfxNo)
 		// and
 		assertSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))
 	})
@@ -522,7 +523,7 @@ func TestSynthesizer_PlayStop(t *testing.T) {
 				synth.Play(0, ch, 0, 1)
 				// then
 				stat := synth.Stat()
-				assert.Equal(t, 0, stat.Sfx[0])
+				assert.Equal(t, 0, stat.Sfx[0].SfxNo)
 				// and
 				assertNotSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))
 			})
@@ -546,7 +547,7 @@ func TestSynthesizer_PlayStop(t *testing.T) {
 				synth.Play(sfxNo, 0, 0, 1)
 				// then
 				stat := synth.Stat()
-				assert.Equal(t, 0, stat.Sfx[0])
+				assert.Equal(t, 0, stat.Sfx[0].SfxNo)
 				// and
 				assertNotSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))
 			})
@@ -925,6 +926,107 @@ func sfxLengthTest(t *testing.T) {
 
 		assertNotSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))
 		assertSilence(t, readSamples(synth, durationOfNoteWhenSpeedIsOne))
+	})
+}
+
+func TestSynthesizer_Stat(t *testing.T) {
+	t.Run("should return sfx stat when no sfx were played", func(t *testing.T) {
+		var synth audio.Synthesizer
+		expected := audio.SfxStat{
+			SfxNo:     -1,
+			Note:      -1,
+			Remaining: 0,
+		}
+		stat := synth.Stat()
+		for i := 0; i < maxChannels; i++ {
+			assert.Equal(t, expected, stat.Sfx[i])
+		}
+	})
+
+	t.Run("should return issued note", func(t *testing.T) {
+		for note := 0; note < 2; note++ {
+			var synth audio.Synthesizer
+			synth.Play(0, 0, note, 0)
+			assert.Equal(t, note, synth.Stat().Sfx[0].Note)
+		}
+	})
+
+	t.Run("should return issued remaining notes", func(t *testing.T) {
+		for length := 1; length < 3; length++ {
+			var synth audio.Synthesizer
+			synth.Play(0, 0, 0, length)
+			assert.Equal(t, length, synth.Stat().Sfx[0].Remaining)
+		}
+	})
+
+	t.Run("should return 32 when issued length was 0", func(t *testing.T) {
+		var synth audio.Synthesizer
+		synth.Play(0, 0, 0, 0)
+		assert.Equal(t, 32, synth.Stat().Sfx[0].Remaining)
+	})
+
+	t.Run("should return -1 when sfx has loop", func(t *testing.T) {
+		var synth audio.Synthesizer
+		synth.SetSfx(0, audio.SoundEffect{
+			LoopStart: 0,
+			LoopStop:  1,
+		})
+		synth.Play(0, 0, 0, 0)
+		assert.Equal(t, -1, synth.Stat().Sfx[0].Remaining)
+	})
+
+	t.Run("should return -1 when sfx was updated after played", func(t *testing.T) {
+		var synth audio.Synthesizer
+		synth.Play(0, 0, 0, 0)
+		synth.SetSfx(0, audio.SoundEffect{
+			LoopStart: 0,
+			LoopStop:  1,
+		})
+		assert.Equal(t, -1, synth.Stat().Sfx[0].Remaining)
+	})
+
+	t.Run("should return length when sfx.LoopStart > sfx.LoopStop", func(t *testing.T) {
+		var synth audio.Synthesizer
+		synth.SetSfx(0, audio.SoundEffect{
+			LoopStart: 1, // len=1
+			LoopStop:  0,
+		})
+		synth.Play(0, 0, 0, 0)
+		assert.Equal(t, 1, synth.Stat().Sfx[0].Remaining)
+	})
+
+	t.Run("should return min length when sfx.LoopStart > sfx.LoopStop", func(t *testing.T) {
+		var synth audio.Synthesizer
+		synth.SetSfx(0, audio.SoundEffect{
+			LoopStart: 3, // len=3
+			LoopStop:  0,
+		})
+		synth.Play(0, 0, 0, 2) // len=2
+		assert.Equal(t, 2, synth.Stat().Sfx[0].Remaining)
+	})
+
+	t.Run("should return remaining notes after one note was played", func(t *testing.T) {
+		var synth audio.Synthesizer
+		synth.Play(0, 0, 0, 2)
+		readSamples(&synth, durationOfNoteWhenSpeedIsOne)
+		assert.Equal(t, 1, synth.Stat().Sfx[0].Remaining)
+	})
+
+	t.Run("should return 32 when length higher than 32", func(t *testing.T) {
+		var synth audio.Synthesizer
+		synth.Play(0, 0, 0, 33)
+		assert.Equal(t, 32, synth.Stat().Sfx[0].Remaining)
+	})
+
+	t.Run("should return remaining notes when sfx has length (loop start > loop stop) and one was played", func(t *testing.T) {
+		var synth audio.Synthesizer
+		synth.SetSfx(0, audio.SoundEffect{
+			LoopStart: 3, // len=3
+			LoopStop:  0,
+		})
+		synth.Play(0, 0, 0, 2)
+		readSamples(&synth, durationOfNoteWhenSpeedIsOne)
+		assert.Equal(t, 1, synth.Stat().Sfx[0].Remaining)
 	})
 }
 

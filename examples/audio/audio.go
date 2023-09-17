@@ -17,6 +17,8 @@ func main() {
 
 	sfxNote0 := &audio.Sfx[0].Notes[0]
 
+	audio.Play(0, 0, 0, 0)
+
 	pi.Update = func() {
 		if pi.Btnp(pi.X) {
 			audio.Play(0, 0, 0, 0)

@@ -57,8 +57,12 @@ func startAudio() (stop func(), ready <-chan struct{}, _ error) {
 			audioSystem: synth,
 			readSamples: liveReader.ReadSamples,
 		}
+		stat := audio.GetStat()
 		audio.SetSystem(audioSystem) // make audio system concurrency-safe
 		audio.Sync()
+		for channel, sfx := range stat.Sfx {
+			audioSystem.Play(sfx.SfxNo, channel, sfx.Note, sfx.Remaining)
+		}
 		AudioStream = audioSystem
 	}
 
