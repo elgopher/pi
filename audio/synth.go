@@ -189,8 +189,6 @@ func (s *Synthesizer) Music(patterNo int, fadeMs int, channelMask byte) {
 }
 
 func (s *Synthesizer) Stat() Stat {
-	fmt.Println("Stat is not fully implemented yet. Sorry...")
-
 	stat := Stat{}
 	for i, c := range s.channels {
 		if c.playing {
