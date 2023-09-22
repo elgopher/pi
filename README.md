@@ -6,6 +6,11 @@
 
 The retro game development engine for Go, inspired by [Pico-8](https://www.lexaloffle.com/pico-8.php) and powered by [Ebitengine](https://ebiten.org/).
 
+[![Hello World example](docs/screenshot-hello.png)](examples/hello)
+[![Controller example](docs/screenshot-controller.png)](examples/controller)
+[![Keyboard example](docs/screenshot-keyboard.png)](examples/keyboard)
+[![Palette swapping example](docs/screenshot-pal.png)](examples/pal)
+
 ## FAQ
 
 ### Is this a new fantasy console?
