@@ -11,14 +11,22 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/image"
 	"github.com/elgopher/pi/key"
 )
 
 type game struct {
 	ready              atomic.Bool
-	screenDataRGBA     []byte // reused RGBA pixels
-	screenChanged      bool
 	shouldSkipNextDraw bool
+	screenFrame        screenFrame
+}
+
+type screenFrame struct {
+	changed        bool
+	pix            []byte
+	palette        [256]image.RGB
+	pald           pi.PalMapping
+	screenDataRGBA []byte // reused RGBA pixels
 }
 
 func (e *game) Update() error {
@@ -58,9 +66,37 @@ func (e *game) Update() error {
 		}
 	}
 
-	e.screenChanged = true
+	e.screenFrame.update()
 
 	return nil
+}
+
+func (f *screenFrame) update() {
+	scrPix := pi.Scr().Pix()
+	screenChanged := !slicesEqual(f.pix, scrPix) || f.palette != pi.Palette || f.pald != pi.Pald
+	if screenChanged {
+		f.changed = true
+
+		if len(f.pix) != len(scrPix) {
+			f.pix = make([]byte, len(scrPix))
+		}
+		copy(f.pix, scrPix)
+		f.pald = pi.Pald
+		f.palette = pi.Palette
+	}
+}
+
+// replace with slices.Equal after upgrading to go 1.21
+func slicesEqual[S ~[]E, E comparable](s1, s2 S) bool {
+	if len(s1) != len(s2) {
+		return false
+	}
+	for i := range s1 {
+		if s1[i] != s2[i] {
+			return false
+		}
+	}
+	return true
 }
 
 func handleKeyboardShortcuts() {
@@ -77,33 +113,30 @@ func (e *game) Draw(screen *ebiten.Image) {
 		return
 	}
 
-	// Ebitengine executes Draw based on display frequency.
-	// But the screen is changed at most 30 times per second.
-	// That's why there is no need to write pixels more often
-	// than 30 times per second.
-	if e.screenChanged {
-		e.writeScreenPixels(screen)
-		e.screenChanged = false
-	}
+	e.screenFrame.writeScreenPixels(screen)
 }
 
-func (e *game) writeScreenPixels(screen *ebiten.Image) {
-	pix := pi.Scr().Pix()
-	if e.screenDataRGBA == nil || len(e.screenDataRGBA)/4 != len(pix) {
-		e.screenDataRGBA = make([]byte, len(pix)*4)
-	}
+func (f *screenFrame) writeScreenPixels(screen *ebiten.Image) {
+	if f.changed {
+		f.changed = false
 
-	offset := 0
-	for _, col := range pix {
-		rgb := pi.Palette[pi.Pald[col]]
-		e.screenDataRGBA[offset] = rgb.R
-		e.screenDataRGBA[offset+1] = rgb.G
-		e.screenDataRGBA[offset+2] = rgb.B
-		e.screenDataRGBA[offset+3] = 0xff
-		offset += 4
-	}
+		pix := pi.Scr().Pix()
+		if f.screenDataRGBA == nil || len(f.screenDataRGBA)/4 != len(pix) {
+			f.screenDataRGBA = make([]byte, len(pix)*4)
+		}
 
-	screen.WritePixels(e.screenDataRGBA)
+		offset := 0
+		for _, col := range pix {
+			rgb := pi.Palette[pi.Pald[col]]
+			f.screenDataRGBA[offset] = rgb.R
+			f.screenDataRGBA[offset+1] = rgb.G
+			f.screenDataRGBA[offset+2] = rgb.B
+			f.screenDataRGBA[offset+3] = 0xff
+			offset += 4
+		}
+
+		screen.WritePixels(f.screenDataRGBA)
+	}
 }
 
 func (e *game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
