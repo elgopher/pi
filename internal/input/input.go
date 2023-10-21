@@ -5,8 +5,8 @@ package input
 
 func IsPressedRepeatably(duration uint) bool {
 	const (
-		pressDuration = 15 // make it configurable
-		pressInterval = 4  // make it configurable
+		pressDuration = 15
+		pressInterval = 4
 	)
 
 	if duration == 1 {
