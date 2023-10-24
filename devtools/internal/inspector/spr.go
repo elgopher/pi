@@ -65,7 +65,7 @@ func (m *sprSelectionMode) update(spr *Spr) {
 }
 
 func (m *sprSelectionMode) draw() {
-	pi.SprSheet().Copy(0, 0, pi.SprSheet().Width(), pi.SprSheet().Height(), pi.Scr(), m.camera.X, m.camera.Y)
+	pi.SprSheet().Copy(pi.Scr(), m.camera.X, m.camera.Y)
 
 	mouseX, mouseY := pi.MousePos.X, pi.MousePos.Y
 

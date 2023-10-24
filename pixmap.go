@@ -226,9 +226,9 @@ type Pointer struct {
 	RemainingLines  int
 }
 
-// Copy copies the region specified by x, y, w, h into dst PixMap at dstX,dstY position.
-func (p PixMap) Copy(x, y, w, h int, dst PixMap, dstX, dstY int) {
-	dstPtr, srcPtr := p.pointersForCopy(x, y, w, h, dst, dstX, dstY)
+// Copy copies the clipped pixmap into dst PixMap at dstX,dstY position.
+func (p PixMap) Copy(dst PixMap, dstX, dstY int) {
+	dstPtr, srcPtr := p.pointersForCopy(dst, dstX, dstY)
 
 	remainingLines := MinInt(dstPtr.RemainingLines, srcPtr.RemainingLines)
 
@@ -247,8 +247,8 @@ func (p PixMap) Copy(x, y, w, h int, dst PixMap, dstX, dstY int) {
 }
 
 // Merge merges destination with source by running merge operation for each destination line.
-func (p PixMap) Merge(x, y, w, h int, dst PixMap, dstX, dstY int, merge func(dst, src []byte)) {
-	dstPtr, srcPtr := p.pointersForCopy(x, y, w, h, dst, dstX, dstY)
+func (p PixMap) Merge(dst PixMap, dstX, dstY int, merge func(dst, src []byte)) {
+	dstPtr, srcPtr := p.pointersForCopy(dst, dstX, dstY)
 
 	remainingLines := MinInt(dstPtr.RemainingLines, srcPtr.RemainingLines)
 
@@ -266,13 +266,18 @@ func (p PixMap) Merge(x, y, w, h int, dst PixMap, dstX, dstY int, merge func(dst
 	}
 }
 
-// Foreach runs the update function on PixMap fragment specified by x, y, w and h.
+// Foreach runs the update function on clipped PixMap.
 //
 // The update function accepts entire line to increase the performance.
-func (p PixMap) Foreach(x, y, w, h int, update func(x, y int, dst []byte)) {
+func (p PixMap) Foreach(update func(x, y int, dst []byte)) {
 	if update == nil {
 		return
 	}
+
+	x := p.clip.X
+	y := p.clip.Y
+	w := p.clip.W
+	h := p.clip.H
 
 	ptr, ok := p.Pointer(x, y, w, h)
 	if !ok {
@@ -334,9 +339,9 @@ func (p PixMap) lineOfColor(col byte, length int) []byte {
 	return line
 }
 
-func (p PixMap) pointersForCopy(srcX int, srcY int, w int, h int, dst PixMap, dstX int, dstY int) (Pointer, Pointer) {
-	dstPtr, _ := dst.Pointer(dstX, dstY, w, h)
-	srcPtr, _ := p.Pointer(srcX, srcY, w, h)
+func (p PixMap) pointersForCopy(dst PixMap, dstX int, dstY int) (Pointer, Pointer) {
+	dstPtr, _ := dst.Pointer(dstX, dstY, p.clip.W, p.clip.H)
+	srcPtr, _ := p.Pointer(p.clip.X, p.clip.Y, p.clip.W, p.clip.H)
 
 	// both maps must be moved by the same DeltaX and DeltaY
 	if srcPtr.DeltaX > dstPtr.DeltaX {
