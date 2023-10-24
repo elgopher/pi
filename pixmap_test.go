@@ -351,14 +351,15 @@ func TestPixMap_Pointer(t *testing.T) {
 func TestPixMap_Foreach(t *testing.T) {
 	t.Run("should not do anything when update function is nil", func(t *testing.T) {
 		pixMap := pi.NewPixMap(2, 2)
-		pixMap.Foreach(0, 0, 2, 2, nil)
+		pixMap.Foreach(nil)
 	})
 
 	t.Run("should run update line number of times", func(t *testing.T) {
 		t.Run("inside clipping range", func(t *testing.T) {
 			pixMap := pi.NewPixMap(1, 3)
 			timesRun := 0
-			pixMap.Foreach(0, 0, 1, 2, func(x, y int, dst []byte) {
+			src := pixMap.WithClip(0, 0, 1, 2)
+			src.Foreach(func(x, y int, dst []byte) {
 				timesRun++
 			})
 			assert.Equal(t, 2, timesRun)
@@ -367,7 +368,8 @@ func TestPixMap_Foreach(t *testing.T) {
 		t.Run("outside clipping range", func(t *testing.T) {
 			pixMap := pi.NewPixMap(1, 3)
 			timesRun := 0
-			pixMap.Foreach(0, 0, 1, 4, func(x, y int, dst []byte) {
+			src := pixMap.WithClip(0, 0, 1, 4)
+			src.Foreach(func(x, y int, dst []byte) {
 				timesRun++
 			})
 			assert.Equal(t, 3, timesRun)
@@ -380,7 +382,8 @@ func TestPixMap_Foreach(t *testing.T) {
 
 		t.Run("x=0", func(t *testing.T) {
 			var lines [][]byte
-			pixMap.Foreach(0, 0, 2, 3, func(x, y int, dst []byte) {
+			src := pixMap.WithClip(0, 0, 2, 3)
+			src.Foreach(func(x, y int, dst []byte) {
 				lines = append(lines, dst)
 			})
 			assert.Equal(t, [][]byte{{0, 1}, {3, 4}, {6, 7}}, lines)
@@ -388,7 +391,8 @@ func TestPixMap_Foreach(t *testing.T) {
 
 		t.Run("x=1", func(t *testing.T) {
 			var lines [][]byte
-			pixMap.Foreach(1, 0, 2, 3, func(x, y int, dst []byte) {
+			src := pixMap.WithClip(1, 0, 2, 3)
+			src.Foreach(func(x, y int, dst []byte) {
 				lines = append(lines, dst)
 			})
 			assert.Equal(t, [][]byte{{1, 2}, {4, 5}, {7, 8}}, lines)
@@ -401,7 +405,8 @@ func TestPixMap_Foreach(t *testing.T) {
 
 		t.Run("inside clipping range", func(t *testing.T) {
 			var coords []pi.Position
-			pixMap.Foreach(1, 1, 2, 2, func(x, y int, dst []byte) {
+			src := pixMap.WithClip(1, 1, 2, 2)
+			src.Foreach(func(x, y int, dst []byte) {
 				coords = append(coords, pi.Position{X: x, Y: y})
 			})
 			assert.Equal(t, []pi.Position{{X: 1, Y: 1}, {X: 1, Y: 2}}, coords)
@@ -409,7 +414,8 @@ func TestPixMap_Foreach(t *testing.T) {
 
 		t.Run("outside clipping range", func(t *testing.T) {
 			var coords []pi.Position
-			pixMap.Foreach(-1, -1, 3, 3, func(x, y int, dst []byte) {
+			src := pixMap.WithClip(-1, -1, 3, 3)
+			src.Foreach(func(x, y int, dst []byte) {
 				coords = append(coords, pi.Position{X: x, Y: y})
 			})
 			assert.Equal(t, []pi.Position{{X: 0, Y: 0}, {X: 0, Y: 1}}, coords)
@@ -422,14 +428,16 @@ func TestPixMap_Foreach(t *testing.T) {
 		update := func(x, y int, dst []byte) {
 			executed = true
 		}
-		pixMap.Foreach(0, 0, 0, 1, update) // width = 0
+		src := pixMap.WithClip(0, 0, 0, 1) // width = 0
+		src.Foreach(update)
 		assert.False(t, executed)
 	})
 
 	t.Run("should update pixels", func(t *testing.T) {
 		pixMap := pi.NewPixMap(2, 3)
 		i := byte(1)
-		pixMap.Foreach(0, 0, 2, 3, func(x, y int, dst []byte) {
+		src := pixMap.WithClip(0, 0, 2, 3)
+		src.Foreach(func(x, y int, dst []byte) {
 			dst[0] = i
 			dst[1] = i + 1
 			i += 2
@@ -442,7 +450,7 @@ func TestPixMap_Copy(t *testing.T) {
 	testPixMapCopy(t, pi.PixMap.Copy)
 }
 
-func testPixMapCopy(t *testing.T, merge func(pi.PixMap, int, int, int, int, pi.PixMap, int, int)) {
+func testPixMapCopy(t *testing.T, merge func(pi.PixMap, pi.PixMap, int, int)) {
 	t.Run("src bigger than dst", func(t *testing.T) {
 		src := pi.NewPixMapWithPix([]byte{
 			1, 2, 3,
@@ -488,7 +496,8 @@ func testPixMapCopy(t *testing.T, merge func(pi.PixMap, int, int, int, int, pi.P
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
 				dst := pi.NewPixMap(dstWidth, dstHeight)
-				merge(src, test.x, test.y, test.w, test.h, dst, test.dstX, test.dstY)
+				source := src.WithClip(test.x, test.y, test.w, test.h)
+				merge(source, dst, test.dstX, test.dstY)
 				assert.Equal(t, test.expected, dst.Pix())
 			})
 		}
@@ -517,7 +526,8 @@ func testPixMapCopy(t *testing.T, merge func(pi.PixMap, int, int, int, int, pi.P
 		for name, test := range tests {
 			t.Run(name, func(t *testing.T) {
 				dst := pi.NewPixMap(dstWidth, dstHeight)
-				merge(src, test.x, test.y, test.w, test.h, dst, test.dstX, test.dstY)
+				source := src.WithClip(test.x, test.y, test.w, test.h)
+				merge(source, dst, test.dstX, test.dstY)
 				assert.Equal(t, test.expected, dst.Pix())
 			})
 		}
@@ -525,8 +535,8 @@ func testPixMapCopy(t *testing.T, merge func(pi.PixMap, int, int, int, int, pi.P
 }
 
 func TestPixMap_Merge(t *testing.T) {
-	testPixMapCopy(t, func(src pi.PixMap, x int, y int, w int, h int, dst pi.PixMap, dstX int, dstY int) {
-		src.Merge(x, y, w, h, dst, dstX, dstY, func(dst, src []byte) {
+	testPixMapCopy(t, func(src pi.PixMap, dst pi.PixMap, dstX int, dstY int) {
+		src.Merge(dst, dstX, dstY, func(dst, src []byte) {
 			copy(dst, src)
 		})
 	})
