@@ -3,7 +3,7 @@ module github.com/elgopher/pi
 go 1.20
 
 require (
-	github.com/hajimehoshi/ebiten/v2 v2.6.2
+	github.com/hajimehoshi/ebiten/v2 v2.6.3
 	github.com/peterh/liner v1.2.2
 	github.com/stretchr/testify v1.8.4
 	github.com/traefik/yaegi v0.15.1
