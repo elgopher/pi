@@ -28,7 +28,7 @@ func BenchmarkPixMapPointer(b *testing.B) {
 func BenchmarkCopy(b *testing.B) {
 	runBenchmarks(b, func(res Resolution) {
 		for i := 0; i < 100; i++ {
-			pi.SprSheet().Copy(0, 0, 16, 16, pi.Scr(), 16, 16) // 2x times faster than SprSize
+			pi.SprSheet().WithClip(0, 0, 16, 16).Copy(pi.Scr(), 16, 16) // 2x times faster than SprSize
 		}
 	})
 }
@@ -38,7 +38,7 @@ func SrcAtop(dst, src []byte) { copy(dst, src) }
 func BenchmarkMerge(b *testing.B) {
 	runBenchmarks(b, func(res Resolution) {
 		for i := 0; i < 100; i++ {
-			pi.SprSheet().Merge(0, 0, 16, 16, pi.Scr(), 16, 16, SrcAtop) // FAST! NOT AS FAST AS COPY BUT THE PERF IS GREAT!
+			pi.SprSheet().WithClip(0, 0, 16, 16).Merge(pi.Scr(), 16, 16, SrcAtop) // FAST! NOT AS FAST AS COPY BUT THE PERF IS GREAT!
 		}
 	})
 }
@@ -47,7 +47,7 @@ func BenchmarkForeach(b *testing.B) {
 	src := make([]byte, 16)
 	runBenchmarks(b, func(res Resolution) {
 		for i := 0; i < 100; i++ {
-			pi.Scr().Foreach(0, 0, 16, 16, func(x, y int, dst []byte) { copy(dst, src) })
+			pi.Scr().WithClip(0, 0, 16, 16).Foreach(func(x, y int, dst []byte) { copy(dst, src) })
 		}
 	})
 }

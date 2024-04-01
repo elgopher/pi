@@ -22,7 +22,8 @@ func FuzzPixMap_Pointer(f *testing.F) {
 func FuzzPixMap_Foreach(f *testing.F) {
 	pixMap := pi.NewPixMap(2, 3)
 	f.Fuzz(func(t *testing.T, x, y, w, h, dstX, dstY int) {
-		pixMap.Foreach(x, y, w, h, func(x, y int, dst []byte) {
+		src := pixMap.WithClip(x, y, w, h)
+		src.Foreach(func(x, y int, dst []byte) {
 			dst[0] = byte(x + y)
 		})
 	})
@@ -33,7 +34,7 @@ func FuzzPixMap_Copy_Src_Bigger(f *testing.F) {
 	dst := pi.NewPixMap(2, 3)
 
 	f.Fuzz(func(t *testing.T, x, y, w, h, dstX, dstY int) {
-		src.Copy(x, y, w, h, dst, dstX, dstY)
+		src.WithClip(x, y, w, h).Copy(dst, dstX, dstY)
 	})
 }
 
@@ -42,7 +43,7 @@ func FuzzPixMap_Copy_Dst_Bigger(f *testing.F) {
 	dst := pi.NewPixMap(5, 4)
 
 	f.Fuzz(func(t *testing.T, x, y, w, h, dstX, dstY int) {
-		src.Copy(x, y, w, h, dst, dstX, dstY)
+		src.WithClip(x, y, w, h).Copy(dst, dstX, dstY)
 	})
 }
 
@@ -51,7 +52,7 @@ func FuzzPixMap_Merge(f *testing.F) {
 	dst := pi.NewPixMap(4, 3)
 
 	f.Fuzz(func(t *testing.T, x, y, w, h, dstX, dstY int) {
-		src.Merge(x, y, w, h, dst, dstX, dstY, func(dst, src []byte) {
+		src.WithClip(x, y, w, h).Merge(dst, dstX, dstY, func(dst, src []byte) {
 			copy(dst, src)
 		})
 	})
