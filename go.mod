@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.7.0
 	github.com/peterh/liner v1.2.2
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	github.com/traefik/yaegi v0.15.1
 )
 
