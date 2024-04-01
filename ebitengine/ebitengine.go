@@ -73,5 +73,5 @@ func MustRun() {
 }
 
 func scale() int {
-	return int(math.Round(ebiten.DeviceScaleFactor() * 3))
+	return int(math.Round(ebiten.Monitor().DeviceScaleFactor() * 3))
 }
