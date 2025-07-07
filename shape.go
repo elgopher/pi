@@ -1,26 +1,27 @@
-// (c) 2022 Jacek Olszak
+// Copyright 2025 Jacek Olszak
 // This code is licensed under MIT license (see LICENSE for details)
 
 package pi
 
 import "math"
 
-// RectFill draws a filled rectangle on screen between points x0,y0 and x1,y1 (inclusive).
+// Rect draws the outline of a rectangle between (x0, y0) and (x1, y1), inclusive.
 //
-// RectFill takes into account camera position, clipping region and draw palette.
-func RectFill(x0, y0, x1, y1 int, color byte) {
-	col := Pal[color]
-
-	x0 -= Camera.X
-	x1 -= Camera.X
-	y0 -= Camera.Y
-	y1 -= Camera.Y
-
-	screen.RectFill(x0, y0, x1, y1, col)
+// It takes into account the camera position, clipping region,
+// color tables, and masks.
+func Rect(x0, y0, x1, y1 int) {
+	// Optimize - run vertical and horizontal line functions directly
+	Line(x0, y0, x1, y0) // horizontal line top
+	Line(x0, y1, x1, y1) // horizontal line bottom
+	Line(x0, y0, x0, y1) // vertical line left
+	Line(x1, y0, x1, y1) // vertical line right
 }
 
-// RectFill draws a filled rectangle between points x0,y0 and x1,y1 (inclusive).
-func (p PixMap) RectFill(x0 int, y0 int, x1 int, y1 int, col byte) {
+// RectFill draws a filled rectangle between (x0, y0) and (x1, y1), inclusive.
+//
+// It takes into account the camera position, clipping region,
+// color tables, and masks.
+func RectFill(x0 int, y0 int, x1 int, y1 int) {
 	if x0 > x1 {
 		x0, x1 = x1, x0
 	}
@@ -28,68 +29,38 @@ func (p PixMap) RectFill(x0 int, y0 int, x1 int, y1 int, col byte) {
 		y0, y1 = y1, y0
 	}
 
-	ptr, ok := p.Pointer(x0, y0, x1-x0+1, y1-y0+1)
-	if !ok {
-		return
+	area := IntArea{
+		X: x0,
+		Y: y0,
+		W: x1 - x0 + 1,
+		H: y1 - y0 + 1,
 	}
 
-	line := p.lineOfColor(col, ptr.RemainingPixels)
+	area = area.MovedBy(-Camera.X, -Camera.Y)
+	area, _, _ = area.ClippedBy(Clip())
 
-	copy(ptr.Pix, line)
-	for y := 1; y < ptr.RemainingLines; y++ {
-		ptr.Pix = ptr.Pix[p.width:]
-		copy(ptr.Pix, line)
+	currentColor := GetColor() & ReadMask
+
+	for _, line := range DrawTarget().LinesIterator(area) {
+		for i := 0; i < len(line); i++ {
+			target := line[i]
+			line[i] = ColorTables[(currentColor|target)>>6][currentColor&(MaxColors-1)][target&(MaxColors-1)]
+		}
 	}
 }
 
-// Rect draws a rectangle on screen between points x0,y0 and x1,y1 (inclusive).
+// Line draws a line on the screen between (x0, y0) and (x1, y1), inclusive.
 //
-// Rect takes into account camera position, clipping region and draw palette.
-func Rect(x0, y0, x1, y1 int, color byte) {
-	color = Pal[color]
+// It takes into account the camera position, clipping region,
+// color tables, and masks.
+func Line(x0, y0, x1, y1 int) {
+	draw := drawColor & ReadMask
+	// Optimize - add vertical and horizontal line functions
 
-	x0, x1 = x0-Camera.X, x1-Camera.X
-	y0, y1 = y0-Camera.Y, y1-Camera.Y
-
-	screen.Rect(x0, y0, x1, y1, color)
-}
-
-// Rect draws a rectangle between points x0,y0 and x1,y1 (inclusive).
-func (p PixMap) Rect(x0, y0, x1, y1 int, col byte) {
-	p.horizontalLine(y0, x0, x1, col)
-	p.horizontalLine(y1, x0, x1, col)
-	p.verticalLine(x0, y0, y1, col)
-	p.verticalLine(x1, y0, y1, col)
-}
-
-// Line draws a line on screen between points x0,y0 and x1,y1 (inclusive).
-//
-// Line takes into account camera position, clipping region and draw palette.
-func Line(x0, y0, x1, y1 int, color byte) {
-	color = Pal[color]
-
-	x0 -= Camera.X
-	x1 -= Camera.X
-	y0 -= Camera.Y
-	y1 -= Camera.Y
-
-	screen.Line(x0, y0, x1, y1, color)
-}
-
-// Line draws a line between points x0,y0 and x1,y1 (inclusive).
-func (p PixMap) Line(x0, y0, x1, y1 int, color byte) {
 	// Bresenham algorithm: https://www.youtube.com/watch?v=IDFB5CDpLDE
 	run := float64(x1 - x0)
-	if run == 0 {
-		p.verticalLine(x0, y0, y1, color)
-		return
-	}
 
 	rise := float64(y1 - y0)
-	if rise == 0 {
-		p.horizontalLine(y0, x0, x1, color)
-		return
-	}
 
 	slope := rise / run
 
@@ -110,7 +81,7 @@ func (p PixMap) Line(x0, y0, x1, y1 int, color byte) {
 		}
 
 		for x := x0; x <= x1; x++ {
-			p.Set(x, y, color)
+			setPixelWithColor(x, y, draw)
 
 			offset += delta
 			if offset >= threshold {
@@ -127,7 +98,7 @@ func (p PixMap) Line(x0, y0, x1, y1 int, color byte) {
 		}
 
 		for y := y0; y <= y1; y++ {
-			p.Set(x, y, color)
+			setPixelWithColor(x, y, draw)
 
 			offset += delta
 			if offset >= threshold {
@@ -138,111 +109,92 @@ func (p PixMap) Line(x0, y0, x1, y1 int, color byte) {
 	}
 }
 
-// verticalLine draws a vertical line between y0-y1 inclusive
-func (p PixMap) verticalLine(x, y0, y1 int, color byte) {
-	if y0 > y1 {
-		y0, y1 = y1, y0
-	}
-
-	ptr, ok := p.Pointer(x, y0, 1, y1-y0+1)
-	if !ok {
-		return
-	}
-
-	index := 0
-	for i := 0; i < ptr.RemainingLines; i++ {
-		ptr.Pix[index] = color
-		index += p.width
-	}
-}
-
-// horizontalLine draws a vertical line between x0-x1 inclusive
-func (p PixMap) horizontalLine(y, x0, x1 int, color byte) {
-	if x0 > x1 {
-		x0, x1 = x1, x0
-	}
-	ptr, ok := p.Pointer(x0, y, x1-x0+1, 1)
-	if !ok {
-		return
-	}
-
-	pix := ptr.Pix[:ptr.RemainingPixels]
-	for i := 0; i < len(pix); i++ {
-		pix[i] = color
-	}
-}
-
-// Circ draws a circle on screen.
+// Circ draws the outline of a circle with center at (cx, cy) and radius r.
 //
-// Circ takes into account camera position, clipping region and draw palette.
-func Circ(centerX, centerY, radius int, color byte) {
-	color = Pal[color]
+// It takes into account the camera position, clipping region,
+// color tables, and masks.
+func Circ(cx, cy, r int) {
+	draw := drawColor & ReadMask
 
-	centerX = centerX - Camera.X
-	centerY = centerY - Camera.Y
-
-	screen.Circ(centerX, centerY, radius, color)
-}
-
-// Circ draws a circle.
-func (p PixMap) Circ(centerX int, centerY int, radius int, color byte) {
-	// Code based on Frédéric Goset work: http://fredericgoset.ovh/mathematiques/courbes/en/bresenham_circle.html
 	x := 0
-	y := radius
-	m := 5 - 4*radius
+	y := r
+	d := 3 - 2*r
 
 	for x <= y {
-		p.Set(centerX+x, centerY+y, color)
-		p.Set(centerX+x, centerY-y, color)
-		p.Set(centerX-x, centerY+y, color)
-		p.Set(centerX-x, centerY-y, color)
-		p.Set(centerX+y, centerY+x, color)
-		p.Set(centerX+y, centerY-x, color)
-		p.Set(centerX-y, centerY+x, color)
-		p.Set(centerX-y, centerY-x, color)
+		if x == 0 {
+			setPixelWithColor(cx+y, cy, draw)
+			setPixelWithColor(cx-y, cy, draw)
+			setPixelWithColor(cx, cy+y, draw)
+			setPixelWithColor(cx, cy-y, draw)
+		} else {
+			setPixelWithColor(cx+x, cy+y, draw)
+			setPixelWithColor(cx-x, cy+y, draw)
+			setPixelWithColor(cx+x, cy-y, draw)
+			setPixelWithColor(cx-x, cy-y, draw)
 
-		if m > 0 {
-			y--
-			m -= 8 * y
+			if x != y {
+				setPixelWithColor(cx+y, cy+x, draw)
+				setPixelWithColor(cx-y, cy+x, draw)
+				setPixelWithColor(cx+y, cy-x, draw)
+				setPixelWithColor(cx-y, cy-x, draw)
+			}
 		}
 
+		if d <= 0 {
+			d += 4*x + 6
+		} else {
+			d += 4*(x-y) + 10
+			y--
+		}
 		x++
-
-		m += 8*x + 4
 	}
 }
 
-// CircFill draws a filled circle
-//
-// CircFill takes into account camera position, clipping region and draw palette.
-func CircFill(centerX, centerY, radius int, color byte) {
-	color = Pal[color]
-
-	centerX = centerX - Camera.X
-	centerY = centerY - Camera.Y
-
-	// Code based on Frédéric Goset work: http://fredericgoset.ovh/mathematiques/courbes/en/filled_circle.html
-	screen.CircFill(centerX, centerY, radius, color)
+func horizontalLine(x0, x1, y int) {
+	RectFill(x0, y, x1, y)
 }
 
-func (p PixMap) CircFill(centerX int, centerY int, radius int, color byte) {
-	x := 0
-	y := radius
-	m := 5 - 4*radius
+// CircFill draws a filled circle with center at (centerX, centerY) and the given radius.
+//
+// It takes into account the camera position, clipping region,
+// color tables, and masks.
+func CircFill(centerX, centerY, radius int) {
+	// Algorithm designed by https://stackoverflow.com/users/3797048/colinday
+	//
+	// Details: https://stackoverflow.com/questions/10878209/midpoint-circle-algorithm-for-filled-circles#answer-24527943
+	x := radius
+	y := 0
+	radiusError := 1 - x
 
-	for x <= y {
-		p.RectFill(centerX-y, centerY-x, centerX+y, centerY-x, color)
-		p.RectFill(centerX-y, centerY+x, centerX+y, centerY+x, color)
-
-		if m > 0 {
-			p.RectFill(centerX-x, centerY-y, centerX+x, centerY-y, color)
-			p.RectFill(centerX-x, centerY+y, centerX+x, centerY+y, color)
-			y--
-			m -= 8 * y
+	// iterate to the circle diagonal
+	for x >= y {
+		// use symmetry to draw the two horizontal lines at this Y with a special case to draw
+		// only one line at the centerY where y == 0
+		startX := -x + centerX
+		endX := x + centerX
+		horizontalLine(startX, endX, y+centerY)
+		if y != 0 {
+			horizontalLine(startX, endX, -y+centerY)
 		}
 
-		x++
+		// move Y one line
+		y++
 
-		m += 8*x + 4
+		// calculate or maintain new x
+		if radiusError < 0 {
+			radiusError += 2*y + 1
+		} else {
+			// we're about to move x over one, this means we completed a column of X values, use
+			// symmetry to draw those complete columns as horizontal lines at the top and bottom of the circle
+			// beyond the diagonal of the main loop
+			if x >= y {
+				startX = -y + 1 + centerX
+				endX = y - 1 + centerX
+				horizontalLine(startX, endX, x+centerY)
+				horizontalLine(startX, endX, -x+centerY)
+			}
+			x--
+			radiusError += 2 * (y - x + 1)
+		}
 	}
 }

@@ -1,578 +1,217 @@
-// (c) 2022 Jacek Olszak
+// Copyright 2025 Jacek Olszak
 // This code is licensed under MIT license (see LICENSE for details)
 
 package pi_test
 
 import (
+	_ "embed"
 	"testing"
 
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/pisnap"
+	"github.com/elgopher/pi/pitest"
+	"github.com/stretchr/testify/require"
 )
 
-const white, red = 7, 8
+//go:embed "internal/test/shapes.png"
+var shapes []byte
 
-func TestPixMap_RectFill(t *testing.T) {
-	testPixMapRect(t, pi.PixMap.RectFill, "rectfill")
-}
+func TestShapes(t *testing.T) {
+	t.Run("should draw shapes in the same way as in shapes.png", func(t *testing.T) {
+		pi.ResetPaletteMapping()
+		pi.ResetColorTables()
+		pi.Palette = pi.DecodePalette(shapes)
+		shapesSheet := pi.DecodeCanvas(shapes)
 
-func testPixMapRect(t *testing.T, rect func(_ pi.PixMap, x0, y0, x1, y1 int, color byte), dir string) {
-
-	t.Run("should draw rectangle", func(t *testing.T) {
 		tests := map[string]struct {
-			x0, y0, x1, y1 int
-			color          byte
+			draw     func()
+			col, row int
 		}{
-			"0,0,0,0":         {0, 0, 0, 0, white},
-			"0,0,0,0 color 8": {0, 0, 0, 0, 8},
-			"1,0,1,0":         {1, 0, 1, 0, white},
-			"0,1,0,1":         {0, 1, 0, 1, white},
-			"1,1,1,1":         {1, 1, 1, 1, white},
-			"15,15,15,15":     {15, 15, 15, 15, white},
-			"0,0,1,0":         {0, 0, 1, 0, white},
-			"0,0,0,1":         {0, 0, 0, 1, white},
-			"0,0,1,1":         {0, 0, 1, 1, white},
-			"3,4,5,6":         {3, 4, 5, 6, white},
-			"1,0,0,0":         {1, 0, 0, 0, white},
-			"0,1,0,0":         {0, 1, 0, 0, white},
-			"1,1,0,0":         {1, 1, 0, 0, white},
-			"6,5,4,3":         {6, 5, 4, 3, white},
-			"-1,0,0,0":        {-1, 0, 0, 0, white},
-			"0,-1,0,0":        {0, -1, 0, 0, white},
-			"16,0,15,0":       {16, 0, 15, 0, white},
-			"17,0,15,0":       {17, 0, 15, 0, white},
-			"0,16,0,15":       {0, 16, 0, 15, white},
-			"0,17,0,15":       {0, 17, 0, 15, white},
-			"15,16,15,15":     {15, 16, 15, 15, white},
-			"15,17,15,15":     {15, 17, 15, 15, white},
-			"-1,-1,16,16":     {-1, -1, 16, 16, white},
-			"0,0,15,15":       {0, 0, 15, 15, white},
-			"0,-1,15,15":      {0, -1, 15, 15, white}, // Rect specific - missing top line
-			"0,0,15,16":       {0, 0, 15, 16, white},  // Rect specific - missing bottom line
-			"-1,0,15,15":      {-1, 0, 15, 15, white}, // Rect specific - missing left line
-			"0,0,16,15":       {0, 0, 16, 15, white},  // Rect specific - missing right line
+			"horizontal line": {
+				draw: line(4, 15, 27, 15),
+				col:  0, row: 0,
+			},
+			"horizontal line reversed": {
+				draw: line(27, 15, 4, 15),
+				col:  0, row: 0,
+			},
+			"vertical line": {
+				draw: line(47-32, 2, 47-32, 27),
+				col:  1, row: 0,
+			},
+			"diagonal line 1": {
+				draw: line(67-64, 2, 92-64, 27),
+				col:  2, row: 0,
+			},
+			"diagonal line 2": {
+				draw: line(100-96, 29, 122-96, 7),
+				col:  3, row: 0,
+			},
+			"diagonal line 3": {
+				draw: line(136-128, 4, 147-128, 27),
+				col:  4, row: 0,
+			},
+			"diagonal line 4": {
+				draw: line(165-160, 21, 187-160, 16),
+				col:  5, row: 0,
+			},
+			"line dot": {
+				draw: line(208-192, 16, 208-192, 16),
+				col:  6, row: 0,
+			},
+			"rect dot": {
+				draw: rect(16, 47-32, 16, 47-32),
+				col:  0, row: 1,
+			},
+			"rect horizontal line": {
+				draw: rect(40-32, 47-32, 54-32, 47-32),
+				col:  1, row: 1,
+			},
+			"rect vertical line": {
+				draw: rect(78-64, 38-32, 78-64, 56-32),
+				col:  2, row: 1,
+			},
+			"square": {
+				draw: rect(102-96, 39-32, 119-96, 56-32),
+				col:  3, row: 1,
+			},
+			"square reversed": {
+				draw: rect(119-96, 56-32, 102-96, 39-32),
+				col:  3, row: 1,
+			},
+			"rectangle wide": {
+				draw: rect(130-128, 45-32, 155-128, 51-32),
+				col:  4, row: 1,
+			},
+			"rectangle toll": {
+				draw: rect(170-160, 38-32, 179-160, 58-32),
+				col:  5, row: 1,
+			},
+			"rectfill dot": {
+				draw: rectfill(16, 80-64, 16, 80-64),
+				col:  0, row: 2,
+			},
+			"rectfill horizontal line": {
+				draw: rectfill(40-32, 80-64, 54-32, 80-64),
+				col:  1, row: 2,
+			},
+			"rectfill vertical line": {
+				draw: rectfill(78-64, 71-64, 78-64, 89-64),
+				col:  2, row: 2,
+			},
+			"rectfill square": {
+				draw: rectfill(102-96, 72-64, 119-96, 89-64),
+				col:  3, row: 2,
+			},
+			"rectfill square reversed": {
+				draw: rectfill(119-96, 89-64, 102-96, 72-64),
+				col:  3, row: 2,
+			},
+			"rectfill wide": {
+				draw: rectfill(130-128, 78-64, 155-128, 84-64),
+				col:  4, row: 2,
+			},
+			"rectfill toll": {
+				draw: rectfill(170-160, 71-64, 179-160, 91-64),
+				col:  5, row: 2,
+			},
+			"circ": {
+				draw: circ(19, 112-96, 9),
+				col:  0, row: 3,
+			},
+			"tiny circ": {
+				draw: circ(49-32, 112-96, 1),
+				col:  1, row: 3,
+			},
+			"small circ": {
+				draw: circ(79-64, 110-96, 2),
+				col:  2, row: 3,
+			},
+			"big circ": {
+				draw: circ(110-96, 113-96, 10),
+				col:  3, row: 3,
+			},
+			"ugly circ": {
+				draw: circ(144-128, 111-96, 4),
+				col:  4, row: 3,
+			},
+			"dot circ": {
+				draw: circ(175-160, 110-96, 0),
+				col:  5, row: 3,
+			},
+			"circfill": {
+				draw: circfill(19, 144-128, 9),
+				col:  0, row: 4,
+			},
+			"tiny circfill": {
+				draw: circfill(49-32, 144-128, 1),
+				col:  1, row: 4,
+			},
+			"small circfill": {
+				draw: circfill(79-64, 142-128, 2),
+				col:  2, row: 4,
+			},
+			"big circfill": {
+				draw: circfill(110-96, 145-128, 10),
+				col:  3, row: 4,
+			},
+			"ugly circfill": {
+				draw: circfill(144-128, 143-128, 4), // TODO this circfill is not as ugly as circ :)
+				col:  4, row: 4,
+			},
+			"dot circfill": {
+				draw: circfill(175-160, 142-128, 0),
+				col:  5, row: 4,
+			},
 		}
 
-		for name, test := range tests {
-			t.Run(name, func(t *testing.T) {
-				pixMap := pi.NewPixMap(16, 16)
-				pixMap.ClearCol(5)
-				rect(pixMap, test.x0, test.y0, test.x1, test.y1, test.color)
-				assertPixMapEqual(t, pixMap, "internal/testimage/"+dir+"/draw/"+name+".png")
-			})
-		}
-	})
-
-	t.Run("should draw inside clipping region", func(t *testing.T) {
-		tests := map[string]struct {
-			x0, y0, x1, y1             int
-			clipX, clipY, clipW, clipH int
-		}{
-			"clipx_0,0,2,1": {
-				x1: 2, y1: 1,
-				clipX: 1, clipW: 16, clipH: 16,
-			},
-			"clipw_0,0,15,1": {
-				x1: 15, y1: 1,
-				clipW: 15, clipH: 16,
-			},
-			"clipxw_0,0,15,1": {
-				x1: 15, y1: 1,
-				clipX: 1, clipW: 14, clipH: 16,
-			},
-			"clipy_0,0,15,1": {
-				x1: 15, y1: 1,
-				clipY: 1, clipW: 16, clipH: 16,
-			},
-			"cliph_0,0,15,15": {
-				x1: 15, y1: 15,
-				clipW: 16, clipH: 15,
-			},
-			"clipyh_0,0,15,15": {
-				x1: 15, y1: 15,
-				clipY: 1, clipW: 16, clipH: 14,
-			},
-			"clipall_0,0,15,15": {
-				x1: 15, y1: 15,
-				clipX: 1, clipY: 1, clipW: 14, clipH: 14,
-			},
-			"clipxw_22_3,0,3,0": {
-				x0: 3, y0: 0, x1: 3, y1: 0, // X > clip width, but still should be drawn (because clip X is>0)
-				clipX: 2, clipW: 2, clipH: 16,
-			},
-			"clipyh_22_0,3,0,3": {
-				x0: 0, y0: 3, x1: 0, y1: 3, // Y > clip height, but still should be drawn (because clip Y is>0)
-				clipY: 2, clipW: 16, clipH: 2,
-			},
-		}
-
-		for name, test := range tests {
-			t.Run(name, func(t *testing.T) {
-				pixMap := pi.NewPixMap(16, 16).WithClip(test.clipX, test.clipY, test.clipW, test.clipH)
-				rect(pixMap, test.x0, test.y0, test.x1, test.y1, white)
-				assertPixMapEqual(t, pixMap, "internal/testimage/"+dir+"/clip/"+name+".png")
-			})
-		}
-	})
-
-	t.Run("should not draw anything outside clipping region", func(t *testing.T) {
-		tests := map[string]struct {
-			clipX, clipY, clipW, clipH int
-			x0, y0, x1, y1             int
-		}{
-			"both x < clip x": {
-				clipX: 0, clipY: 0, clipW: 16, clipH: 16,
-				x0: -1, y0: 0, x1: -1, y1: 0,
-			},
-			"both x < clip x - 1": {
-				clipX: 0, clipY: 0, clipW: 16, clipH: 16,
-				x0: -2, y0: 0, x1: -2, y1: 0,
-			},
-			"both x > clip width": {
-				clipX: 0, clipY: 0, clipW: 16, clipH: 16,
-				x0: 17, y0: 0, x1: 17, y1: 0,
-			},
-			"both x==clip width": {
-				clipX: 0, clipY: 0, clipW: 16, clipH: 16,
-				x0: 16, y0: 0, x1: 16, y1: 0,
-			},
-			"both y < clip y": {
-				clipX: 0, clipY: 0, clipW: 16, clipH: 16,
-				x0: 0, y0: -1, x1: 0, y1: -1,
-			},
-			"both y > clip height": {
-				clipX: 0, clipY: 0, clipW: 16, clipH: 16,
-				x0: 0, y0: 17, x1: 0, y1: 17,
-			},
-			"both y==clip height": {
-				clipX: 0, clipY: 0, clipW: 16, clipH: 16,
-				x0: 0, y0: 16, x1: 0, y1: 16,
-			},
-			"both y==clip height,both x==1": {
-				clipX: 0, clipY: 0, clipW: 16, clipH: 16,
-				x0: 1, y0: 16, x1: 1, y1: 16,
-			},
-		}
-
-		for name, test := range tests {
-			t.Run(name, func(t *testing.T) {
-				pixMap := pi.NewPixMap(16, 16).WithClip(test.clipX, test.clipY, test.clipW, test.clipH)
-				rect(pixMap, test.x0, test.y0, test.x1, test.y1, white)
+		for testName, shape := range tests {
+			t.Run(testName, func(t *testing.T) {
+				pi.SetScreenSize(32, 32)
+				pi.Cls()
+				pi.SetColor(1)
+				// when
+				shape.draw()
 				// then
-				assertEmptyPixMap(t, pixMap)
+				shapeArea := pi.IntArea{X: shape.col * 32, Y: shape.row * 32, W: 32, H: 32}
+				expected := shapesSheet.CloneArea(shapeArea)
+				equal := pitest.AssertSurfaceEqual(t, expected, pi.Screen())
+				if !equal {
+					f, err := pisnap.CaptureOrErr()
+					require.NoError(t, err)
+					t.Log("INVALID SNAPSHOT STORED TO", f)
+				}
 			})
 		}
 	})
 }
 
-func TestPixMap_Rect(t *testing.T) {
-	testPixMapRect(t, pi.PixMap.Rect, "rect")
+func line(x0, y0, x1, y1 int) func() {
+	return func() {
+		pi.Line(x0, y0, x1, y1)
+	}
 }
 
-func TestRectFill(t *testing.T) {
-	testRect(t, pi.RectFill, "rectfill")
+func rect(x0, y0, x1, y1 int) func() {
+	return func() {
+		pi.Rect(x0, y0, x1, y1)
+	}
 }
 
-func testRect(t *testing.T, rect func(x0 int, y0 int, x1 int, y1 int, col byte), dir string) {
-	t.Run("should move by camera position", func(t *testing.T) {
-		pi.Reset()
-		pi.SetScreenSize(16, 16)
-		pi.Camera.Set(-2, -3)
-		rect(0, 1, 2, 4, white)
-		assertScreenEqual(t, "internal/testimage/"+dir+"/camera_0,1,2,4.png")
-	})
-
-	t.Run("should replace color from draw palette", func(t *testing.T) {
-		pi.Reset()
-		pi.SetScreenSize(16, 16)
-		pi.Pal[white] = 3
-		rect(5, 5, 10, 10, white)
-		assertScreenEqual(t, "internal/testimage/"+dir+"/pal_5,5,10,10.png")
-	})
+func rectfill(x0, y0, x1, y1 int) func() {
+	return func() {
+		pi.RectFill(x0, y0, x1, y1)
+	}
 }
 
-func TestRect(t *testing.T) {
-	testRect(t, pi.Rect, "rect")
+func circ(cx, cy, r int) func() {
+	return func() {
+		pi.Circ(cx, cy, r)
+	}
 }
 
-func TestPixMap_Line(t *testing.T) {
-	t.Run("should not draw anything outside clipping region", func(t *testing.T) {
-		tests := map[string]struct {
-			clipX, clipY, clipW, clipH int
-			x0, y0, x1, y1             int
-		}{
-			"both x<clipX": {
-				clipW: 16, clipH: 16,
-				x0: -1, x1: -1,
-			},
-			"both x==clipX+W": {
-				clipX: 1, clipW: 15, clipH: 16,
-				x0: 16, x1: 16,
-			},
-			"both x>clipX+W": {
-				clipX: 1, clipW: 15, clipH: 16,
-				x0: 17, x1: 17,
-			},
-			"both y<clipY": {
-				clipW: 16, clipH: 16,
-				y0: -1, y1: -1,
-			},
-			"both y==clipY+H": {
-				clipY: 1, clipW: 15, clipH: 16,
-				y0: 16, y1: 16,
-			},
-			"both y>clipY+H": {
-				clipY: 1, clipW: 15, clipH: 16,
-				y0: 17, y1: 17,
-			},
-			"horizontal,both x<clipX": {
-				clipW: 16, clipH: 16,
-				x0: -2, x1: -1,
-			},
-			"horizontal,both x==clipX+W": {
-				clipX: 1, clipW: 14, clipH: 16,
-				x0: 15, y0: 0, x1: 16, y1: 0,
-			},
-			"horizontal,both x>clipX+W": {
-				clipX: 1, clipW: 14, clipH: 16,
-				x0: 16, y0: 0, x1: 17, y1: 0,
-			},
-			"horizontal line,y<clipY": {
-				clipY: 1, clipW: 16, clipH: 16,
-				y0: -1, y1: -1, x0: 0, x1: 2,
-			},
-			"horizontal line,y==clipY+H": {
-				clipY: 1, clipW: 16, clipH: 14,
-				y0: 15, y1: 15, x0: 0, x1: 2,
-			},
-			"horizontal line,y>clipY+H": {
-				clipY: 1, clipW: 16, clipH: 14,
-				y0: 16, y1: 16, x0: 0, x1: 2,
-			},
-			"slope 1,both x<clipX": {
-				clipW: 16, clipH: 16,
-				x0: -2, y0: 0, x1: -1, y1: 1,
-			},
-			"slope 1,y<clipY": {
-				clipY: 1, clipW: 16, clipH: 16,
-				y0: -3, y1: -1, x0: 0, x1: 2,
-			},
-			"slope 1,y0==clipY+H": {
-				clipY: 1, clipW: 16, clipH: 14,
-				y0: 15, y1: 17, x0: 0, x1: 2,
-			},
-			"slope 1,y0>clipY+H": {
-				clipY: 1, clipW: 16, clipH: 14,
-				y0: 16, y1: 18, x0: 0, x1: 2,
-			},
-			"slope 1,x0==clipX+W": {
-				clipX: 1, clipW: 14, clipH: 16,
-				x0: 15, y0: 0, x1: 17, y1: 2,
-			},
-			"slope 1,x0>clipX+W": {
-				clipX: 1, clipW: 14, clipH: 16,
-				x0: 16, y0: 0, x1: 18, y1: 2,
-			},
-			"slope 2,both x<clipX": {
-				clipW: 16, clipH: 16,
-				x0: -2, y0: 0, x1: -1, y1: 2,
-			},
-			"slope 2,y<clipY": {
-				clipY: 1, clipW: 16, clipH: 16,
-				y0: -5, y1: -1, x0: 0, x1: 2,
-			},
-			"slope 2,y0==clipY+H": {
-				clipY: 1, clipW: 16, clipH: 14,
-				y0: 15, y1: 19, x0: 0, x1: 2,
-			},
-			"slope 2,y0>clipY+H": {
-				clipY: 1, clipW: 16, clipH: 14,
-				y0: 16, y1: 20, x0: 0, x1: 2,
-			},
-			"slope 2,x0==clipX+W": {
-				clipX: 1, clipW: 14, clipH: 16,
-				x0: 15, y0: 0, x1: 17, y1: 4,
-			},
-			"slope 2,x0>clipX+W": {
-				clipX: 1, clipW: 14, clipH: 16,
-				x0: 16, y0: 0, x1: 18, y1: 4,
-			},
-		}
-
-		for name, test := range tests {
-			t.Run(name, func(t *testing.T) {
-				pixMap := pi.NewPixMap(16, 16).WithClip(test.clipX, test.clipY, test.clipW, test.clipH)
-				// when
-				pixMap.Line(test.x0, test.y0, test.x1, test.y1, white)
-				// then
-				assertEmptyPixMap(t, pixMap)
-			})
-		}
-	})
-
-	t.Run("should draw line", func(t *testing.T) {
-		tests := map[string]struct {
-			x0, y0, x1, y1 int
-			color          byte
-		}{
-			"slope 0, white":          {0, 0, 0, 0, white},
-			"slope 0, red":            {0, 0, 0, 0, red},
-			"vertical line":           {0, 0, 0, 1, white},
-			"vertical line inverse":   {0, 1, 0, 0, white},
-			"vertical line red":       {0, 0, 0, 1, red},
-			"horizontal line":         {0, 0, 1, 0, white},
-			"horizontal line inverse": {1, 0, 0, 0, white},
-			"horizontal line red":     {0, 0, 1, 0, red},
-			"slope 1":                 {0, 0, 2, 2, white},
-			"slope -1":                {0, 2, 2, 0, white},
-			"slope 0.5":               {0, 0, 2, 1, white},
-			"slope -0.5":              {0, 1, 2, 0, white},
-			"slope 2":                 {0, 0, 2, 4, white},
-			"slope -2":                {0, 4, 2, 0, white},
-			"slope 2.5":               {0, 0, 2, 5, white},
-			"slope -2.5":              {0, 5, 2, 0, white},
-			"slope 1.5":               {0, 3, 15, 13, white},
-		}
-
-		for name, test := range tests {
-			t.Run(name, func(t *testing.T) {
-				pixMap := pi.NewPixMap(16, 16)
-				pixMap.ClearCol(5)
-				// when
-				pixMap.Line(test.x0, test.y0, test.x1, test.y1, test.color)
-				assertPixMapEqual(t, pixMap, "internal/testimage/line/draw/"+name+".png")
-			})
-		}
-	})
-
-	t.Run("should draw inside clipping region", func(t *testing.T) {
-		tests := map[string]struct {
-			clipX, clipY, clipW, clipH int
-			x0, y0, x1, y1             int
-		}{
-			"top-left": {
-				clipX: 1, clipW: 15, clipH: 16,
-				x0: 1, x1: 1,
-			},
-			"top-right": {
-				clipX: 1, clipW: 15, clipH: 16,
-				x0: 15, x1: 15,
-			},
-			"top": {
-				clipY: 1, clipW: 16, clipH: 15,
-				y0: 1, y1: 1,
-			},
-			"bottom": {
-				clipY: -1, clipW: 16, clipH: 16,
-				y0: 14, y1: 14,
-			},
-			"vertical line": {
-				clipW: 16, clipH: 16,
-				y0: -1, y1: 16,
-			},
-			"horizontal line": {
-				clipW: 16, clipH: 16,
-				x0: -1, x1: 17,
-			},
-			"horizontal line, clipx=1": {
-				clipX: 1, clipW: 2, clipH: 16,
-				x0: 1, x1: 2,
-			},
-			"horizontal line, bottom": {
-				clipW: 16, clipH: 16,
-				x0: 0, y0: 15, x1: 15, y1: 15,
-			},
-			"slope 1": {
-				clipW: 16, clipH: 16,
-				x0: -1, y0: -1, x1: 16, y1: 16,
-			},
-			"slope -1": {
-				clipW: 16, clipH: 16,
-				x0: 16, y0: -1, x1: -1, y1: 16,
-			},
-			"slope 2": { // different from Pico-8
-				clipW: 16, clipH: 16,
-				x0: -1, y0: -1, x1: 8, y1: 17,
-			},
-			"slope -2": { // different from Pico-8
-				clipW: 16, clipH: 16,
-				x0: 8, y0: -1, x1: -1, y1: 17,
-			},
-		}
-
-		for name, test := range tests {
-			t.Run(name, func(t *testing.T) {
-				pixMap := pi.NewPixMap(16, 16).WithClip(test.clipX, test.clipY, test.clipW, test.clipH)
-				pixMap.ClearCol(5)
-				// when
-				pixMap.Line(test.x0, test.y0, test.x1, test.y1, white)
-				assertPixMapEqual(t, pixMap, "internal/testimage/line/clip/"+name+".png")
-			})
-		}
-	})
-}
-
-func TestLine(t *testing.T) {
-	t.Run("should use draw palette", func(t *testing.T) {
-		tests := map[string]struct {
-			x0, y0, x1, y1 int
-		}{
-			"horizontal line": {
-				x1: 15,
-			},
-			"vertical line": {
-				y1: 15,
-			},
-			"slope 1": {
-				x1: 15, y1: 15,
-			},
-			"slope 2": {
-				x1: 15, y1: 30,
-			},
-		}
-
-		for name, test := range tests {
-			t.Run(name, func(t *testing.T) {
-				pi.Reset()
-				pi.SetScreenSize(16, 16)
-				pi.ClsCol(5)
-				pi.Pal[white] = red
-				// when
-				pi.Line(test.x0, test.y0, test.x1, test.y1, white)
-				assertScreenEqual(t, "internal/testimage/line/pal/"+name+".png")
-			})
-		}
-	})
-
-	t.Run("should move by camera position", func(t *testing.T) {
-		tests := map[string]struct {
-			x0, y0, x1, y1 int
-		}{
-			"horizontal line": {
-				x1: 15,
-			},
-			"vertical line": {
-				y1: 15,
-			},
-			"slope 1": {
-				x1: 15, y1: 15,
-			},
-			"slope 2": {
-				x1: 15, y1: 30,
-			},
-		}
-
-		for name, test := range tests {
-			t.Run(name, func(t *testing.T) {
-				pi.Reset()
-				pi.SetScreenSize(16, 16)
-				pi.ClsCol(5)
-				pi.Camera.Set(-1, -2)
-				// when
-				pi.Line(test.x0, test.y0, test.x1, test.y1, red)
-				assertScreenEqual(t, "internal/testimage/line/camera/"+name+".png")
-			})
-		}
-	})
-}
-
-func TestPixMap_Circ(t *testing.T) {
-	testPixMapCirc(t, pi.PixMap.Circ, "circ")
-}
-
-func testPixMapCirc(t *testing.T, circ func(_ pi.PixMap, x, y, r int, color byte), dir string) {
-	t.Run("should draw", func(t *testing.T) {
-		tests := map[string]struct {
-			x, y, r int
-			color   byte
-		}{
-			"radius -1":       {8, 8, -1, white},
-			"radius 0, white": {8, 8, 0, white},
-			"radius 1, white": {8, 8, 1, white},
-			"radius 1, red":   {8, 8, 1, red},
-			"radius 2":        {8, 8, 2, white},
-			"radius 3":        {8, 8, 3, white},
-			"radius 4":        {8, 8, 4, white},
-			"radius 5":        {8, 8, 5, white},
-			"radius 6":        {8, 8, 6, white},
-			"radius 7":        {8, 8, 7, white},
-		}
-
-		for name, test := range tests {
-			t.Run(name, func(t *testing.T) {
-				pixMap := pi.NewPixMap(16, 16)
-				pixMap.ClearCol(5)
-				// when
-				circ(pixMap, test.x, test.y, test.r, test.color)
-				assertPixMapEqual(t, pixMap, "internal/testimage/"+dir+"/draw/"+name+".png")
-			})
-		}
-	})
-
-	t.Run("should draw inside clipping region", func(t *testing.T) {
-		tests := map[string]struct {
-			clipX, clipY, clipW, clipH int
-			x, y, r                    int
-		}{
-			"left": {
-				clipW: 16, clipH: 16,
-				x: 4, y: 5, r: 5,
-			},
-			"top": {
-				clipW: 16, clipH: 16,
-				x: 5, y: 4, r: 5,
-			},
-			"right": {
-				clipW: 16, clipH: 16,
-				x: 11, y: 5, r: 5,
-			},
-			"bottom": {
-				clipW: 16, clipH: 16,
-				x: 5, y: 11, r: 5,
-			},
-		}
-
-		for name, test := range tests {
-			t.Run(name, func(t *testing.T) {
-				pixMap := pi.NewPixMap(16, 16).WithClip(test.clipX, test.clipY, test.clipW, test.clipH)
-				pixMap.ClearCol(5)
-				// when
-				circ(pixMap, test.x, test.y, test.r, white)
-				assertPixMapEqual(t, pixMap, "internal/testimage/"+dir+"/clip/"+name+".png")
-			})
-		}
-	})
-}
-
-func TestPixMap_CircFill(t *testing.T) {
-	testPixMapCirc(t, pi.PixMap.CircFill, "circfill")
-}
-
-func TestCirc(t *testing.T) {
-	testCirc(t, pi.Circ, "circ")
-}
-
-func testCirc(t *testing.T, circ func(x, y, r int, color byte), dir string) {
-	t.Run("should use draw palette", func(t *testing.T) {
-		pi.Reset()
-		pi.SetScreenSize(16, 16)
-		pi.ClsCol(5)
-		pi.Pal[white] = red
-		// when
-		circ(8, 8, 1, white)
-		assertScreenEqual(t, "internal/testimage/"+dir+"/draw/radius 1, red.png")
-	})
-
-	t.Run("should move by camera position", func(t *testing.T) {
-		pi.Reset()
-		pi.SetScreenSize(16, 16)
-		pi.ClsCol(5)
-		pi.Camera.Set(2, 1)
-		// when
-		circ(8, 8, 5, white)
-		assertScreenEqual(t, "internal/testimage/"+dir+"/camera.png")
-	})
-}
-
-func TestCircFill(t *testing.T) {
-	testCirc(t, pi.CircFill, "circfill")
+func circfill(cx, cy, r int) func() {
+	return func() {
+		pi.CircFill(cx, cy, r)
+	}
 }

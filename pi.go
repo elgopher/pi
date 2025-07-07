@@ -1,155 +1,152 @@
-// (c) 2022 Jacek Olszak
+// Copyright 2025 Jacek Olszak
 // This code is licensed under MIT license (see LICENSE for details)
 
-// Package pi provides API to develop retro games.
+// Package pi provides the core Pi functions for the game loop,
+// screen, color palette, and drawing pixels, shapes, and sprites.
 //
-// Like other game development engines, Pi runs your game in a loop:
-//
-//	for {
-//	  pi.Update()
-//	  pi.Draw()
-//	  sleep() // sleep until next frame (30 frames per second)
-//	 }
-//
-// Both pi.Update and pi.Draw functions are provided by you. By default,
-// they do nothing. You can set them by using:
-//
-//	pi.Draw = func() {
-//	  pi.Print("HELLO WORLD", 40, 60, 7)
-//	}
-//
-// To run the game please use the ebitengine back-end by calling
-// ebitengine.Run or ebitengine.MustRun.
-//
-// During development, you might want to use dev-tools which provide tools
-// for screen inspection and REPL terminal, where you can write Go code
-// live when your game is running. To start the game with dev-tools
-// please use:
-//
-//	devtools.MustRun(ebitengine.Run)
-//
-// Please note that the entire pi package is not concurrency-safe.
-// This means that it is unsafe to run functions and access package
-// variables from go-routines started by your code.
+// This package and all other pi* packages are not thread-safe.
+// This is an intentional design choice to significantly improve performance.
+// You should not call Pi's API from any goroutine other than the one
+// running your `pi.Update` and `pi.Draw` functions. You can still
+// create your own goroutines in your game, but they must not call
+// any Pi functions or access Pi state.
 package pi
 
-import (
-	_ "embed"
-	"errors"
-	"fmt"
-	"io/fs"
+// MaxColors is the maximum number of colors that can be used simultaneously on the screen.
+const MaxColors = 64
 
-	"github.com/elgopher/pi/audio"
-	"github.com/elgopher/pi/font"
-)
+// TPS defines the ticks per second.
+//
+// You can change TPS while the game is running.
+var TPS = 30
 
-// Game-loop function callbacks
 var (
-	// Update is a user provided function executed each frame (30 times per second).
+	// Frame is the current game frame number.
 	//
-	// The purpose of this function is to handle user input, perform calculations, update
-	// game state etc. Typically, this function does not draw on screen.
-	Update func()
+	// It is automatically incremented by the backend at the start of each game frame.
+	Frame int
 
-	// Draw is a user provided function executed at most each frame (up to 30 times per second).
-	// π may skip calling this function if previous frame took too long.
+	// Time is the current game time in seconds.
 	//
-	// The purpose of this function is to draw on screen.
-	Draw func()
+	// It is automatically incremented by the backend at the start of each frame.
+	Time float64
 )
 
-// Camera has camera offset used for all subsequent draw operations.
+// Camera is the camera offset applied to all subsequent draw operations.
 var Camera Position
 
-// Time returns the amount of time since game was run, as a (fractional) number of seconds
-//
-// Time is updated each frame.
-var Time float64
+var (
+	drawColor  Color = 7
+	drawTarget Canvas
+	clip       IntArea
+)
 
-var GameLoopStopped bool
+// Color represents a pixel color value in the range 0..63 (first 6 bits).
+// Bits 6 and 7 specify the ColorTable index.
+type Color = uint8
 
-// Load loads files: sprite-sheet.png, custom-font.png and audio.sfx from resources parameter.
+// Number describes any numeric type in Go.
 //
-// Load looks for images with hard-coded names, eg for sprite-sheet it loads "sprite-sheet.png".
-// Your file name must be exactly the same. And it cannot be inside subdirectory.
+// Includes signed integers, unsigned integers, and floating-point types.
+type Number interface {
+	~int | ~float64 |
+		~int8 | ~int16 | ~int32 | ~int64 |
+		~float32 |
+		~uint | ~byte | ~uint16 | ~uint32 | ~uint64
+}
+
+// SetDrawTarget sets c as the target Canvas for all subsequent drawing,
+// including functions like Spr, SetPixel, Line, etc.
 //
-// sprite-sheet.png file must have an indexed color mode. This means that pixels in the sprite-sheet
-// file refers to an index of the color defined in a small palette, also attached to the file in a
-// form of mapping: index number->RGB color. Image must have an indexed color mode,
-// because Pi loads the palette from the sprite-sheet.png file itself. Please use a pixel-art editor
-// which supports indexed color mode, such as Aseprite (paid) or LibreSprite (free). Sprite-sheet
-// width and height must be multiplication of 8. Each sprite is 8x8 pixels. The maximum number of pixels
-// is 65536 (64KB).
+// This function also automatically sets the clip region to cover the entire area of c.
+func SetDrawTarget(c Canvas) (prev Canvas) {
+	prev = drawTarget
+	drawTarget = c
+	SetClip(c.EntireArea())
+	return
+}
+
+func DrawTarget() Canvas {
+	return drawTarget
+}
+
+// SetColor sets the current draw color.
 //
-// custom-font.png must also have an indexed color mode. Color with index 0 is treated as background.
-// Any other color as foreground. The size of the image is fixed. It must be 128x128. Each char is 8x8.
-// Char 0 is in the top-left corner. Char 1 to the right.
+// Returns the previous color.
+func SetColor(c Color) (prev Color) {
+	prev = c
+	drawColor = c
+	return
+}
+
+// GetColor returns the current draw color.
+func GetColor() Color {
+	return drawColor
+}
+
+// SetClip sets the clipping region to the specified area.
 //
-// To acquire the resources object, the easiest way is to include the resources in the game binary
-// by using go:embed directive:
-//
-//	package main
-//
-//	// go:embed sprite-sheet.png
-//	var resources embed.FS
-func Load(resources fs.ReadFileFS) {
-	if resources == nil {
+// Returns the previous clipping area.
+func SetClip(area IntArea) (prev IntArea) {
+	prev = clip
+	clip, _, _ = area.ClippedBy(IntArea{W: drawTarget.width, H: drawTarget.height})
+	return
+}
+
+func Clip() IntArea {
+	return clip
+}
+
+func setPixelWithColor(x, y int, draw Color) {
+	x -= Camera.X
+	y -= Camera.Y
+
+	if x < clip.X {
+		return
+	}
+	if y < clip.Y {
+		return
+	}
+	if x >= clip.X+clip.W {
+		return
+	}
+	if y >= clip.Y+clip.H {
 		return
 	}
 
-	if err := loadGameResources(resources); err != nil {
-		panic(err)
-	}
+	idx := y*drawTarget.width + x
+	target := drawTarget.data[idx] & ShapeTargetMask
+
+	drawTarget.data[idx] = ColorTables[(draw|target)>>6][drawColor&(MaxColors-1)][target&(MaxColors-1)]
 }
 
-func Reset() {
-	Update = nil
-	Draw = nil
-	Camera.Reset()
-	ClipReset()
-	Pald.Reset()
-	Pal.Reset()
-	Palt.Reset()
-	systemFont.Data, _ = font.Load(systemFontPNG)
-	customFont = defaultCustomFont
-	customFont.Data = make([]byte, fontDataSize)
-	screen = NewPixMap(defaultScreenWidth, defaultScreenHeight)
-	sprSheet = newSpriteSheet(defaultSpriteSheetWidth, defaultSpriteSheetHeight)
-	Palette = defaultPalette
+// SetPixel sets the draw color at the given coordinates.
+//
+// It takes into account the camera position, clipping region,
+// color tables, and masks.
+func SetPixel(x, y int) {
+	setPixelWithColor(x, y, drawColor&ReadMask)
 }
 
-func loadGameResources(resources fs.ReadFileFS) error {
-	if err := loadSpriteSheet(resources); err != nil {
-		return err
+// GetPixel returns the color at the given coordinates.
+//
+// It takes into account the camera position and the clipping region.
+func GetPixel(x, y int) (color Color) {
+	x -= Camera.X
+	y -= Camera.Y
+
+	if x < clip.X {
+		return
+	}
+	if y < clip.Y {
+		return
+	}
+	if x >= clip.X+clip.W {
+		return
+	}
+	if y >= clip.Y+clip.H {
+		return
 	}
 
-	if err := loadCustomFont(resources); err != nil {
-		return err
-	}
-
-	if err := loadAudio(resources); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func loadAudio(resources fs.ReadFileFS) error {
-	fileContents, err := resources.ReadFile("audio.sfx")
-	if errors.Is(err, fs.ErrNotExist) {
-		return nil
-	}
-
-	if err = audio.Load(fileContents); err != nil {
-		return fmt.Errorf("error loading audio.sfx: %w", err)
-	}
-
-	return nil
-}
-
-// Stop will stop the game loop after Update or Draw is finished.
-// If you are using devtools, the game will be paused. Otherwise, the game
-// will be closed.
-func Stop() {
-	GameLoopStopped = true
+	return drawTarget.data[y*drawTarget.width+x]
 }
