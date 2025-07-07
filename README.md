@@ -258,7 +258,7 @@ Questions, ideas, bug reports, and contributions are all welcome!
 ## Attributions
 
 * [picofont](picofont) package uses [original Pico-8 font][pico-8-faq] created by Zep - [CC-0 license][cc-0]
-* default palette is the [original Pico-8 palette][pico-8-faq] created by Zep - [CC-0 license][cc-0]
+* default palette is the [original Picotron palette][picotron-faq] created by Zep
 
 [aseprite]: https://www.aseprite.org/
 [cc-0]: https://creativecommons.org/publicdomain/zero/1.0/
@@ -269,6 +269,7 @@ Questions, ideas, bug reports, and contributions are all welcome!
 [issues]: https://github.com/elgopher/pi/issues
 [pico-8]: https://www.lexaloffle.com/pico-8.php
 [pico-8-faq]: https://www.lexaloffle.com/pico-8.php?page=faq
+[picotron-faq]: https://www.lexaloffle.com/picotron.php?page=faq
 [piweb]: https://github.com/elgopher/piweb
 [pi-codecov]: https://codecov.io/gh/elgopher/pi
 [pi-godoc]: https://pkg.go.dev/github.com/elgopher/pi
