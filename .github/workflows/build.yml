@@ -13,10 +13,10 @@ concurrency:
 jobs:
 
   all:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        go: [ "1.20" ]
+        go: [ "1.24" ]
     env:
       DISPLAY: ':99.0'
     steps:
@@ -25,12 +25,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install libasound2-dev libgl1-mesa-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev libxxf86vm-dev
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go }}
 
@@ -57,13 +57,13 @@ jobs:
         run: GOOS=js GOARCH=wasm go test -v ./...
 
       - name: Lint
-        uses: golangci/golangci-lint-action@v3.7.0
+        uses: golangci/golangci-lint-action@v8
         with:
           args: "-v"
-          version: v1.54.2
+          version: v2.2.1
 
       - name: Generate coverage report
-        run: go test -v -coverprofile=coverage.txt -covermode=atomic ./...
+        run: go test -v -coverprofile coverage.txt -covermode atomic ./...
 
       - name: Upload coverage to Codecov
         run: bash <(curl -s https://codecov.io/bash)
