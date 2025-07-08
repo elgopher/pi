@@ -35,9 +35,7 @@ They resemble games from 8-bit and 16-bit computers, because:
 
 ## Why Pi?
 
-Because it's probably the easiest and most fun way to write a game in Go.  
-No complex engine setup. No boilerplate. Just write code and see things happen.  
-Perfect for small projects, prototypes, jams — or simply to have fun.
+Because it's probably the easiest and most fun way to write a game in Go. No complex engine setup. No boilerplate. Just write code and see things happen. Perfect for small projects, prototypes, jams — or simply to have fun.
 
 ## How to get started?
 
@@ -112,59 +110,44 @@ func main() {
 }
 ````
 
-When Pi opens a window for your game, it automatically adjusts the window size to match your monitor's resolution.  
-Since modern monitors have much higher resolutions (e.g. 1920×1080 or even 3840×2160), Pi needs to scale up the game screen.  
-Each game pixel is multiplied an integer number of times (integer scaling).  
-This ensures that the game screen always stays true to its original pixel-perfect look without any distortion.
+When Pi opens a window for your game, it automatically adjusts the window size to match your monitor's resolution. Since modern monitors have much higher resolutions (e.g. 1920×1080 or even 3840×2160), Pi needs to scale up the game screen. Each game pixel is multiplied an integer number of times (integer scaling). This ensures that the game screen always stays true to its original pixel-perfect look without any distortion.
 
 ---
 
 ### Game screen
 
-Pi gives you a small, low-resolution pixel canvas to draw on.
-It's like an old-school screen: you can set pixels, draw lines, rectangles, sprites, and text.
-The limited resolution encourages you to focus on clear shapes and designs.
+Pi gives you a small, low-resolution pixel canvas to draw on. It's like an old-school screen: you can set pixels, draw lines, rectangles, sprites, and text. The limited resolution encourages you to focus on clear shapes and designs.
 
-Each pixel on the game screen has (x, y) coordinates and a `pi.Color`.
-`pi.Color` is a number from 0 to 63, letting you use up to 64 colors on screen at once.
-Coordinate (0,0) is the top-left corner of the screen.
+Each pixel on the game screen has (x, y) coordinates and a `pi.Color`. `pi.Color` is a number from 0 to 63, letting you use up to 64 colors on screen at once. Coordinate (0,0) is the top-left corner of the screen.
 
-Pi does not impose any fixed screen size — you can choose resolutions like 128×128 or 320×180.
-However, there's a limit on the total number of pixels: 128 KB (131,072 pixels).
-It's recommended to start with a low resolution for your first game, such as 128×128.
+Pi does not impose any fixed screen size — you can choose resolutions like 128×128 or 320×180. However, there's a limit on the total number of pixels: 128 KB (131,072 pixels). It's recommended to start with a low resolution for your first game, such as 128×128.
 
 ---
 
 ### Color palette
 
-Pi uses a game-defined, configurable `pi.Palette` which maps each `pi.Color` to an RGB value.
-For example, by default color 0 is black (0x000000), and color 7 is white (0xFFF1E8).
+Pi uses a game-defined, configurable `pi.Palette` which maps each `pi.Color` to an RGB value. For example, by default color 0 is black (0x000000), and color 7 is white (0xFFF1E8).
 
-You choose your game's palette, but you're limited to 64 colors.
-That may seem small, but for low-resolution pixel-art it's usually plenty.
+You choose your game's palette, but you're limited to 64 colors. That may seem small, but for low-resolution pixel-art it's usually plenty.
 The palette can be changed during the game, but changes will appear only when rendering the frame at the end of the update cycle.
 
 ---
 
 ### Canvas, sprites, and blitting
 
-`pi.Canvas` is a 2D structure storing color values. The game screen itself is a Canvas.
-Your game can not only draw pixels on a Canvas but also read them back.
+`pi.Canvas` is a 2D structure storing color values. The game screen itself is a Canvas. Your game can not only draw pixels on a Canvas but also read them back.
 
 This makes it possible to copy pixels from one Canvas to another — for example, you can load a PNG file into a Canvas and then copy (blit) parts of it onto the game screen.
 
-These source images (PNG files with your art) are typically called **sprite sheets**.
-Pi can decode them into Canvases and help you define sprites that you then blit onto the screen.
+These source images (PNG files with your art) are typically called **sprite sheets**. Pi can decode them into Canvases and help you define sprites that you then blit onto the screen.
 
 ---
 
 ### Keyboard, mouse, and gamepad input
 
-Pi lets you check the state of buttons on various input devices.  
-To make sure games work across different hardware, Pi defines a subset of buttons that exist on most modern keyboards, mice, and gamepads.
+Pi lets you check the state of buttons on various input devices. To make sure games work across different hardware, Pi defines a subset of buttons that exist on most modern keyboards, mice, and gamepads.
 
-Pi also tries to offer only the kinds of input that were typical in the 16-bit era.  
-For example, mice had just two buttons, and gamepads had only simple digital (on/off) buttons — no analog sticks or triggers.
+Pi also tries to offer only the kinds of input that were typical in the 16-bit era. For example, mice had just two buttons, and gamepads had only simple digital (on/off) buttons — no analog sticks or triggers.
 
 For handling input devices, you can use these packages: [pikey](pikey), [pimouse](pimouse), and [pipad](pipad).
 
@@ -186,8 +169,7 @@ Pi intentionally limits:
 * resolution
 * color palette
 
-These constraints force you to be creative and keep things simple.
-It's easier to finish a game when you don't try to do everything at once.
+These constraints force you to be creative and keep things simple. It's easier to finish a game when you don't try to do everything at once.
 The goal is to have fun, not get lost in complexity!
 
 ## FAQ
@@ -197,9 +179,7 @@ The goal is to have fun, not get lost in complexity!
 Yes — the core functionality is implemented and ready to use.  
 Currently, the focus is on developer tools like [piscope](piscope).
 
-Note: Pi does not yet include built-in APIs for sound effects or music playback.  
-However, you can use [Ebitengine's audio API][ebitengine-audio] to play OGG or MP3 files,  
-or the external Go module [quasilyte/xm][quasilyte-xm] to play XM tracker files.
+Note: Pi does not yet include built-in APIs for sound effects or music playback. However, you can use [Ebitengine's audio API][ebitengine-audio] to play OGG or MP3 files, or the external Go module [quasilyte/xm][quasilyte-xm] to play XM tracker files.
 
 ### What similarities does Pi have with Pico-8 on the API level?
 
@@ -209,24 +189,19 @@ or the external Go module [quasilyte/xm][quasilyte-xm] to play XM tracker files.
 
 ### Can I use Pi in a game that already uses Ebitengine?
 
-Yes! You can use the [piebiten](piebiten) package to integrate Pi with your existing Ebitengine project.  
-For example, you can copy pixel data from `pi.Canvas` into an `ebiten.Image`.
+Yes! You can use the [piebiten](piebiten) package to integrate Pi with your existing Ebitengine project. For example, you can copy pixel data from `pi.Canvas` into an `ebiten.Image`.
 
 ### What platforms do Pi games run on?
 
-Pi runs on all platforms supported by Ebitengine.  
-However, it is currently tested only on Windows, Linux, and web browsers.
+Pi runs on all platforms supported by Ebitengine. However, it is currently tested only on Windows, Linux, and web browsers.
 
 ### Can I write my own backend for Pi instead of Ebitengine?
 
-Yes! You can create a specialized backend that runs on unusual devices or is optimized for a specific architecture.  
-For example, there's [piweb][piweb] — an experimental backend for web browsers.  
-Its goal is to cut the size of the generated WASM program roughly in half, which can be important for small browser-based games.
+Yes! You can create a specialized backend that runs on unusual devices or is optimized for a specific architecture. For example, there's [piweb][piweb] — an experimental backend for web browsers. Its goal is to cut the size of the generated WASM program roughly in half, which can be important for small browser-based games.
 
 ### How can I contribute to Pi's development?
 
-The best way to help Pi grow is by creating your own packages that add new or improved features.  
-Pi is designed so that anyone can extend it without needing to contribute code directly to the main Pi repository.  
+The best way to help Pi grow is by creating your own packages that add new or improved features. Pi is designed so that anyone can extend it without needing to contribute code directly to the main Pi repository.  
 Examples of useful packages include:
 
 * developer tools that other programmers can run directly in their games
@@ -238,22 +213,17 @@ Examples of useful packages include:
 
 First of all, you'll need a good Go editor. I recommend GoLand (paid) or Visual Studio Code.
 
-For creating sprites, I highly recommend [Aseprite][aseprite] — probably the best pixel-art editor ever made.  
-It has tons of features, scripting support, and can export images with metadata.  
-In general, try to use the same color indices in your graphics program and in your game code.  
-It really simplifies game development. Aseprite is one of the tools that supports editing images with indexed colors.
+For creating sprites, I highly recommend [Aseprite][aseprite] — probably the best pixel-art editor ever made. It has tons of features, scripting support, and can export images with metadata. In general, try to use the same color indices in your graphics program and in your game code. It really simplifies game development. Aseprite is one of the tools that supports editing images with indexed colors.
 
 For creating tile maps, I recommend [Tiled][tiled].
 
 ### How can I persist game state or settings?
 
-Pi itself doesn't include built-in save/load APIs.  
-To store your game's progress or settings, you can use the external Go module [quasilyte/gdata][quasilyte-gdata].
+Pi itself doesn't include built-in save/load APIs. To store your game's progress or settings, you can use the external Go module [quasilyte/gdata][quasilyte-gdata].
 
 ### I have more questions or found a bug. Where can I ask?
 
-Please open an [Issue][issues] or start a [Discussion][discussions] on GitHub.  
-Questions, ideas, bug reports, and contributions are all welcome!
+Please open an [Issue][issues] or start a [Discussion][discussions] on GitHub. Questions, ideas, bug reports, and contributions are all welcome!
 
 ## Attributions
 
