@@ -50,7 +50,7 @@ Perfect for small projects, prototypes, jams — or simply to have fun.
 2. Try examples from the [_examples](_examples) directory
     * Run the Snake example directly:
       ```bash
-      go run github.com/elgopher/pi/_examples/snake
+      go run github.com/elgopher/pi/_examples/snake@latest
       ```
     * Or clone the Pi repository and modify the example:
       ```bash
