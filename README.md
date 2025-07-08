@@ -55,7 +55,7 @@ Perfect for small projects, prototypes, jams — or simply to have fun.
     * Or clone the Pi repository and modify the example:
       ```bash
       git clone https://github.com/elgopher/pi
-      cd _examples/snake
+      cd pi/_examples/snake
       # edit main.go to experiment
       go run .
       ```
