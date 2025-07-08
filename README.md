@@ -59,7 +59,36 @@ Because it's probably the easiest and most fun way to write a game in Go. No com
       ```
 
 3. Create a new game
-    * Use the provided [GitHub template][pi-template]
+    * Create a new Go module and add Pi as a dependency:
+      ```bash
+      mkdir mygame
+      cd mygame
+      go mod init mygame
+      go get github.com/elgopher/pi@latest
+      ```
+   * Create main.go:
+      ```go
+      package main
+         
+      import (
+         "github.com/elgopher/pi"          // import pi core package
+         "github.com/elgopher/pi/picofont" // import very small pico-8 font
+         "github.com/elgopher/pi/piebiten" // import backend
+      )
+   
+      func main() {
+         pi.SetScreenSize(47, 9) // set custom screen size
+         pi.Draw = func() {      // draw will be executed each frame
+            picofont.Print("HELLO WORLD", 2, 2)
+         }
+         piebiten.Run() // run backend
+      }
+      ```
+   * Run the game:
+      ```bash
+      go run .
+      ```
+
 
 4. Explore further
     * Read the rest of this README.md
