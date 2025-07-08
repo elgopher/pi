@@ -61,7 +61,14 @@ Perfect for small projects, prototypes, jams — or simply to have fun.
       ```
 
 3. Create a new game
-    * Use the provided [GitHub template][pi-template]
+    * Create a new Go module and add Pi as a dependency:
+      ```bash
+      mkdir mygame
+      cd mygame
+      go mod init mygame
+      go get github.com/elgopher/pi@latest
+      ```
+    * Or use the provided [GitHub template][pi-template]
 
 4. Explore further
     * Read the rest of this README.md
