@@ -22,10 +22,10 @@ func SetScreenSize(width, height int) {
 		return
 	}
 	if width <= 0 {
-		panic(fmt.Sprintf("screen width %d is not greather than 0", width))
+		panic(fmt.Sprintf("screen width %d is not greater than 0", width))
 	}
 	if height <= 0 {
-		panic(fmt.Sprintf("screen height %d is not greather than 0", height))
+		panic(fmt.Sprintf("screen height %d is not greater than 0", height))
 	}
 
 	const maxScreenSize = 128 * 1024
