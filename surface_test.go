@@ -166,3 +166,13 @@ func BenchmarkBlit(b *testing.B) {
 		pi.Blit(src, 130, 130)
 	}
 }
+
+func TestSurface_GetLine(t *testing.T) {
+	surface := pi.NewSurface[int](3, 2)
+	surface.SetAll(1, 2, 3, 4, 5, 6)
+
+	assert.Equal(t, []int{1, 2, 3}, surface.GetLine(0))
+	assert.Equal(t, []int{4, 5, 6}, surface.GetLine(1))
+	assert.Nil(t, surface.GetLine(-1))
+	assert.Nil(t, surface.GetLine(2))
+}
