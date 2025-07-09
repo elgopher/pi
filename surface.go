@@ -216,7 +216,7 @@ func (m Surface[T]) GetLine(y int) []T {
 		return nil
 	}
 
-	return m.data[y*m.height : y*m.height+m.width]
+	return m.data[y*m.width : (y+1)*m.width]
 }
 
 // LinesIterator returns an iterator for reading and writing data in lines.
