@@ -1,7 +1,7 @@
 // Copyright 2025 Jacek Olszak
 // This code is licensed under MIT license (see LICENSE for details)
 
-package piscope
+package internal
 
 import (
 	"github.com/elgopher/pi"
@@ -48,6 +48,10 @@ func (s *screenRecorder) Save() {
 	s.shift = 0
 }
 
+func (s *screenRecorder) HasPrev() bool {
+	return -s.shift+1 <= s.snapshots.Len()
+}
+
 func (s *screenRecorder) ShowPrev() bool {
 	if -s.shift+1 > s.snapshots.Len() {
 		return false
@@ -75,5 +79,9 @@ func (s *screenRecorder) showCurrent() {
 
 func (s *screenRecorder) Reset() {
 	s.snapshots.Reset()
+	s.shift = 0
+}
+
+func (s *screenRecorder) GoToLast() {
 	s.shift = 0
 }
