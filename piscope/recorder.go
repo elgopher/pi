@@ -24,7 +24,7 @@ func newScreenRecorder(historySize int) *screenRecorder {
 
 type screenRecorder struct {
 	snapshots *piring.Buffer[screenSnapshot]
-	shift     int // ktory element od konca jest obecnie wybrany
+	shift     int // which element from the end is currently selected
 }
 
 type screenSnapshot struct {
