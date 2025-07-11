@@ -24,12 +24,12 @@ func attachToolbar(parent *pigui.Element) *pigui.Element {
 	// attachIconButton(toolbar, icons.Paint, 32) // icon hidden until implemented
 
 	snap := attachIconButton(toolbar, icons.Snap, pi.Screen().W()-34)
-	snap.OnTapped = func(event pigui.Event) {
+	snap.OnTap = func(event pigui.Event) {
 		captureSnapshot()
 	}
 
 	prev := attachIconButton(toolbar, icons.Prev, pi.Screen().W()-24)
-	prev.OnTapped = func(event pigui.Event) {
+	prev.OnTap = func(event pigui.Event) {
 		showPrevSnapshot()
 	}
 	prev.OnUpdate = func(pigui.UpdateEvent) {
@@ -41,7 +41,7 @@ func attachToolbar(parent *pigui.Element) *pigui.Element {
 	}
 
 	playPause := attachIconButton(toolbar, icons.Pause, pi.Screen().W()-19)
-	playPause.OnTapped = func(pigui.Event) {
+	playPause.OnTap = func(pigui.Event) {
 		pauseOrResume()
 	}
 	playPause.OnUpdate = func(pigui.UpdateEvent) {
@@ -53,12 +53,12 @@ func attachToolbar(parent *pigui.Element) *pigui.Element {
 	}
 
 	next := attachIconButton(toolbar, icons.Next, pi.Screen().W()-14)
-	next.OnTapped = func(event pigui.Event) {
+	next.OnTap = func(event pigui.Event) {
 		showNextSnapshot()
 	}
 
 	exit := attachIconButton(toolbar, icons.Exit, pi.Screen().W()-8)
-	exit.OnTapped = func(event pigui.Event) {
+	exit.OnTap = func(event pigui.Event) {
 		exitConsoleMode()
 	}
 
