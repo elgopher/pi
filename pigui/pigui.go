@@ -11,14 +11,14 @@ import (
 	"github.com/elgopher/pi/pimouse"
 )
 
-// New creates a new GUI root element.
+// New creates a new GUI root element with the current screen size.
 //
 // To update and draw the element along with its children,
 // add it to your game loop by calling Element.Update and Element.Draw.
 func New() *Element {
 	return &Element{
-		area: pi.IntArea{
-			W: pi.Screen().W(), // TODO Should not be fixed
+		Area: pi.IntArea{
+			W: pi.Screen().W(),
 			H: pi.Screen().H(),
 		},
 	}
@@ -29,19 +29,20 @@ func New() *Element {
 // It returns the newly created element.
 func Attach(parent *Element, x, y, w, h int) *Element {
 	ch := &Element{
-		area: pi.IntArea{X: x, Y: y, W: w, H: h},
+		Area: pi.IntArea{X: x, Y: y, W: w, H: h},
 	}
 	parent.Attach(ch)
 	return ch
 }
 
 type Element struct {
+	pi.Area[int]
+
 	OnDraw     func(DrawEvent)
 	OnUpdate   func(UpdateEvent)
 	OnPressed  func(Event)
 	OnReleased func(Event)
 	OnTapped   func(Event)
-	area       pi.Area[int]
 	children   []*Element
 	pressed    bool
 }
@@ -66,13 +67,13 @@ func (e *Element) Update() {
 		pi.Camera = prevCamera
 	}()
 
-	pi.Camera.X -= e.area.X // musze przesuwac kamere, zeby dzieci dzieciow zbieraly eventy
-	pi.Camera.Y -= e.area.Y
+	pi.Camera.X -= e.X // I have to move the camera so that the children's children can pick up events
+	pi.Camera.Y -= e.Y
 
 	mousePosition := pimouse.Position.Add(pi.Camera)
 
-	hasPointer := mousePosition.X >= 0 && mousePosition.X < e.area.W &&
-		mousePosition.Y >= 0 && mousePosition.Y < e.area.H
+	hasPointer := mousePosition.X >= 0 && mousePosition.X < e.W &&
+		mousePosition.Y >= 0 && mousePosition.Y < e.H
 
 	propagate := getPropagateToChildrenFromThePool()
 
@@ -132,12 +133,12 @@ func (e *Element) Draw() {
 		pi.Camera = prevCamera
 	}()
 
-	pi.Camera.X -= e.area.X
-	pi.Camera.Y -= e.area.Y
+	pi.Camera.X -= e.X
+	pi.Camera.Y -= e.Y
 
 	prevClip := pi.SetClip(pi.IntArea{
 		X: -pi.Camera.X, Y: -pi.Camera.Y,
-		W: e.area.W, H: e.area.H,
+		W: e.W, H: e.H,
 	})
 	defer func() {
 		pi.SetClip(prevClip)
@@ -146,8 +147,8 @@ func (e *Element) Draw() {
 	propagate := getPropagateToChildrenFromThePool()
 
 	mousePosition := pimouse.Position.Add(pi.Camera)
-	hasPointer := mousePosition.X >= 0 && mousePosition.X < e.area.W &&
-		mousePosition.Y >= 0 && mousePosition.Y < e.area.H
+	hasPointer := mousePosition.X >= 0 && mousePosition.X < e.W &&
+		mousePosition.Y >= 0 && mousePosition.Y < e.H
 
 	drawEvent := DrawEvent{
 		Element:                  e,
@@ -168,7 +169,4 @@ func (e *Element) Draw() {
 			child.Draw()
 		}
 	}
-}
-func (e *Element) Area() pi.IntArea {
-	return e.area
 }
