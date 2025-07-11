@@ -61,11 +61,10 @@ func main() {
 func attachPanel(parent *pigui.Element, x, y, w, h int) *pigui.Element {
 	panel := pigui.Attach(parent, x, y, w, h)
 	panel.OnDraw = func(event pigui.DrawEvent) {
-		area := panel.Area()
 		pi.SetColor(lightBlue)
-		pi.Rect(0, 0, area.W-1, area.H-1)
+		pi.Rect(0, 0, panel.W-1, panel.H-1)
 		pi.SetColor(darkBlue)
-		pi.RectFill(1, 1, area.W-2, area.H-2)
+		pi.RectFill(1, 1, panel.W-2, panel.H-2)
 	}
 	return panel
 }
