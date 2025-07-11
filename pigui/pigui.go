@@ -38,13 +38,13 @@ func Attach(parent *Element, x, y, w, h int) *Element {
 type Element struct {
 	pi.Area[int]
 
-	OnDraw     func(DrawEvent)
-	OnUpdate   func(UpdateEvent)
-	OnPressed  func(Event)
-	OnReleased func(Event)
-	OnTapped   func(Event)
-	children   []*Element
-	pressed    bool
+	OnDraw    func(DrawEvent)
+	OnUpdate  func(UpdateEvent)
+	OnPress   func(Event)
+	OnRelease func(Event)
+	OnTap     func(Event)
+	children  []*Element
+	pressed   bool
 }
 
 // Attach re-attaches an existing element to the parent e.
@@ -91,23 +91,23 @@ func (e *Element) Update() {
 
 	if hasPointer && mouseLeft == 1 {
 		e.pressed = true
-		if e.OnPressed != nil {
-			e.OnPressed(Event{
+		if e.OnPress != nil {
+			e.OnPress(Event{
 				Element:    e,
 				HasPointer: true,
 			})
 		}
 	} else if e.pressed && mouseLeft == 0 {
 		e.pressed = false
-		if e.OnReleased != nil {
-			e.OnReleased(Event{
+		if e.OnRelease != nil {
+			e.OnRelease(Event{
 				Element:    e,
 				HasPointer: hasPointer,
 			})
 		}
 		if hasPointer {
-			if e.OnTapped != nil {
-				e.OnTapped(Event{
+			if e.OnTap != nil {
+				e.OnTap(Event{
 					Element:    e,
 					HasPointer: true,
 				})

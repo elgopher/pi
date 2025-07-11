@@ -40,7 +40,7 @@ func main() {
 	// add a button with a callback that runs when the user clicks
 	// and releases the left mouse button while staying inside its area
 	btn3 := attachButton(panel, 10, 41, 44, 14, "BUTTON 3")
-	btn3.OnTapped = func(event pigui.Event) {
+	btn3.OnTap = func(event pigui.Event) {
 		log.Println("Button 3 was tapped")
 	}
 
