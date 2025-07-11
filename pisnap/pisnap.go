@@ -48,6 +48,7 @@ func CaptureOrErr() (string, error) {
 func PalettedImage() image.PalettedImage {
 	var palette color.Palette
 	for _, col := range pi.PaletteMapping {
+		col &= pi.MaxColors - 1
 		rgb := pi.Palette[col]
 		r, g, b := rgb.RGB()
 		rgba := &color.NRGBA{R: r, G: g, B: b, A: 255}
