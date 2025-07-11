@@ -42,10 +42,10 @@ func (b *Buffer[E]) Cap() int {
 func (b *Buffer[E]) PointerTo(index int) *E {
 	idx := index + b.start
 
-	if idx < 0 {
-		idx = len(b.data) + idx%len(b.data)
-	} else if idx >= len(b.data) {
-		idx %= len(b.data)
+	// wrap the index so that both positive and negative values fall
+	// into the [0, Cap()-1] range
+	if capacity := len(b.data); capacity > 0 {
+		idx = ((idx % capacity) + capacity) % capacity
 	}
 
 	return &b.data[idx]

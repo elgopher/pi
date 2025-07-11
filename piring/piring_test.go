@@ -18,7 +18,7 @@ func TestBuffer(t *testing.T) {
 		assert.Zero(t, *buffer.PointerTo(0))
 	})
 
-	t.Run("no circle", func(t *testing.T) {
+	t.Run("no cycle", func(t *testing.T) {
 		buffer := piring.NewBuffer[int](3)
 		*buffer.NextWritePointer() = 0
 		*buffer.NextWritePointer() = 1
@@ -31,7 +31,7 @@ func TestBuffer(t *testing.T) {
 		assertHas(t, buffer, 2, 2)
 	})
 
-	t.Run("circle", func(t *testing.T) {
+	t.Run("cycle", func(t *testing.T) {
 		buffer := piring.NewBuffer[int](2)
 		*buffer.NextWritePointer() = 0
 		*buffer.NextWritePointer() = 1
@@ -43,7 +43,7 @@ func TestBuffer(t *testing.T) {
 		assertHas(t, buffer, 1, 2)
 	})
 
-	t.Run("two circles", func(t *testing.T) {
+	t.Run("two cycles", func(t *testing.T) {
 		buffer := piring.NewBuffer[int](2)
 		*buffer.NextWritePointer() = 0
 		*buffer.NextWritePointer() = 1
@@ -94,6 +94,14 @@ func TestBuffer(t *testing.T) {
 
 		assertHas(t, buffer, 5, *buffer.PointerTo(1))
 		assertHas(t, buffer, -5, *buffer.PointerTo(1))
+	})
+
+	t.Run("negative index equal to -Cap()", func(t *testing.T) {
+		buffer := piring.NewBuffer[int](2)
+		*buffer.NextWritePointer() = 0
+		*buffer.NextWritePointer() = 1
+
+		assertHas(t, buffer, -buffer.Cap(), *buffer.PointerTo(0))
 	})
 }
 
