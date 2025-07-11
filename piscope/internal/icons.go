@@ -29,8 +29,14 @@ var icons = struct {
 }{}
 
 func init() {
-	// TODO Decode palette
+	prevPalette := pi.Palette
+	defer func() {
+		pi.Palette = prevPalette
+	}()
+
+	pi.Palette = pi.DecodePalette(iconsPNG)
 	iconsSheet := pi.DecodeCanvas(iconsPNG)
+
 	icons.AlignTop = pi.SpriteFrom(iconsSheet, 0, 0, 8, 8)
 	icons.AlignBottom = pi.SpriteFrom(iconsSheet, 8, 0, 8, 8)
 	icons.Screen = pi.SpriteFrom(iconsSheet, 16, 0, 8, 8)
