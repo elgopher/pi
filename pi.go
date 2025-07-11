@@ -74,7 +74,7 @@ func DrawTarget() Canvas {
 //
 // Returns the previous color.
 func SetColor(c Color) (prev Color) {
-	prev = c
+	prev = drawColor
 	drawColor = c
 	return
 }
