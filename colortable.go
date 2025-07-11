@@ -48,50 +48,45 @@ func init() {
 }
 
 func ResetColorTables() {
-	ColorTables[0] = defaultColorTable()
-	ColorTables[1] = identityColorTable()
+	ColorTables[0] = opaqueColorTable
+	ColorTables[0][0] = transparentColor
+	ColorTables[1] = identityColorTable
 }
 
 func Pal(fromColor, toColor Color) {
-	ColorTables[0][fromColor] = useOneColorNoMatterWhatIsTheTargetColor(toColor)
+	ColorTables[0][fromColor] = opaqueColorTable[toColor]
 }
 
 func Palt(color Color, t bool) {
 	if t {
-		ColorTables[0][color] = transparent()
+		ColorTables[0][color] = transparentColor
 	} else {
-		ColorTables[0][color] = useOneColorNoMatterWhatIsTheTargetColor(color)
+		ColorTables[0][color] = opaqueColorTable[color]
 	}
 }
 
-func defaultColorTable() (p ColorTable) {
-	p[0] = transparent()
-	for sourceColor := Color(1); sourceColor < MaxColors; sourceColor++ {
-		p[sourceColor] = useOneColorNoMatterWhatIsTheTargetColor(sourceColor)
-	}
-	return p
-}
-
-// drawing has no effect
-func identityColorTable() (p [MaxColors][MaxColors]Color) {
-	for sourceColor := Color(0); sourceColor < MaxColors; sourceColor++ {
-		for targetColor := Color(0); targetColor < MaxColors; targetColor++ {
-			p[sourceColor][targetColor] = targetColor
+var opaqueColorTable = func() (table [MaxColors][MaxColors]Color) {
+	for draw := Color(0); draw < MaxColors; draw++ {
+		for target := 0; target < MaxColors; target++ {
+			table[draw][target] = draw
 		}
 	}
-	return p
-}
+	return
+}()
 
-func transparent() (colors [MaxColors]Color) {
-	for i := Color(0); i < MaxColors; i++ {
-		colors[i] = i
+var transparentColor = func() (colors [MaxColors]Color) {
+	for target := Color(0); target < MaxColors; target++ {
+		colors[target] = target
 	}
 	return
-}
+}()
 
-func useOneColorNoMatterWhatIsTheTargetColor(c Color) (colors [MaxColors]Color) {
-	for targetColor := 0; targetColor < MaxColors; targetColor++ {
-		colors[targetColor] = c
+// drawing has no effect
+var identityColorTable = func() (table [MaxColors][MaxColors]Color) {
+	for draw := Color(0); draw < MaxColors; draw++ {
+		for target := Color(0); target < MaxColors; target++ {
+			table[draw][target] = target
+		}
 	}
-	return
-}
+	return table
+}()
