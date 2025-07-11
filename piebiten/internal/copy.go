@@ -19,7 +19,8 @@ func CopyCanvasToEbitenImage(canvas pi.Canvas, dst *ebiten.Image) {
 
 	offset := 0
 	for _, col := range pixels {
-		rgba := pi.Palette[pi.PaletteMapping[col]]
+		col &= pi.MaxColors - 1
+		rgba := pi.Palette[pi.PaletteMapping[col]&(pi.MaxColors-1)]
 		buff[offset] = byte(rgba >> 16)
 		buff[offset+1] = byte(rgba >> 8)
 		buff[offset+2] = byte(rgba)
