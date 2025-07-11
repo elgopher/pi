@@ -79,6 +79,13 @@ func attachIconButton(parent *pigui.Element, icon pi.Sprite, x int) *IconButton 
 		if event.Pressed {
 			y = 1
 		}
+
+		prevColorTable := pi.ColorTables[0]
+		defer func() {
+			pi.ColorTables[0] = prevColorTable
+		}()
+		pi.Pal(0, *bgColor) // 0 is bg color in icons.png
+		pi.Pal(1, *fgColor) // 1 is fg color in icons.png
 		pi.Spr(iconBtn.Icon, 0, y)
 	}
 	return iconBtn

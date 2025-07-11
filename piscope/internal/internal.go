@@ -14,7 +14,7 @@ import (
 	"github.com/elgopher/pi/pimouse"
 )
 
-var bgColor *pi.Color
+var bgColor, fgColor *pi.Color
 
 var consoleMode, pauseOnNextFrame bool
 
@@ -25,8 +25,9 @@ var consoleMode, pauseOnNextFrame bool
 // używać conajmniej 2 kolorów.
 //
 // Pressing Ctrl+Shift+I will activate the tools in the game
-func Start(backgroundColor *pi.Color) {
+func Start(backgroundColor, foregroundColor *pi.Color) {
 	bgColor = backgroundColor
+	fgColor = foregroundColor
 
 	// TODO Handle screen size change event and redraw entire gui.
 

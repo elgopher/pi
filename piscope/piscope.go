@@ -9,7 +9,11 @@ import (
 	"github.com/elgopher/pi/piscope/internal"
 )
 
-var BgColor pi.Color = 8 // toolbar background color
+// Toolbar colors
+var (
+	BgColor pi.Color = 8 // toolbar background color
+	FgColor pi.Color = 1 // toolbar foreground color
+)
 
 // Start launches the developer tools.
 //
@@ -27,5 +31,5 @@ var BgColor pi.Color = 8 // toolbar background color
 // 128 pixels horizontally and 16 pixels vertically. Additionally, the game's
 // palette must use at least 2 colors.
 func Start() {
-	internal.Start(&BgColor)
+	internal.Start(&BgColor, &FgColor)
 }
