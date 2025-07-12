@@ -5,6 +5,7 @@ package internal
 
 import (
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/piaudio"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -12,6 +13,8 @@ var RememberWindow bool
 
 func RunOrErr() error {
 	game := NewEbitenGame()
+
+	piaudio.Backend = &audioBackend{}
 
 	setWindowSize := func() {
 		monitor := ebiten.Monitor()
