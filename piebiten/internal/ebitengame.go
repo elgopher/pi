@@ -4,6 +4,8 @@
 package internal
 
 import (
+	"github.com/elgopher/pi/piaudio"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"math"
 	"time"
 
@@ -15,13 +17,18 @@ import (
 	"github.com/elgopher/pi/piloop"
 )
 
-func NewEbitenGame() *EbitenGame {
+func RunEbitenGame() *EbitenGame {
 	screen := pi.Screen()
+
+	ctx := audio.NewContext(CtxSampleRate)
+	theAudioBackend := StartAudioBackend(ctx)
+	piaudio.Backend = theAudioBackend
 
 	game := &EbitenGame{
 		piScreen:       screen,
 		ebitenScreen:   ebiten.NewImage(screen.W(), screen.H()),
 		drawScreenOpts: &ebiten.DrawImageOptions{},
+		audioBackend:   theAudioBackend,
 	}
 
 	pidebug.Target().SubscribeAll(game.onPidebugEvent)
@@ -69,8 +76,9 @@ type EbitenGame struct {
 
 	paused bool
 
-	gamepads    ebitenGamepads
-	windowState windowState
+	gamepads     ebitenGamepads
+	windowState  windowState
+	audioBackend *AudioBackend
 }
 
 func (g *EbitenGame) Update() error {
@@ -81,6 +89,8 @@ func (g *EbitenGame) Update() error {
 
 	g.windowState.store()
 
+	g.audioBackend.OnBeforeUpdate()
+
 	started := time.Now()
 
 	pi.Time += 1 / float64(pi.TPS)
@@ -88,6 +98,7 @@ func (g *EbitenGame) Update() error {
 
 	if !g.started {
 		piloop.Target().Publish(piloop.EventGameStarted)
+		g.audioBackend.ebitenPlayer.Play()
 	}
 	g.started = true
 
@@ -133,6 +144,8 @@ func (g *EbitenGame) Update() error {
 	if time.Since(started).Seconds() > 1/float64(pi.TPS) {
 		g.skipNextDraw = true // game is too slow. Try to keep up by discarding next pi.Draw()
 	}
+
+	g.audioBackend.OnAfterUpdate()
 
 	return nil
 }

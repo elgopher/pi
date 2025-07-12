@@ -11,7 +11,7 @@ import (
 var RememberWindow bool
 
 func RunOrErr() error {
-	game := NewEbitenGame()
+	game := RunEbitenGame()
 
 	setWindowSize := func() {
 		monitor := ebiten.Monitor()

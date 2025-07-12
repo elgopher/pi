@@ -16,7 +16,10 @@ package piebiten
 
 import (
 	"errors"
+	"github.com/elgopher/pi/piaudio"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
+	"strconv"
 
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/piebiten/internal"
@@ -52,4 +55,23 @@ func RunOrErr() error {
 // palette in pi.Palette and the palette mapping in pi.PaletteMapping.
 func CopyCanvasToEbitenImage(canvas pi.Canvas, dst *ebiten.Image) {
 	internal.CopyCanvasToEbitenImage(canvas, dst)
+}
+
+// StartAudioBackend starts the audio backend with the given Ebitengine audio.Context.
+// Use if you want only piaudio functionality without Pi's graphics.
+//
+// audio.Context must have a sample rate of 44100.
+func StartAudioBackend(ctx *audio.Context) Audio {
+	if ctx.SampleRate() != internal.CtxSampleRate {
+		panic("piebiten.StartAudioBackend: audio.Context must have " + strconv.Itoa(internal.CtxSampleRate) + " sample rate")
+	}
+	return internal.StartAudioBackend(ctx)
+}
+
+type Audio interface {
+	piaudio.BackendInterface
+	// OnBeforeUpdate must be called at the start of Ebitengine's Update function.
+	OnBeforeUpdate()
+	// OnAfterUpdate must be called at the end of Ebitengine's Update function.
+	OnAfterUpdate()
 }
