@@ -32,7 +32,7 @@ func Duration(k Key) int {
 	if keyDownFrame[k] == 0 {
 		return 0
 	}
-	return pi.Frame - keyDownFrame[k]
+	return pi.Frame - keyDownFrame[k] + 1
 }
 
 type Key string

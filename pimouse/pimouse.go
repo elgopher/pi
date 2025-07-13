@@ -17,7 +17,7 @@ func Duration(b Button) int {
 	if buttonDownFrame[b] == 0 {
 		return 0
 	}
-	return pi.Frame - buttonDownFrame[b]
+	return pi.Frame - buttonDownFrame[b] + 1
 }
 
 type Button string
