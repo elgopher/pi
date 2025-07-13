@@ -86,7 +86,7 @@ func Duration(b Button) int {
 	if buttonAnyDownFrame[b] == 0 {
 		return 0
 	}
-	return pi.Frame - buttonAnyDownFrame[b]
+	return pi.Frame - buttonAnyDownFrame[b] + 1
 }
 
 // PlayerCount returns the number of connected controllers
