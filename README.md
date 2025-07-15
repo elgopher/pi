@@ -84,6 +84,10 @@ Because it's probably the easiest and most fun way to write a game in Go. No com
          piebiten.Run() // run backend
       }
       ```
+   * Tidy go.mod file after importing Pi packages
+      ```bash
+      go mod tidy
+      ```
    * Run the game:
       ```bash
       go run .
