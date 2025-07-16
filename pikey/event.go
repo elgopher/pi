@@ -5,6 +5,9 @@ package pikey
 
 import "github.com/elgopher/pi/pievent"
 
+// Event is published when the player presses or releases a key.
+//
+// It may be published more than once during a single game tick.
 type Event struct {
 	Type EventType
 	Key  Key

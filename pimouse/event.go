@@ -8,6 +8,8 @@ import (
 	"github.com/elgopher/pi/pievent"
 )
 
+// EventButton is published when the player presses or releases a mouse button.
+// It may be published more than once during a single game tick.
 type EventButton struct {
 	Type   EventButtonType
 	Button Button
@@ -20,7 +22,9 @@ const (
 	EventButtonDown EventButtonType = "down"
 )
 
-// EventMove is published when mouse position has changed since last frame
+// EventMove is published when the mouse is moved.
+//
+// It may be published more than once during a single game tick.
 type EventMove struct {
 	Position pi.Position
 	Previous pi.Position

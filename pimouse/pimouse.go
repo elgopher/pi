@@ -5,6 +5,7 @@ package pimouse
 
 import (
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/internal/input"
 	"github.com/elgopher/pi/pievent"
 )
 
@@ -14,10 +15,7 @@ var (
 )
 
 func Duration(b Button) int {
-	if buttonDownFrame[b] == 0 {
-		return 0
-	}
-	return pi.Frame - buttonDownFrame[b] + 1
+	return buttonState.Duration(b)
 }
 
 type Button string
@@ -32,15 +30,15 @@ var buttonDebugTarget = pievent.NewTarget[EventButton]()
 var moveTarget = pievent.NewTarget[EventMove]()
 var moveDebugTarget = pievent.NewTarget[EventMove]()
 
-var buttonDownFrame = map[Button]int{}
+var buttonState input.State[Button]
 
 func init() {
 	onButton := func(event EventButton, _ pievent.Handler) {
 		switch event.Type {
 		case EventButtonDown:
-			buttonDownFrame[event.Button] = pi.Frame
+			buttonState.SetStartFrame(event.Button, pi.Frame)
 		case EventButtonUp:
-			buttonDownFrame[event.Button] = 0
+			buttonState.SetStopFrame(event.Button, pi.Frame)
 		}
 	}
 	buttonTarget.SubscribeAll(onButton)

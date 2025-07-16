@@ -79,6 +79,8 @@ type EbitenGame struct {
 	gamepads     ebitenGamepads
 	windowState  windowState
 	audioBackend *AudioBackend
+
+	ebitenFrame int // frame incremented on each Ebiten tick
 }
 
 func (g *EbitenGame) Update() error {
@@ -93,8 +95,7 @@ func (g *EbitenGame) Update() error {
 
 	started := time.Now()
 
-	pi.Time += 1 / float64(pi.TPS())
-	pi.Frame++
+	g.ebitenFrame++
 
 	if !g.started {
 		piloop.Target().Publish(piloop.EventGameStarted)
@@ -102,47 +103,50 @@ func (g *EbitenGame) Update() error {
 	}
 	g.started = true
 
-	if !g.paused {
-		piloop.Target().Publish(piloop.EventFrameStarted)
-	}
-	piloop.DebugTarget().Publish(piloop.EventFrameStarted)
-
 	g.updateMouse()
 	g.updateKeyboard()
 	g.gamepads.update()
 
-	if !g.paused {
-		pi.Update()
-		piloop.Target().Publish(piloop.EventUpdate)
-	}
-	piloop.DebugTarget().Publish(piloop.EventUpdate)
-
-	if !g.paused {
-		piloop.Target().Publish(piloop.EventLateUpdate)
-	}
-	piloop.DebugTarget().Publish(piloop.EventLateUpdate)
-
-	ebiten.SetTPS(pi.TPS()) // in case the user changed pi.TPS during pi.Update
-
-	if !g.skipNextDraw {
+	if g.ebitenFrame%(ebitenTPS/pi.TPS()) == 0 {
 		if !g.paused {
-			pi.Draw()
-			piloop.Target().Publish(piloop.EventDraw)
+			piloop.Target().Publish(piloop.EventFrameStarted)
 		}
-		piloop.DebugTarget().Publish(piloop.EventDraw)
+		piloop.DebugTarget().Publish(piloop.EventFrameStarted)
 
 		if !g.paused {
-			piloop.Target().Publish(piloop.EventLateDraw)
+			pi.Update()
+			piloop.Target().Publish(piloop.EventUpdate)
 		}
-		piloop.DebugTarget().Publish(piloop.EventLateDraw)
+		piloop.DebugTarget().Publish(piloop.EventUpdate)
 
-		g.dirty = true
-	} else {
-		g.skipNextDraw = false
-	}
+		if !g.paused {
+			piloop.Target().Publish(piloop.EventLateUpdate)
+		}
+		piloop.DebugTarget().Publish(piloop.EventLateUpdate)
 
-	if time.Since(started).Seconds() > 1/float64(pi.TPS()) {
-		g.skipNextDraw = true // game is too slow. Try to keep up by discarding next pi.Draw()
+		if !g.skipNextDraw {
+			if !g.paused {
+				pi.Draw()
+				piloop.Target().Publish(piloop.EventDraw)
+			}
+			piloop.DebugTarget().Publish(piloop.EventDraw)
+
+			if !g.paused {
+				piloop.Target().Publish(piloop.EventLateDraw)
+			}
+			piloop.DebugTarget().Publish(piloop.EventLateDraw)
+
+			g.dirty = true
+		} else {
+			g.skipNextDraw = false
+		}
+
+		if time.Since(started).Seconds() > 1/float64(pi.TPS()) {
+			g.skipNextDraw = true // game is too slow. Try to keep up by discarding next pi.Draw()
+		}
+
+		pi.Time += 1 / ebitenTPS
+		pi.Frame++
 	}
 
 	g.audioBackend.OnAfterUpdate()

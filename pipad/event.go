@@ -5,6 +5,9 @@ package pipad
 
 import "github.com/elgopher/pi/pievent"
 
+// EventButton is published when the player presses or releases a gamepad button.
+//
+// It may be published more than once during a single game tick.
 type EventButton struct {
 	Type   EventButtonType
 	Button Button
