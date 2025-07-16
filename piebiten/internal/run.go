@@ -4,11 +4,12 @@
 package internal
 
 import (
-	"github.com/elgopher/pi"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 var RememberWindow bool
+
+const ebitenTPS = 60 // ensure that most input events are caught
 
 func RunOrErr() error {
 	game := RunEbitenGame()
@@ -25,7 +26,7 @@ func RunOrErr() error {
 
 	// here we intentionally set only a subset of Ebiten parameters,
 	// so the user can configure the rest as needed
-	ebiten.SetTPS(pi.TPS())
+	ebiten.SetTPS(ebitenTPS)
 	ebiten.SetScreenClearedEveryFrame(false)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowClosingHandled(true)

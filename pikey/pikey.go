@@ -24,15 +24,13 @@ package pikey
 
 import (
 	"github.com/elgopher/pi"
+	"github.com/elgopher/pi/internal/input"
 	"github.com/elgopher/pi/pievent"
 )
 
 // Duration returns the number of frames the key k has been held down.
 func Duration(k Key) int {
-	if keyDownFrame[k] == 0 {
-		return 0
-	}
-	return pi.Frame - keyDownFrame[k] + 1
+	return keyState.Duration(k)
 }
 
 type Key string
@@ -121,15 +119,15 @@ const (
 var target = pievent.NewTarget[Event]()
 var debugTarget = pievent.NewTarget[Event]()
 
-var keyDownFrame = map[Key]int{}
+var keyState input.State[Key]
 
 func init() {
 	onKey := func(event Event, _ pievent.Handler) {
 		switch event.Type {
 		case EventDown:
-			keyDownFrame[event.Key] = pi.Frame
+			keyState.SetStartFrame(event.Key, pi.Frame)
 		case EventUp:
-			keyDownFrame[event.Key] = 0
+			keyState.SetStopFrame(event.Key, pi.Frame)
 		}
 	}
 	Target().SubscribeAll(onKey)

@@ -57,6 +57,7 @@
 package pipad
 
 import (
+	"github.com/elgopher/pi/internal/input"
 	"log"
 
 	"github.com/elgopher/pi"
@@ -83,10 +84,7 @@ const (
 
 // Duration returns button press duration for any controller
 func Duration(b Button) int {
-	if buttonAnyDownFrame[b] == 0 {
-		return 0
-	}
-	return pi.Frame - buttonAnyDownFrame[b] + 1
+	return buttonAnyState.Duration(b)
 }
 
 // PlayerCount returns the number of connected controllers
@@ -95,18 +93,16 @@ func PlayerCount() int {
 }
 
 func PlayerDuration(b Button, player int) int {
-	if buttonDownFrame[player] == nil {
+	state := buttonState[player]
+	if state == nil {
 		return 0
 	}
 
-	if buttonDownFrame[player][b] == 0 {
-		return 0
-	}
-	return pi.Frame - buttonDownFrame[player][b]
+	return state.Duration(b)
 }
 
-var buttonDownFrame = map[int]map[Button]int{}
-var buttonAnyDownFrame = map[Button]int{}
+var buttonState = map[int]*input.State[Button]{}
+var buttonAnyState input.State[Button]
 
 func init() {
 	ButtonTarget().SubscribeAll(onButton)
@@ -114,17 +110,17 @@ func init() {
 }
 
 func onButton(event EventButton, _ pievent.Handler) {
-	if buttonDownFrame[event.Player] == nil {
-		buttonDownFrame[event.Player] = map[Button]int{}
+	if buttonState[event.Player] == nil {
+		buttonState[event.Player] = &input.State[Button]{}
 	}
 
 	switch event.Type {
 	case EventDown:
-		buttonDownFrame[event.Player][event.Button] = pi.Frame
-		buttonAnyDownFrame[event.Button] = pi.Frame
+		buttonState[event.Player].SetStartFrame(event.Button, pi.Frame)
+		buttonAnyState.SetStartFrame(event.Button, pi.Frame)
 	case EventUp:
-		buttonDownFrame[event.Player][event.Button] = 0
-		buttonAnyDownFrame[event.Button] = 0
+		buttonState[event.Player].SetStopFrame(event.Button, pi.Frame)
+		buttonAnyState.SetStopFrame(event.Button, pi.Frame)
 	}
 }
 
@@ -133,11 +129,11 @@ var playerCount = 0
 func onConnection(event EventConnection, _ pievent.Handler) {
 	if event.Type == EventDisconnected {
 		log.Println("Controller disconnected", event.Player)
-		buttonDownFrame[event.Player] = map[Button]int{}
+		buttonState[event.Player] = &input.State[Button]{}
 		playerCount -= 1
 	} else {
 		log.Println("Controller connected", event.Player)
-		buttonDownFrame[event.Player] = map[Button]int{} // na wszelki
+		buttonState[event.Player] = &input.State[Button]{}
 		playerCount += 1
 	}
 }
