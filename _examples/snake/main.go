@@ -173,7 +173,7 @@ func main() {
 	headHorizontal = pi.SpriteFrom(sprites, 16, 0, 8, 8)
 	bodySprite = pi.SpriteFrom(sprites, 24, 0, 8, 8)
 
-	pi.TPS = 30 // 60 is for hardcore players!
+	pi.SetTPS(30) // 60 is for hardcore players!
 	pi.SetScreenSize(gridSize*width, gridSize*height)
 	pi.Update = update
 	pi.Draw = draw

@@ -66,7 +66,7 @@ var (
 
 func main() {
 	pi.SetScreenSize(128, 128)
-	pi.TPS = 60 // pi.Update and pi.Draw wil be executed 60 times per second
+	pi.SetTPS(60) // pi.Update and pi.Draw wil be executed 60 times per second
 
 	pi.Palette = pi.DecodePalette(spriteSheetPNG)
 	spriteSheet := pi.DecodeCanvas(spriteSheetPNG)
