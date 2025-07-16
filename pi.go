@@ -12,13 +12,30 @@
 // any Pi functions or access Pi state.
 package pi
 
+import "strconv"
+
 // MaxColors is the maximum number of colors that can be used simultaneously on the screen.
 const MaxColors = 64
 
-// TPS defines the ticks per second.
+var ticksPerSecond = 30
+
+// SetTPS sets the number of ticks per second. This determines how often
+// the Update and Draw functions are called.
 //
-// You can change TPS while the game is running.
-var TPS = 30
+// tps must be one of: 60, 30, or 15.
+//
+// You can change the TPS while the game is running.
+func SetTPS(tps int) {
+	if tps != 60 && tps != 30 && tps != 15 {
+		panic("tps must be one of: 60, 30, 15, but was: " + strconv.Itoa(tps) + "")
+	}
+	ticksPerSecond = tps
+}
+
+// TPS returns the number of ticks per second. The default value is 30.
+func TPS() int {
+	return ticksPerSecond
+}
 
 var (
 	// Frame is the current game frame number.

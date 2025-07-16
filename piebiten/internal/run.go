@@ -25,7 +25,7 @@ func RunOrErr() error {
 
 	// here we intentionally set only a subset of Ebiten parameters,
 	// so the user can configure the rest as needed
-	ebiten.SetTPS(pi.TPS)
+	ebiten.SetTPS(pi.TPS())
 	ebiten.SetScreenClearedEveryFrame(false)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowClosingHandled(true)

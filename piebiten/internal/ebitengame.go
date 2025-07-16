@@ -93,7 +93,7 @@ func (g *EbitenGame) Update() error {
 
 	started := time.Now()
 
-	pi.Time += 1 / float64(pi.TPS)
+	pi.Time += 1 / float64(pi.TPS())
 	pi.Frame++
 
 	if !g.started {
@@ -122,7 +122,7 @@ func (g *EbitenGame) Update() error {
 	}
 	piloop.DebugTarget().Publish(piloop.EventLateUpdate)
 
-	ebiten.SetTPS(pi.TPS) // in case the user changed pi.TPS during pi.Update
+	ebiten.SetTPS(pi.TPS()) // in case the user changed pi.TPS during pi.Update
 
 	if !g.skipNextDraw {
 		if !g.paused {
@@ -141,7 +141,7 @@ func (g *EbitenGame) Update() error {
 		g.skipNextDraw = false
 	}
 
-	if time.Since(started).Seconds() > 1/float64(pi.TPS) {
+	if time.Since(started).Seconds() > 1/float64(pi.TPS()) {
 		g.skipNextDraw = true // game is too slow. Try to keep up by discarding next pi.Draw()
 	}
 
