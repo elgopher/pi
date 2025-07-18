@@ -45,7 +45,7 @@ func main() {
 
 		// the sound is very short, so we need to loop it.
 		// the loop covers the entire sample.
-		piaudio.SetLoop(piaudio.Chan1, 0, sample.Len()-1, piaudio.LoopForward, delay)
+		piaudio.SetLoop(piaudio.Chan1, 0, sample.Len(), piaudio.LoopForward, delay)
 
 		for i := 1.0; i > -0.01; i -= 0.01 {
 			// gradually reduce the volume to 0

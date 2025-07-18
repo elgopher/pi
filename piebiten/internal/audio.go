@@ -81,14 +81,14 @@ type loop struct {
 	loopType    piaudio.LoopType
 }
 
-func (b *AudioBackend) SetLoop(ch piaudio.Chan, start, stop int, loopType piaudio.LoopType, delay float64) {
+func (b *AudioBackend) SetLoop(ch piaudio.Chan, start, length int, loopType piaudio.LoopType, delay float64) {
 	b.commands = append(b.commands,
 		command{
 			kind: cmdKindSetLoop,
 			ch:   ch,
 			loop: loop{
 				start:    start,
-				stop:     stop,
+				stop:     start + length - 1,
 				loopType: loopType,
 			},
 			time: b.scheduleTime(delay),

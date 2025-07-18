@@ -19,7 +19,7 @@ type BackendInterface interface {
 	SetSample(ch Chan, sample *Sample, offset int, delay float64)
 
 	// SetLoop schedules the loop configuration to take effect after the specified delay.
-	SetLoop(_ Chan, start int, stop int, loop LoopType, delay float64)
+	SetLoop(_ Chan, start int, length int, loop LoopType, delay float64)
 
 	// SetPitch schedules the pitch change to take effect after the specified delay.
 	// A pitch of 1.0 plays the sample at its original speed.
@@ -48,7 +48,7 @@ func (p panicBackend) SetSample(ch Chan, sample *Sample, offset int, delay float
 	panic("cannot set sample: backend not set. Please call SetSample only after starting the game")
 }
 
-func (p panicBackend) SetLoop(ch Chan, start, stop int, loop LoopType, delay float64) {
+func (p panicBackend) SetLoop(ch Chan, start, length int, loop LoopType, delay float64) {
 	panic("cannot set loop: backend not set. Please call SetLoop only after starting the game")
 }
 
