@@ -13,12 +13,12 @@ func (s *State[T]) Duration(input T) int {
 	return s.pressedInput(input).duration()
 }
 
-func (s *State[T]) SetStartFrame(input T, frame int) {
-	s.pressedInput(input).startFrame = frame
+func (s *State[T]) SetDownFrame(input T, frame int) {
+	s.pressedInput(input).downFrame = frame
 }
 
-func (s *State[T]) SetStopFrame(input T, frame int) {
-	s.pressedInput(input).stopFrame = frame
+func (s *State[T]) SetUpFrame(input T, frame int) {
+	s.pressedInput(input).upFrame = frame
 }
 
 func (s *State[T]) pressedInput(input T) *pressedInput {
@@ -27,24 +27,24 @@ func (s *State[T]) pressedInput(input T) *pressedInput {
 	}
 	p, ok := s.pressedInputs[input]
 	if !ok {
-		p = &pressedInput{startFrame: -1, stopFrame: -1}
+		p = &pressedInput{downFrame: -1, upFrame: -1}
 		s.pressedInputs[input] = p
 	}
 	return p
 }
 
 type pressedInput struct {
-	startFrame, stopFrame int
+	downFrame, upFrame int
 }
 
 func (p pressedInput) duration() int {
-	if p.startFrame < 0 {
+	if p.downFrame < 0 {
 		return 0
 	}
-	if p.startFrame > p.stopFrame {
-		return pi.Frame - p.startFrame + 1
+	if p.downFrame > p.upFrame {
+		return pi.Frame - p.downFrame + 1
 	}
-	if p.stopFrame == pi.Frame {
+	if p.downFrame == p.upFrame && p.upFrame == pi.Frame {
 		return 1
 	}
 	return 0

@@ -125,9 +125,9 @@ func init() {
 	onKey := func(event Event, _ pievent.Handler) {
 		switch event.Type {
 		case EventDown:
-			keyState.SetStartFrame(event.Key, pi.Frame)
+			keyState.SetDownFrame(event.Key, pi.Frame)
 		case EventUp:
-			keyState.SetStopFrame(event.Key, pi.Frame)
+			keyState.SetUpFrame(event.Key, pi.Frame)
 		}
 	}
 	Target().SubscribeAll(onKey)

@@ -36,9 +36,9 @@ func init() {
 	onButton := func(event EventButton, _ pievent.Handler) {
 		switch event.Type {
 		case EventButtonDown:
-			buttonState.SetStartFrame(event.Button, pi.Frame)
+			buttonState.SetDownFrame(event.Button, pi.Frame)
 		case EventButtonUp:
-			buttonState.SetStopFrame(event.Button, pi.Frame)
+			buttonState.SetUpFrame(event.Button, pi.Frame)
 		}
 	}
 	buttonTarget.SubscribeAll(onButton)
