@@ -12,13 +12,13 @@
 // Each channel plays a single audio sample at a time,
 // which means you can play 4 different samples simultaneously.
 // A channel, in addition to holding the current sample,
-// also stores parameters such as pitch, volume, and loop,
+// also stores parameters such as playback rate, volume, and loop,
 // which affect how the sound is generated.
 // These parameters can be updated in real-time
 // to play sound effects and music.
 //
 // The piaudio package supports scheduling operations in advance.
-// It allows setting the sample to play or changing pitch and volume
+// It allows setting the sample to play or changing playback rate and volume
 // with a specified delay parameter.
 // Programmers should plan commands tens of milliseconds ahead
 // to avoid audio glitches caused by CPU blocking, e.g. by the garbage collector.
@@ -41,18 +41,6 @@
 // or provide raw data directly to NewSample.
 // Once created, a *Sample can be loaded into the backend using LoadSample.
 package piaudio
-
-// Freq represents frequency in Hz.
-type Freq = float64
-
-// Predefined common musical pitches in Hz.
-const (
-	A4 Freq = 440.0  // Standard tuning reference
-	C4 Freq = 261.63 // Middle C
-	E4 Freq = 329.63
-	G4 Freq = 392.00
-	A5 Freq = 880.0
-)
 
 // Chan represents an audio channel number.
 type Chan = uint8
@@ -83,9 +71,9 @@ func SetLoop(ch Chan, start int, stop int, loop LoopType, delay float64) {
 	Backend.SetLoop(ch, start, stop, loop, delay)
 }
 
-// SetPitch schedules the pitch change to take effect after the specified delay.
-func SetPitch(ch Chan, pitch Freq, delay float64) {
-	Backend.SetPitch(ch, pitch, delay)
+// SetPlaybackRate schedules the playback rate change to take effect after the specified delay.
+func SetPlaybackRate(ch Chan, rate float64, delay float64) {
+	Backend.SetPlaybackRate(ch, rate, delay)
 }
 
 // SetVolume schedules the volume change to take effect after the specified delay.

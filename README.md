@@ -192,7 +192,7 @@ Pi audio system is inspired by the Paula audio chip used in Amiga computers.
 
 In Pi, sound is generated in 4 independent channels, which are then mixed to stereo output: channels 0 and 3 are mixed to the left speaker, and channels 1 and 2 to the right.
 
-Each channel plays a single audio sample at a time, which means you can play 4 different samples simultaneously. A channel, in addition to holding the current sample, also stores parameters such as pitch, volume, and loop, which affect how the sound is generated. These parameters can be updated in real-time to play sound effects and music.
+Each channel plays a single audio sample at a time, which means you can play 4 different samples simultaneously. A channel, in addition to holding the current sample, also stores parameters such as playback rate, volume, and loop, which affect how the sound is generated. These parameters can be updated in real-time to play sound effects and music.
 
 Pi only supports samples encoded in 8-bit mono PCM format. 
 

@@ -12,10 +12,10 @@ import (
 
 // DecodeRaw decodes uncompressed raw data (no headers) into a *Sample.
 // Expects 8-bit mono PCM with samples as int8 (-128..127).
-func DecodeRaw(raw []byte, baseFreq Freq) *Sample {
+func DecodeRaw(raw []byte) *Sample {
 	data := byteSliceToInt8Slice(raw)
 
-	return NewSample(data, baseFreq)
+	return NewSample(data)
 }
 
 func byteSliceToInt8Slice(b []byte) []int8 {
@@ -24,8 +24,8 @@ func byteSliceToInt8Slice(b []byte) []int8 {
 
 // DecodeWav decodes a WAV file into a *Sample, panicking if decoding fails.
 // Expects 8-bit mono PCM with samples as int8 (-128..127).
-func DecodeWav(wav []byte, baseFreq Freq) *Sample {
-	sample, err := DecodeWavOrErr(wav, baseFreq)
+func DecodeWav(wav []byte) *Sample {
+	sample, err := DecodeWavOrErr(wav)
 	if err != nil {
 		panic(err)
 	}
@@ -34,7 +34,7 @@ func DecodeWav(wav []byte, baseFreq Freq) *Sample {
 
 // DecodeWavOrErr decodes a WAV file into a *Sample or returns an error if decoding fails.
 // Expects 8-bit mono PCM with samples as int8 (-128..127).
-func DecodeWavOrErr(wav []byte, baseFreq Freq) (*Sample, error) {
+func DecodeWavOrErr(wav []byte) (*Sample, error) {
 	if len(wav) < 44 {
 		return nil, errors.New("WAV too short")
 	}
@@ -104,5 +104,5 @@ func DecodeWavOrErr(wav []byte, baseFreq Freq) (*Sample, error) {
 		pcm[i] = int8(int(v) - 128)
 	}
 
-	return NewSample(pcm, baseFreq), nil
+	return NewSample(pcm), nil
 }
