@@ -67,8 +67,8 @@ func SetSample(ch Chan, sample *Sample, offset int, delay float64) {
 }
 
 // SetLoop schedules the loop configuration to take effect after the specified delay.
-func SetLoop(ch Chan, start int, stop int, loop LoopType, delay float64) {
-	Backend.SetLoop(ch, start, stop, loop, delay)
+func SetLoop(ch Chan, start int, length int, loop LoopType, delay float64) {
+	Backend.SetLoop(ch, start, length, loop, delay)
 }
 
 // SetPitch schedules the pitch change to take effect after the specified delay.
