@@ -95,24 +95,24 @@ func (g *EbitenGame) Update() error {
 
 	started := time.Now()
 
-	g.ebitenFrame++
-
 	if !g.started {
 		piloop.Target().Publish(piloop.EventGameStarted)
 		g.audioBackend.ebitenPlayer.Play()
 	}
 	g.started = true
 
-	g.updateMouse()
-	g.updateKeyboard()
-	g.gamepads.update()
-
 	if g.ebitenFrame%(ebitenTPS/pi.TPS()) == 0 {
 		if !g.paused {
 			piloop.Target().Publish(piloop.EventFrameStarted)
 		}
 		piloop.DebugTarget().Publish(piloop.EventFrameStarted)
+	}
 
+	g.updateMouse()
+	g.updateKeyboard()
+	g.gamepads.update()
+
+	if g.ebitenFrame%(ebitenTPS/pi.TPS()) == (ebitenTPS/pi.TPS())-1 {
 		if !g.paused {
 			pi.Update()
 			piloop.Target().Publish(piloop.EventUpdate)
@@ -150,6 +150,8 @@ func (g *EbitenGame) Update() error {
 	}
 
 	g.audioBackend.OnAfterUpdate()
+
+	g.ebitenFrame++
 
 	return nil
 }
