@@ -116,11 +116,11 @@ func onButton(event EventButton, _ pievent.Handler) {
 
 	switch event.Type {
 	case EventDown:
-		buttonState[event.Player].SetStartFrame(event.Button, pi.Frame)
-		buttonAnyState.SetStartFrame(event.Button, pi.Frame)
+		buttonState[event.Player].SetDownFrame(event.Button, pi.Frame)
+		buttonAnyState.SetDownFrame(event.Button, pi.Frame)
 	case EventUp:
-		buttonState[event.Player].SetStopFrame(event.Button, pi.Frame)
-		buttonAnyState.SetStopFrame(event.Button, pi.Frame)
+		buttonState[event.Player].SetUpFrame(event.Button, pi.Frame)
+		buttonAnyState.SetUpFrame(event.Button, pi.Frame)
 	}
 }
 
