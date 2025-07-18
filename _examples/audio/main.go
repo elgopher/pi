@@ -21,7 +21,7 @@ import (
 var clickWav []byte
 
 func main() {
-	sample := piaudio.DecodeWav(clickWav, 2349.32)
+	sample := piaudio.DecodeWav(clickWav)
 
 	piloop.Target().Subscribe(piloop.EventGameStarted, func(piloop.Event, pievent.Handler) {
 		// The sample must be loaded before use,
@@ -51,8 +51,8 @@ func main() {
 			// gradually reduce the volume to 0
 			piaudio.SetVolume(piaudio.Chan1, i, delay)
 
-			// gradually reduce the pitch down to ~340
-			pitch := 540 - delay*200
+			// gradually reduce the pitch down to 0
+			pitch := 1.0 - delay
 			piaudio.SetPitch(piaudio.Chan1, pitch, delay)
 			delay += 0.01
 		}

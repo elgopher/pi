@@ -106,7 +106,7 @@ func (b *AudioBackend) ClearChan(ch piaudio.Chan, delay float64) {
 	)
 }
 
-func (b *AudioBackend) SetPitch(ch piaudio.Chan, pitch piaudio.Freq, delay float64) {
+func (b *AudioBackend) SetPitch(ch piaudio.Chan, pitch float64, delay float64) {
 	if pitch < 0 {
 		pitch = 0
 	}
@@ -148,7 +148,7 @@ type command struct {
 	ch         piaudio.Chan
 	sampleAddr uintptr
 	offset     int
-	pitch      piaudio.Freq
+	pitch      float64
 	time       float64
 	vol        float64
 	loop       loop
@@ -189,8 +189,8 @@ type channel struct {
 	active     bool
 	sampleData []int8
 	position   float64 // float for fractional pitch
-	pitch      piaudio.Freq
-	baseFreq   float64
+	pitch      float64
+	sampleRate uint16
 	volume     float64
 	loop       loop
 }
@@ -215,7 +215,7 @@ func (c *channel) nextSample() (float64, bool) {
 	sample := float64(c.sampleData[pos])
 
 	// Advance position
-	c.position += c.pitch / c.baseFreq
+	c.position += (float64(c.sampleRate) / CtxSampleRate) * c.pitch
 
 	// Apply volume
 	sample *= c.volume
@@ -227,7 +227,7 @@ func (p *player) LoadSample(sample *piaudio.Sample) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	p.samplesByAddr[getPointerAddr(sample)] = piaudio.NewSample(slices.Clone(sample.Data()), sample.BaseFreq())
+	p.samplesByAddr[getPointerAddr(sample)] = piaudio.NewSample(slices.Clone(sample.Data()), sample.SampleRate())
 }
 
 func (p *player) UnloadSample(sample *piaudio.Sample) {
@@ -283,7 +283,7 @@ func (p *player) runCommands() {
 				c.active = true
 				sample := p.samplesByAddr[cmd.sampleAddr]
 				c.sampleData = sample.Data()
-				c.baseFreq = sample.BaseFreq()
+				c.sampleRate = sample.SampleRate()
 			}
 			c.position = float64(cmd.offset)
 		case cmdKindSetLoop:

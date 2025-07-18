@@ -22,7 +22,10 @@ type BackendInterface interface {
 	SetLoop(_ Chan, start int, stop int, loop LoopType, delay float64)
 
 	// SetPitch schedules the pitch change to take effect after the specified delay.
-	SetPitch(_ Chan, pitch Freq, delay float64)
+	// A pitch of 1.0 plays the sample at its original speed.
+	// Values below 1.0 slow down the sample and lower its pitch (e.g., 0.5 = one octave lower),
+	// while values above 1.0 speed it up and raise the pitch.
+	SetPitch(_ Chan, pitch float64, delay float64)
 
 	// SetVolume schedules the volume change to take effect after the specified delay.
 	SetVolume(_ Chan, vol float64, delay float64)
@@ -53,7 +56,7 @@ func (p panicBackend) ClearChan(ch Chan, delay float64) {
 	panic("cannot clear channel: backend not set. Please call ClearChan only after starting the game")
 }
 
-func (p panicBackend) SetPitch(_ Chan, pitch Freq, delay float64) {
+func (p panicBackend) SetPitch(_ Chan, pitch float64, delay float64) {
 	panic("cannot set pitch: backend not set. Please call SetPitch only after starting the game")
 }
 

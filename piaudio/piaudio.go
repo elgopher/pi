@@ -42,18 +42,6 @@
 // Once created, a *Sample can be loaded into the backend using LoadSample.
 package piaudio
 
-// Freq represents frequency in Hz.
-type Freq = float64
-
-// Predefined common musical pitches in Hz.
-const (
-	A4 Freq = 440.0  // Standard tuning reference
-	C4 Freq = 261.63 // Middle C
-	E4 Freq = 329.63
-	G4 Freq = 392.00
-	A5 Freq = 880.0
-)
-
 // Chan represents an audio channel number.
 type Chan = uint8
 
@@ -84,7 +72,10 @@ func SetLoop(ch Chan, start int, stop int, loop LoopType, delay float64) {
 }
 
 // SetPitch schedules the pitch change to take effect after the specified delay.
-func SetPitch(ch Chan, pitch Freq, delay float64) {
+// A pitch of 1.0 plays the sample at its original speed.
+// Values below 1.0 slow down the sample and lower its pitch (e.g., 0.5 = one octave lower),
+// while values above 1.0 speed it up and raise the pitch.
+func SetPitch(ch Chan, pitch float64, delay float64) {
 	Backend.SetPitch(ch, pitch, delay)
 }
 
