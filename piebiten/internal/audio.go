@@ -248,16 +248,12 @@ func (p *player) Read(out []byte) (n int, err error) {
 	defer p.mutex.Unlock()
 
 	n = len(out)
+	p.time <- p.currentTime + sampleTime*float64(n)
 
 	for i := 0; i < n; i += 4 {
 		p.currentTime += sampleTime
 		p.runCommands()
 		p.read(out[i : i+4])
-
-		if i%1764 == 0 {
-			// update time each 10ms
-			p.time <- p.currentTime
-		}
 	}
 
 	return
