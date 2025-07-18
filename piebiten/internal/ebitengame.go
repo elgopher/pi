@@ -145,7 +145,7 @@ func (g *EbitenGame) Update() error {
 			g.skipNextDraw = true // game is too slow. Try to keep up by discarding next pi.Draw()
 		}
 
-		pi.Time += 1 / ebitenTPS
+		pi.Time += 1.0 / float64(pi.TPS())
 		pi.Frame++
 	}
 
