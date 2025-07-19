@@ -96,6 +96,9 @@ func (g *EbitenGame) Update() error {
 	started := time.Now()
 
 	if !g.started {
+		if pi.Init != nil {
+			pi.Init()
+		}
 		piloop.Target().Publish(piloop.EventGameStarted)
 		g.audioBackend.ebitenPlayer.Play()
 	}
