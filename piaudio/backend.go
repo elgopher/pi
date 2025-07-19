@@ -19,7 +19,10 @@ type BackendInterface interface {
 	SetSample(ch Chan, sample *Sample, offset int, delay float64)
 
 	// SetLoop schedules the loop configuration to take effect after the specified delay.
-	SetLoop(_ Chan, start int, length int, loop LoopType, delay float64)
+	//
+	// This function can also be used to limit the sample's length. Just call
+	// SetLoop with loopType = LoopNone and provide the desired length.
+	SetLoop(_ Chan, start int, length int, loopType LoopType, delay float64)
 
 	// SetPitch schedules the pitch change to take effect after the specified delay.
 	// A pitch of 1.0 plays the sample at its original speed.

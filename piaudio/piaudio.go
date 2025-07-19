@@ -70,6 +70,9 @@ func SetSample(ch Chan, sample *Sample, offset int, delay float64) {
 
 // SetLoop schedules the loop configuration to take effect after the specified delay.
 //
+// This function can also be used to limit the sample's length. Just call
+// SetLoop with loopType = LoopNone and provide the desired length.
+//
 // Initial start is 0, length is 2_147_483_647 and loopType is LoopNone
 func SetLoop(ch Chan, start int, length int, loopType LoopType, delay float64) {
 	Backend.SetLoop(ch, start, length, loopType, delay)
