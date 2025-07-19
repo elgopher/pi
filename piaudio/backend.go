@@ -41,7 +41,7 @@ type BackendInterface interface {
 	// Initial vol is 1.0
 	SetVolume(_ Chan, vol float64, delay float64)
 
-	// ClearChan removes all scheduled operations for the channel after the specified delay.
+	// ClearChan removes all scheduled operations for the channel(s) after the specified delay.
 	ClearChan(ch Chan, delay float64)
 }
 

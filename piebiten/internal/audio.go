@@ -283,33 +283,38 @@ func (p *player) runCommands() {
 			break
 		}
 
-		c := &p.channels[cmd.ch]
-
-		switch cmd.kind {
-		case cmdKindSetSample:
-			switch {
-			case cmd.sampleAddr == 0:
-				c.active = false
-				c.sampleData = nil
-			case p.samplesByAddr[cmd.sampleAddr] == nil:
-				log.Printf("[piaudio] SetSample failed: Sample not found, addr: 0x%x", cmd.sampleAddr)
-				c.active = false
-				c.sampleData = nil
-			default:
-				c.active = true
-				sample := p.samplesByAddr[cmd.sampleAddr]
-				c.sampleData = sample.Data()
-				c.sampleRate = sample.SampleRate()
+		for i := 0; i < 4; i++ {
+			selectedChan := &p.channels[i]
+			chanNum := piaudio.Chan(1 << i)
+			// a single command can be executed on multiple channels at once
+			if cmd.ch&chanNum == chanNum {
+				switch cmd.kind {
+				case cmdKindSetSample:
+					switch {
+					case cmd.sampleAddr == 0:
+						selectedChan.active = false
+						selectedChan.sampleData = nil
+					case p.samplesByAddr[cmd.sampleAddr] == nil:
+						log.Printf("[piaudio] SetSample failed: Sample not found, addr: 0x%x", cmd.sampleAddr)
+						selectedChan.active = false
+						selectedChan.sampleData = nil
+					default:
+						selectedChan.active = true
+						sample := p.samplesByAddr[cmd.sampleAddr]
+						selectedChan.sampleData = sample.Data()
+						selectedChan.sampleRate = sample.SampleRate()
+					}
+					selectedChan.position = float64(cmd.offset)
+				case cmdKindSetLoop:
+					selectedChan.loop = cmd.loop
+				case cmdKindSetPitch:
+					selectedChan.pitch = cmd.pitch
+				case cmdKindSetVolume:
+					selectedChan.volume = cmd.vol
+				case cmdKindClearChan:
+					// ClearChan was already called in SendCommands
+				}
 			}
-			c.position = float64(cmd.offset)
-		case cmdKindSetLoop:
-			c.loop = cmd.loop
-		case cmdKindSetPitch:
-			c.pitch = cmd.pitch
-		case cmdKindSetVolume:
-			c.volume = cmd.vol
-		case cmdKindClearChan:
-			// ClearChan was already called in SendCommands
 		}
 		processed++
 	}
@@ -395,10 +400,16 @@ func (p *player) clearChan(ch piaudio.Chan, time float64) {
 		if noMoreCommands {
 			return
 		}
-		if cmd.ch == ch {
-			// remove cmd
-			copy(p.commandsByTime[j:], p.commandsByTime[j+1:])
-			p.commandsByTime = p.commandsByTime[:len(p.commandsByTime)-1]
+		if cmd.ch&ch != 0 {
+			remaining := cmd.ch &^ ch
+			if remaining == 0 {
+				// remove cmd
+				copy(p.commandsByTime[j:], p.commandsByTime[j+1:])
+				p.commandsByTime = p.commandsByTime[:len(p.commandsByTime)-1]
+			} else {
+				// update cmd to apply only to the remaining channels
+				p.commandsByTime[j].ch = remaining
+			}
 		}
 	}
 }
