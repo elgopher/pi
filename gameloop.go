@@ -5,6 +5,12 @@ package pi
 
 // Game-loop function callbacks.
 var (
+	// Init is a user-defined function called once when the game starts.
+	//
+	// Use this function to initialize the game state, load assets,
+	// or prepare data needed before the main loop begins.
+	Init = func() {}
+
 	// Update is a user-provided function called every frame.
 	//
 	// This function handles user input, performs calculations, and updates

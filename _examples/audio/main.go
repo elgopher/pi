@@ -9,6 +9,7 @@ package main
 
 import (
 	_ "embed"
+	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/piaudio"
 	"github.com/elgopher/pi/piebiten"
 	"github.com/elgopher/pi/pievent"
@@ -23,11 +24,11 @@ var clickWav []byte
 func main() {
 	sample := piaudio.DecodeWav(clickWav)
 
-	piloop.Target().Subscribe(piloop.EventGameStarted, func(piloop.Event, pievent.Handler) {
+	pi.Init = func() {
 		// The sample must be loaded before use,
 		// but communication with the audio backend is only possible after starting the game.
 		piaudio.LoadSample(sample)
-	})
+	}
 
 	// function that schedules playing the SFX
 	scheduleSFX := func() {
