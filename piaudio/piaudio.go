@@ -61,6 +61,22 @@ func LoadSample(sample *Sample) { Backend.LoadSample(sample) }
 // UnloadSample removes a sample from the backend. Call this to free memory when it's no longer needed.
 func UnloadSample(sample *Sample) { Backend.UnloadSample(sample) }
 
+// Play plays a given sample on selected channel(s).
+//
+// A pitch of 1.0 plays the sample at its original speed.
+// Values below 1.0 slow down the sample and lower its pitch (e.g., 0.5 = one octave lower),
+// while values above 1.0 speed it up and raise the pitch.
+//
+// Vol is 0-1. 1 is the loudest.
+func Play(ch Chan, sample *Sample, pitch, vol float64) {
+	delay := 0.0
+	ClearChan(ch, delay)
+	SetSample(ch, sample, 0, delay)
+	SetLoop(ch, 0, sample.Len(), LoopNone, delay)
+	SetPitch(ch, pitch, delay)
+	SetVolume(ch, vol, delay)
+}
+
 // SetSample schedules playback of the sample to take effect after the specified delay.
 //
 // Initial sample is nil, offset is 0.
