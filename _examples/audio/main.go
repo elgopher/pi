@@ -32,29 +32,33 @@ func main() {
 
 	// function that schedules playing the SFX
 	scheduleSFX := func() {
-		// all commands are scheduled with a minimum delay of 0 seconds.
+		// All commands are scheduled with a minimum delay of 0 seconds.
 		// However, this doesn't mean the sound plays instantly.
 		// On desktop, the delay is around 20 ms; in browsers, about 60 ms.
 		// The backend automatically delays commands to reduce audio glitches.
 		delay := 0.0
 
-		// remove all planned commands from the channel
-		piaudio.ClearChan(piaudio.Chan1, delay)
+		// Use two channels at once.
+		// Chan1 is sent to a left speaker, Chan2 is sent to a right speaker.
+		ch := piaudio.Chan1 | piaudio.Chan2
+
+		// remove all planned commands from channels
+		piaudio.ClearChan(ch, delay)
 
 		// set the sample to play from the beginning (offset=0)
-		piaudio.SetSample(piaudio.Chan1, sample, 0, delay)
+		piaudio.SetSample(ch, sample, 0, delay)
 
 		// the sound is very short, so we need to loop it.
 		// the loop covers the entire sample.
-		piaudio.SetLoop(piaudio.Chan1, 0, sample.Len(), piaudio.LoopForward, delay)
+		piaudio.SetLoop(ch, 0, sample.Len(), piaudio.LoopForward, delay)
 
 		for i := 1.0; i > -0.01; i -= 0.01 {
 			// gradually reduce the volume to 0
-			piaudio.SetVolume(piaudio.Chan1, i, delay)
+			piaudio.SetVolume(ch, i, delay)
 
 			// gradually reduce the pitch down to 0
 			pitch := 1.0 - delay
-			piaudio.SetPitch(piaudio.Chan1, pitch, delay)
+			piaudio.SetPitch(ch, pitch, delay)
 			delay += 0.01
 		}
 	}

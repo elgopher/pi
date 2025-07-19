@@ -46,10 +46,10 @@ package piaudio
 type Chan = uint8
 
 const (
-	Chan0 Chan = 0 // Left speaker
-	Chan1 Chan = 1 // Right speaker
+	Chan1 Chan = 1 // Left speaker
 	Chan2 Chan = 2 // Right speaker
-	Chan3 Chan = 3 // Left speaker
+	Chan3 Chan = 4 // Right speaker
+	Chan4 Chan = 8 // Left speaker
 )
 
 // Time set by the audio backend for synchronization.
