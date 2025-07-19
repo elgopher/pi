@@ -8,6 +8,7 @@ import (
 	"github.com/elgopher/pi/pimath"
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"log"
+	"math"
 	"slices"
 	"sort"
 	"sync"
@@ -20,10 +21,7 @@ const CtxSampleRate = 44100
 func StartAudioBackend(ctx *audio.Context) *AudioBackend {
 	timeFromPlayer := make(chan float64, 100)
 
-	thePlayer := &player{
-		samplesByAddr: map[uintptr]*piaudio.Sample{},
-		time:          timeFromPlayer,
-	}
+	thePlayer := newPlayer(timeFromPlayer)
 	ebitenPlayer, err := ctx.NewPlayer(thePlayer)
 	if err != nil {
 		panic("failed to create Ebitengine player: " + err.Error())
@@ -172,6 +170,24 @@ func (b *AudioBackend) OnAfterUpdate() {
 		cmds: b.commands,
 	})
 	b.commands = b.commands[:0]
+}
+
+func newPlayer(timeFromPlayer chan float64) *player {
+	defaultChannel := channel{
+		pitch:  1.0,
+		volume: 1.0,
+		loop: loop{
+			stop:     math.MaxInt32,
+			loopType: piaudio.LoopNone,
+		},
+	}
+	return &player{
+		samplesByAddr: map[uintptr]*piaudio.Sample{},
+		time:          timeFromPlayer,
+		channels: [4]channel{
+			defaultChannel, defaultChannel, defaultChannel, defaultChannel,
+		},
+	}
 }
 
 type player struct {

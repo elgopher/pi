@@ -62,24 +62,32 @@ func LoadSample(sample *Sample) { Backend.LoadSample(sample) }
 func UnloadSample(sample *Sample) { Backend.UnloadSample(sample) }
 
 // SetSample schedules playback of the sample to take effect after the specified delay.
+//
+// Initial sample is nil, offset is 0.
 func SetSample(ch Chan, sample *Sample, offset int, delay float64) {
 	Backend.SetSample(ch, sample, offset, delay)
 }
 
 // SetLoop schedules the loop configuration to take effect after the specified delay.
-func SetLoop(ch Chan, start int, length int, loop LoopType, delay float64) {
-	Backend.SetLoop(ch, start, length, loop, delay)
+//
+// Initial start is 0, length is 2_147_483_647 and loopType is LoopNone
+func SetLoop(ch Chan, start int, length int, loopType LoopType, delay float64) {
+	Backend.SetLoop(ch, start, length, loopType, delay)
 }
 
 // SetPitch schedules the pitch change to take effect after the specified delay.
 // A pitch of 1.0 plays the sample at its original speed.
 // Values below 1.0 slow down the sample and lower its pitch (e.g., 0.5 = one octave lower),
 // while values above 1.0 speed it up and raise the pitch.
+//
+// Initial pitch is 1.0
 func SetPitch(ch Chan, pitch float64, delay float64) {
 	Backend.SetPitch(ch, pitch, delay)
 }
 
 // SetVolume schedules the volume change to take effect after the specified delay.
+//
+// Initial vol is 1.0
 func SetVolume(ch Chan, vol float64, delay float64) {
 	Backend.SetVolume(ch, vol, delay)
 }
