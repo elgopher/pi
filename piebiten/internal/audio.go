@@ -217,7 +217,7 @@ func (c *channel) nextSample() (float64, bool) {
 	}
 
 	pos := int(c.position)
-	if pos >= len(c.sampleData) || (c.loop.loopType == piaudio.LoopForward && pos >= c.loop.stop) {
+	if pos >= min(len(c.sampleData), c.loop.stop) {
 		// End of sample
 		if c.loop.loopType == piaudio.LoopForward {
 			c.position = float64(c.loop.start)
