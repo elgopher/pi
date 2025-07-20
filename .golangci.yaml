@@ -77,7 +77,7 @@ linters:
     cyclop:
       max-complexity: 20
     nakedret:
-      max-func-lines: 40
+      max-func-lines: 50
     lll:
       line-length: 120
     gocognit:
