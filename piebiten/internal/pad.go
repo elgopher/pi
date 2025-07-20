@@ -55,7 +55,7 @@ func (g *ebitenGamepads) publishDisconnectedGamepadEvents() {
 	for _, id := range g.gamepadIDs {
 		if inpututil.IsGamepadJustDisconnected(id) {
 			pipad.ConnectionTarget().Publish(pipad.EventConnection{
-				Type:   pipad.EventDisconnected,
+				Type:   pipad.EventDisconnect,
 				Player: int(id),
 			})
 		}
@@ -65,7 +65,7 @@ func (g *ebitenGamepads) publishDisconnectedGamepadEvents() {
 func (g *ebitenGamepads) publishConnectedGamepadEvents() {
 	for _, id := range g.gamepadIDs {
 		pipad.ConnectionTarget().Publish(pipad.EventConnection{
-			Type:   pipad.EventConnected,
+			Type:   pipad.EventConnect,
 			Player: int(id),
 		})
 	}

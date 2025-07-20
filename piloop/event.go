@@ -6,11 +6,11 @@ package piloop
 type Event string
 
 const (
-	EventGameStarted  Event = "game_started"  // just before first frame
-	EventFrameStarted Event = "frame_started" // beginning of the frame
-	EventUpdate       Event = "update"        // after pi.Update
-	EventLateUpdate   Event = "late_update"   // after EventUpdate
-	EventDraw         Event = "draw"          // after pi.Draw
-	EventLateDraw     Event = "late_draw"     // after EventDraw
-	EventWindowClosed Event = "window_closed" // when user closes the window (desktop only)
+	EventInit        Event = "init"         // when the game is started, just before the first frame
+	EventFrameStart  Event = "frame_start"  // beginning of the frame
+	EventUpdate      Event = "update"       // after pi.Update
+	EventLateUpdate  Event = "late_update"  // after EventUpdate
+	EventDraw        Event = "draw"         // after pi.Draw
+	EventLateDraw    Event = "late_draw"    // after EventDraw
+	EventWindowClose Event = "window_close" // when a user closes the window (desktop only)
 )

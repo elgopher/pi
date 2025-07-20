@@ -8,8 +8,8 @@ import "github.com/elgopher/pi/pievent"
 type Event string
 
 const (
-	EventPaused  Event = "paused"
-	EventResumed Event = "resumed"
+	EventPause  Event = "pause"
+	EventResume Event = "resume"
 )
 
 func Target() pievent.Target[Event] {
