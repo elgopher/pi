@@ -17,7 +17,7 @@ type Sheet struct {
 	BgColor pi.Color // background color on sprites
 }
 
-var intermediateCanvas pi.Canvas // text is first rendered here to change its color
+var intermediateCanvas pi.Canvas // text is first rendered here to change its color from FgColor to selected color
 
 var prevFgColorTable [pi.MaxColors]pi.Color
 var prevBgColorTable [pi.MaxColors]pi.Color
@@ -33,27 +33,42 @@ func (s Sheet) Print(str string, x, y int) (currentX, currentY int) {
 
 	currentColor := pi.GetColor()
 
-	copy(prevFgColorTable[:], pi.ColorTables[0][s.FgColor][:])
-	copy(prevBgColorTable[:], pi.ColorTables[0][s.BgColor][:])
+	prevFgColorTable = pi.ColorTables[0][s.FgColor]
+	prevBgColorTable = pi.ColorTables[0][s.BgColor]
+
+	// create fake bg color to avoid a situation when fg and bg colors are the same
+	bgColor := (currentColor + 1) % pi.MaxColors
 	intermediateCanvas.Clear(s.BgColor)
 	pi.Pal(s.FgColor, currentColor)
-	pi.Palt(s.BgColor, true)
+	pi.Pal(s.BgColor, bgColor)
 	pi.SetDrawTarget(intermediateCanvas)
 
 	// first draw text in selected color on intermediateCanvas
 	currentX, currentY = s.PrintOriginal(str, x, y)
 
-	copy(pi.ColorTables[0][s.FgColor][:], prevFgColorTable[:])
+	// revert color tables
+	pi.ColorTables[0][s.FgColor] = prevFgColorTable
+	pi.ColorTables[0][s.BgColor] = prevBgColorTable
+
+	// make bgColor transparent
+	prevBgColorTable = pi.ColorTables[0][bgColor]
+	pi.Palt(bgColor, true)
 
 	// now copy text in target color on original draw target
 	coloredText := pi.Sprite{
-		Area:   pi.Area[int]{X: x - pi.Camera.X, Y: y - pi.Camera.Y, W: currentX - x, H: currentY - y + s.Height},
+		Area: pi.Area[int]{
+			X: x - pi.Camera.X,
+			Y: y - pi.Camera.Y,
+			W: currentX - x,
+			H: currentY - y + s.Height,
+		},
 		Source: intermediateCanvas,
 	}
 	pi.SetDrawTarget(originalDrawTarget)
 	pi.Spr(coloredText, x, y)
 
-	copy(pi.ColorTables[0][s.BgColor][:], prevBgColorTable[:])
+	// revert bgColor transparency
+	pi.ColorTables[0][bgColor] = prevBgColorTable
 
 	return
 }
