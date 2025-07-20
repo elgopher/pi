@@ -85,7 +85,7 @@ type EbitenGame struct {
 
 func (g *EbitenGame) Update() error {
 	if ebiten.IsWindowBeingClosed() {
-		piloop.Target().Publish(piloop.EventWindowClosed)
+		piloop.Target().Publish(piloop.EventWindowClose)
 		return ebiten.Termination
 	}
 
@@ -99,16 +99,16 @@ func (g *EbitenGame) Update() error {
 		if pi.Init != nil {
 			pi.Init()
 		}
-		piloop.Target().Publish(piloop.EventGameStarted)
+		piloop.Target().Publish(piloop.EventInit)
 		g.audioBackend.ebitenPlayer.Play()
 	}
 	g.started = true
 
 	if g.ebitenFrame%(ebitenTPS/pi.TPS()) == 0 {
 		if !g.paused {
-			piloop.Target().Publish(piloop.EventFrameStarted)
+			piloop.Target().Publish(piloop.EventFrameStart)
 		}
-		piloop.DebugTarget().Publish(piloop.EventFrameStarted)
+		piloop.DebugTarget().Publish(piloop.EventFrameStart)
 	}
 
 	g.updateMouse()
@@ -208,9 +208,9 @@ func (g *EbitenGame) Resize() {
 
 func (g *EbitenGame) onPidebugEvent(event pidebug.Event, _ pievent.Handler) {
 	switch event {
-	case pidebug.EventPaused:
+	case pidebug.EventPause:
 		g.paused = true
-	case pidebug.EventResumed:
+	case pidebug.EventResume:
 		g.paused = false
 	}
 }

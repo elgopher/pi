@@ -20,10 +20,10 @@ func SetPaused(p bool) bool {
 	prev := paused
 	paused = p
 	if !prev && p {
-		target.Publish(EventPaused)
+		target.Publish(EventPause)
 	}
 	if prev && !p {
-		target.Publish(EventResumed)
+		target.Publish(EventResume)
 	}
 	return prev
 }

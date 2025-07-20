@@ -127,7 +127,7 @@ func onButton(event EventButton, _ pievent.Handler) {
 var playerCount = 0
 
 func onConnection(event EventConnection, _ pievent.Handler) {
-	if event.Type == EventDisconnected {
+	if event.Type == EventDisconnect {
 		log.Println("Controller disconnected", event.Player)
 		buttonState[event.Player] = &input.State[Button]{}
 		playerCount -= 1

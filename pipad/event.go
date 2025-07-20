@@ -29,8 +29,8 @@ type EventConnection struct {
 type EventConnectionType string
 
 const (
-	EventConnected    EventConnectionType = "connected"
-	EventDisconnected EventConnectionType = "disconnected"
+	EventConnect    EventConnectionType = "connect"
+	EventDisconnect EventConnectionType = "disconnect"
 )
 
 var buttonTarget = pievent.NewTarget[EventButton]()
