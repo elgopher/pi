@@ -6,6 +6,7 @@ package internal
 import (
 	"github.com/elgopher/pi/piaudio"
 	"github.com/elgopher/pi/piebiten/internal/audio"
+	"github.com/elgopher/pi/piebiten/internal/input"
 	ebitenaudio "github.com/hajimehoshi/ebiten/v2/audio"
 	"math"
 	"time"
@@ -30,6 +31,12 @@ func RunEbitenGame() *EbitenGame {
 		ebitenScreen:   ebiten.NewImage(screen.W(), screen.H()),
 		drawScreenOpts: &ebiten.DrawImageOptions{},
 		audioBackend:   theAudioBackend,
+	}
+	game.inputBackend = &input.Backend{
+		Paused:     &game.paused,
+		LeftOffset: &game.left,
+		TopOffset:  &game.top,
+		Scale:      &game.scale,
 	}
 
 	pidebug.Target().SubscribeAll(game.onPidebugEvent)
@@ -59,8 +66,6 @@ type EbitenGame struct {
 	piScreen       pi.Canvas
 	ebitenScreen   *ebiten.Image
 	drawScreenOpts *ebiten.DrawImageOptions
-	keys           []ebiten.Key
-	mousePosition  pi.Position
 	cachedMonitor  cachedMonitor
 	started        bool
 
@@ -77,9 +82,9 @@ type EbitenGame struct {
 
 	paused bool
 
-	gamepads     ebitenGamepads
 	windowState  windowState
 	audioBackend *audio.Backend
+	inputBackend *input.Backend
 
 	ebitenFrame int // frame incremented on each Ebiten tick
 }
@@ -111,9 +116,7 @@ func (g *EbitenGame) Update() error {
 		piloop.DebugTarget().Publish(piloop.EventFrameStart)
 	}
 
-	g.updateMouse()
-	g.updateKeyboard()
-	g.gamepads.update()
+	g.inputBackend.Update()
 
 	if g.ebitenFrame%(ebitenTPS/pi.TPS()) == (ebitenTPS/pi.TPS())-1 {
 		if !g.paused {

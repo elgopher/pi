@@ -1,7 +1,7 @@
 // Copyright 2025 Jacek Olszak
 // This code is licensed under MIT license (see LICENSE for details)
 
-package internal
+package input
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
@@ -10,7 +10,7 @@ import (
 	"github.com/elgopher/pi/pimouse"
 )
 
-func (g *EbitenGame) updateMouse() {
+func (g *Backend) updateMouse() {
 	g.publishEventDown(ebiten.MouseButtonLeft, pimouse.Left)
 	g.publishEventDown(ebiten.MouseButtonMiddle, "Middle")
 	g.publishEventDown(ebiten.MouseButtonRight, pimouse.Right)
@@ -25,8 +25,8 @@ func (g *EbitenGame) updateMouse() {
 
 	x, y := ebiten.CursorPosition()
 	prev := g.mousePosition
-	g.mousePosition.X = int((float64(x) - g.left) / g.scale)
-	g.mousePosition.Y = int((float64(y) - g.top) / g.scale)
+	g.mousePosition.X = int((float64(x) - *g.LeftOffset) / *g.Scale)
+	g.mousePosition.Y = int((float64(y) - *g.TopOffset) / *g.Scale)
 
 	mouseMovementDelta := g.mousePosition.Subtract(prev)
 
@@ -35,33 +35,33 @@ func (g *EbitenGame) updateMouse() {
 			Position: g.mousePosition,
 			Previous: prev,
 		}
-		if !g.paused {
+		if !*g.Paused {
 			pimouse.MoveTarget().Publish(event)
 		}
 		pimouse.MoveDebugTarget().Publish(event)
 	}
 }
 
-func (g *EbitenGame) publishEventDown(button ebiten.MouseButton, key pimouse.Button) {
+func (g *Backend) publishEventDown(button ebiten.MouseButton, key pimouse.Button) {
 	if inpututil.IsMouseButtonJustPressed(button) {
 		event := pimouse.EventButton{
 			Type:   pimouse.EventButtonDown,
 			Button: key,
 		}
-		if !g.paused {
+		if !*g.Paused {
 			pimouse.ButtonTarget().Publish(event)
 		}
 		pimouse.ButtonDebugTarget().Publish(event)
 	}
 }
 
-func (g *EbitenGame) publishEventUp(button ebiten.MouseButton, key pimouse.Button) {
+func (g *Backend) publishEventUp(button ebiten.MouseButton, key pimouse.Button) {
 	if inpututil.IsMouseButtonJustReleased(button) {
 		event := pimouse.EventButton{
 			Type:   pimouse.EventButtonUp,
 			Button: key,
 		}
-		if !g.paused {
+		if !*g.Paused {
 			pimouse.ButtonTarget().Publish(event)
 		}
 		pimouse.ButtonDebugTarget().Publish(event)

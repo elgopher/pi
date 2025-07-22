@@ -1,7 +1,7 @@
 // Copyright 2025 Jacek Olszak
 // This code is licensed under MIT license (see LICENSE for details)
 
-package internal
+package input
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
@@ -10,11 +10,11 @@ import (
 	"github.com/elgopher/pi/pikey"
 )
 
-func (g *EbitenGame) updateKeyboard() {
+func (g *Backend) updateKeyboard() {
 	g.keys = inpututil.AppendJustPressedKeys(g.keys[:0])
 	for _, key := range g.keys {
 		event := pikey.Event{Type: pikey.EventDown, Key: keyMap[key]}
-		if !g.paused {
+		if !*g.Paused {
 			pikey.Target().Publish(event)
 		}
 		pikey.DebugTarget().Publish(event)
@@ -23,7 +23,7 @@ func (g *EbitenGame) updateKeyboard() {
 	g.keys = inpututil.AppendJustReleasedKeys(g.keys[:0])
 	for _, key := range g.keys {
 		event := pikey.Event{Type: pikey.EventUp, Key: keyMap[key]}
-		if !g.paused {
+		if !*g.Paused {
 			pikey.Target().Publish(event)
 		}
 		pikey.DebugTarget().Publish(event)
