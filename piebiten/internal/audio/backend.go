@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const CtxSampleRate = 44100
+const CtxSampleRate = 48000
 
 func StartAudioBackend(ctx *audio.Context) *Backend {
 	thePlayer := newPlayer()

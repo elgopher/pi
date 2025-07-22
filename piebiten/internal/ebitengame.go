@@ -195,7 +195,7 @@ func (g *EbitenGame) LayoutF(outsideWidth, outsideHeight float64) (screenWidth, 
 	return
 }
 
-// this method is not executed because LayoutF is
+// Layout method is not executed because LayoutF is
 func (g *EbitenGame) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return
 }
