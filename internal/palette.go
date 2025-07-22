@@ -15,7 +15,7 @@ type PaletteMaker[T ~uint32] struct { // generic type used instead of pi.RGB to 
 	index            int
 }
 
-// Add returns true, when there is no space left
+// Add returns true, when the number of colors has been exceeded
 func (p *PaletteMaker[T]) Add(c color.Color) bool {
 	if p.colorAlreadyUsed == nil {
 		p.colorAlreadyUsed = map[color.Color]struct{}{}
@@ -24,6 +24,8 @@ func (p *PaletteMaker[T]) Add(c color.Color) bool {
 	_, found := p.colorAlreadyUsed[c]
 	if found {
 		return false
+	} else if p.index == maxColors {
+		return true
 	}
 
 	p.colorAlreadyUsed[c] = struct{}{}
@@ -36,7 +38,7 @@ func (p *PaletteMaker[T]) Add(c color.Color) bool {
 
 	p.index++
 
-	return p.index == maxColors
+	return false
 }
 
 func (p *PaletteMaker[T]) Palette() [maxColors]T {
