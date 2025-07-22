@@ -264,7 +264,11 @@ func (p *player) Read(out []byte) (n int, err error) {
 	defer p.mutex.Unlock()
 
 	n = len(out)
-	p.time <- p.currentTime + sampleTime*float64(n)
+	select {
+	case p.time <- p.currentTime + sampleTime*float64(n):
+	default:
+		// discard the event when the game is paused and pi.Update is not run
+	}
 
 	for i := 0; i < n; i += 4 {
 		p.currentTime += sampleTime
