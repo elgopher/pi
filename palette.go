@@ -125,6 +125,10 @@ func defaultPalette() PaletteArray {
 	}
 }
 
+var errToManyColors = fmt.Errorf(
+	"PNG file has too many colors in indexed palette. "+
+		"The maximum number is %d", MaxColors)
+
 // DecodePalette extracts a palette from a PNG file.
 //
 //   - If the file uses an indexed palette, colors are read directly
@@ -150,9 +154,7 @@ func DecodePaletteOrErr(pngFile []byte) (PaletteArray, error) {
 
 	if indexedPalette, ok := stdImage.ColorModel().(color.Palette); ok {
 		if len(indexedPalette) > MaxColors {
-			return PaletteArray{},
-				fmt.Errorf("PNG file has too many colors in indexed palette. "+
-					"The maximum number is %d", MaxColors)
+			return PaletteArray{}, errToManyColors
 		}
 		return convertIndexedPaletteToRGB(indexedPalette), nil
 	}
@@ -164,7 +166,7 @@ func DecodePaletteOrErr(pngFile []byte) (PaletteArray, error) {
 		for x := 0; x < bounds.Max.X; x++ {
 			c := stdImage.At(x, y)
 			if palette.Add(c) {
-				return palette.Palette(), nil
+				return PaletteArray{}, errToManyColors
 			}
 		}
 	}
