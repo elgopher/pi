@@ -1,7 +1,7 @@
 // Copyright 2025 Jacek Olszak
 // This code is licensed under MIT license (see LICENSE for details)
 
-package internal
+package input
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
