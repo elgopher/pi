@@ -32,7 +32,7 @@ func RunOrErr() error {
 	ebiten.SetWindowClosingHandled(true)
 	ebiten.SetWindowTitle("Pi")
 
-	err := ebiten.RunGameWithOptions(game, &ebiten.RunGameOptions{SingleThread: true})
+	err := ebiten.RunGameWithOptions(game, nil)
 	if err != nil {
 		panic(err)
 	}
