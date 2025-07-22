@@ -11,7 +11,7 @@ import (
 	"github.com/elgopher/pi"
 )
 
-func WindowAutoSize(monitor *ebiten.MonitorType) (w, h, minW, minH int) {
+func windowAutoSize(monitor *ebiten.MonitorType) (w, h, minW, minH int) {
 	monitorWidth, monitorHeight := monitor.Size() // already scaled
 	deviceScaleFactor := monitor.DeviceScaleFactor()
 

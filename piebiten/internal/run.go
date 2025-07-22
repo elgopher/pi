@@ -17,7 +17,7 @@ func RunOrErr() error {
 	setWindowSize := func() {
 		monitor := ebiten.Monitor()
 
-		width, height, minW, minH := WindowAutoSize(monitor)
+		width, height, minW, minH := windowAutoSize(monitor)
 		ebiten.SetWindowSize(width, height)
 		ebiten.SetWindowSizeLimits(minW, minH, -1, -1)
 	}
