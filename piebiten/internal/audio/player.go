@@ -14,7 +14,7 @@ import (
 	"unsafe"
 )
 
-func newPlayer(timeFromPlayer chan float64) *player {
+func newPlayer() *player {
 	defaultChannel := channel{
 		pitch:  1.0,
 		volume: 1.0,
@@ -25,7 +25,6 @@ func newPlayer(timeFromPlayer chan float64) *player {
 	}
 	return &player{
 		samplesByAddr: map[uintptr]*piaudio.Sample{},
-		time:          timeFromPlayer,
 		channels: [4]channel{
 			defaultChannel, defaultChannel, defaultChannel, defaultChannel,
 		},
@@ -37,10 +36,9 @@ type player struct {
 	samplesByAddr map[uintptr]*piaudio.Sample
 	channels      [4]channel
 
-	currentTime float64
+	commandsByTime []command // all planned commands sorted by time
 
-	commandsByTime []command // all planned commands
-	time           chan float64
+	currentTime float64
 }
 
 type channel struct {
@@ -106,11 +104,6 @@ func (p *player) Read(out []byte) (n int, err error) {
 	defer p.mutex.Unlock()
 
 	n = len(out)
-	select {
-	case p.time <- p.currentTime + sampleTime*float64(n):
-	default:
-		// discard the event when the game is paused and pi.Update is not run
-	}
 
 	for i := 0; i < n; i += 4 {
 		p.currentTime += sampleTime
@@ -253,6 +246,13 @@ func (p *player) clearChan(ch piaudio.Chan, time float64) {
 			}
 		}
 	}
+}
+
+func (p *player) CurrentTime() float64 {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	return p.currentTime
 }
 
 const sampleTime = 1.0 / float64(CtxSampleRate)
