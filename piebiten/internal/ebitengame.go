@@ -5,7 +5,8 @@ package internal
 
 import (
 	"github.com/elgopher/pi/piaudio"
-	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/elgopher/pi/piebiten/internal/audio"
+	ebitenaudio "github.com/hajimehoshi/ebiten/v2/audio"
 	"math"
 	"time"
 
@@ -20,8 +21,8 @@ import (
 func RunEbitenGame() *EbitenGame {
 	screen := pi.Screen()
 
-	ctx := audio.NewContext(CtxSampleRate)
-	theAudioBackend := StartAudioBackend(ctx)
+	ctx := ebitenaudio.NewContext(audio.CtxSampleRate)
+	theAudioBackend := audio.StartAudioBackend(ctx)
 	piaudio.Backend = theAudioBackend
 
 	game := &EbitenGame{
@@ -78,7 +79,7 @@ type EbitenGame struct {
 
 	gamepads     ebitenGamepads
 	windowState  windowState
-	audioBackend *AudioBackend
+	audioBackend *audio.Backend
 
 	ebitenFrame int // frame incremented on each Ebiten tick
 }
@@ -100,7 +101,6 @@ func (g *EbitenGame) Update() error {
 			pi.Init()
 		}
 		piloop.Target().Publish(piloop.EventInit)
-		g.audioBackend.ebitenPlayer.Play()
 	}
 	g.started = true
 

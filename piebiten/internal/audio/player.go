@@ -1,176 +1,18 @@
 // Copyright 2025 Jacek Olszak
 // This code is licensed under MIT license (see LICENSE for details)
 
-package internal
+package audio
 
 import (
 	"github.com/elgopher/pi/piaudio"
 	"github.com/elgopher/pi/pimath"
-	"github.com/hajimehoshi/ebiten/v2/audio"
 	"log"
 	"math"
 	"slices"
 	"sort"
 	"sync"
-	"time"
 	"unsafe"
 )
-
-const CtxSampleRate = 44100
-
-func StartAudioBackend(ctx *audio.Context) *AudioBackend {
-	timeFromPlayer := make(chan float64, 100)
-
-	thePlayer := newPlayer(timeFromPlayer)
-	ebitenPlayer, err := ctx.NewPlayer(thePlayer)
-	if err != nil {
-		panic("failed to create Ebitengine player: " + err.Error())
-	}
-	ebitenPlayer.SetBufferSize(time.Duration(audioBufferSizeInSeconds * float64(time.Second)))
-
-	b := &AudioBackend{
-		ctx:            ctx,
-		timeFromPlayer: timeFromPlayer,
-		player:         thePlayer,
-		ebitenPlayer:   ebitenPlayer,
-	}
-
-	return b
-}
-
-// AudioBackend also works in browsers but may glitch if the garbage collector
-// blocks the main thread for too long. The backend should ideally use the
-// AudioWorklet API to avoid audio glitches.
-type AudioBackend struct {
-	ctx            *audio.Context
-	timeFromPlayer chan float64
-	commands       []command
-	currentTime    float64
-	player         *player
-	ebitenPlayer   *audio.Player
-}
-
-func (b *AudioBackend) LoadSample(sample *piaudio.Sample) {
-	b.player.LoadSample(sample)
-}
-
-func (b *AudioBackend) UnloadSample(sample *piaudio.Sample) {
-	b.player.UnloadSample(sample)
-}
-
-func (b *AudioBackend) scheduleTime(delay float64) float64 {
-	return b.currentTime + delay + audioBufferSizeInSeconds
-}
-
-func (b *AudioBackend) SetSample(ch piaudio.Chan, sample *piaudio.Sample, offset int, delay float64) {
-	b.commands = append(b.commands,
-		command{
-			kind:       cmdKindSetSample,
-			ch:         ch,
-			sampleAddr: getPointerAddr(sample),
-			offset:     offset,
-			time:       b.scheduleTime(delay),
-		},
-	)
-}
-
-type loop struct {
-	start, stop int
-	loopType    piaudio.LoopType
-}
-
-func (b *AudioBackend) SetLoop(ch piaudio.Chan, start, length int, loopType piaudio.LoopType, delay float64) {
-	b.commands = append(b.commands,
-		command{
-			kind: cmdKindSetLoop,
-			ch:   ch,
-			loop: loop{
-				start:    start,
-				stop:     start + length - 1,
-				loopType: loopType,
-			},
-			time: b.scheduleTime(delay),
-		},
-	)
-}
-
-func (b *AudioBackend) ClearChan(ch piaudio.Chan, delay float64) {
-	b.commands = append(b.commands,
-		command{
-			kind: cmdKindClearChan,
-			ch:   ch,
-			time: b.scheduleTime(delay),
-		},
-	)
-}
-
-func (b *AudioBackend) SetPitch(ch piaudio.Chan, pitch float64, delay float64) {
-	if pitch < 0 {
-		pitch = 0
-	}
-	b.commands = append(b.commands,
-		command{
-			kind:  cmdKindSetPitch,
-			ch:    ch,
-			pitch: pitch,
-			time:  b.scheduleTime(delay),
-		},
-	)
-}
-
-func (b *AudioBackend) SetVolume(ch piaudio.Chan, vol float64, delay float64) {
-	vol = pimath.Clamp(vol, 0, 1)
-
-	b.commands = append(b.commands,
-		command{
-			kind: cmdKindSetVolume,
-			ch:   ch,
-			vol:  vol,
-			time: b.scheduleTime(delay),
-		},
-	)
-}
-
-type cmdKind string
-
-const (
-	cmdKindSetSample cmdKind = "setSample"
-	cmdKindSetLoop   cmdKind = "setLoop"
-	cmdKindClearChan cmdKind = "clearChan"
-	cmdKindSetPitch  cmdKind = "setPitch"
-	cmdKindSetVolume cmdKind = "setVolume"
-)
-
-type command struct {
-	kind       cmdKind
-	ch         piaudio.Chan
-	sampleAddr uintptr
-	offset     int
-	pitch      float64
-	time       float64
-	vol        float64
-	loop       loop
-}
-
-func (b *AudioBackend) OnBeforeUpdate() {
-	for {
-		select {
-		case t := <-b.timeFromPlayer:
-			b.currentTime = t
-			piaudio.Time = t
-		default:
-			return
-		}
-	}
-}
-
-func (b *AudioBackend) OnAfterUpdate() {
-	b.player.SendCommands(commandBatch{
-		time: b.currentTime,
-		cmds: b.commands,
-	})
-	b.commands = b.commands[:0]
-}
 
 func newPlayer(timeFromPlayer chan float64) *player {
 	defaultChannel := channel{
@@ -367,16 +209,11 @@ func writeInt16LE(out []byte, val float64) {
 	out[1] = byte(sample >> 8)
 }
 
-type commandBatch struct {
-	time float64
-	cmds []command
-}
-
-func (p *player) SendCommands(batch commandBatch) {
+func (p *player) SendCommands(cmds []command) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	for _, cmd := range batch.cmds {
+	for _, cmd := range cmds {
 		if cmd.time < p.currentTime {
 			log.Printf("Discarding late audio command with time %f, but current time is %f", cmd.time, p.currentTime)
 			continue
