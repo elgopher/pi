@@ -61,7 +61,7 @@ func CopyCanvasToEbitenImage(canvas pi.Canvas, dst *ebiten.Image) {
 // StartAudioBackend starts the audio backend with the given Ebitengine audio.Context.
 // Use if you want only piaudio functionality without Pi's graphics.
 //
-// audio.Context must have a sample rate of 44100.
+// audio.Context must have a sample rate of 48000.
 func StartAudioBackend(ctx *ebitenaudio.Context) Audio {
 	if ctx.SampleRate() != audio.CtxSampleRate {
 		panic("piebiten.StartAudioBackend: audio.Context must have " + strconv.Itoa(audio.CtxSampleRate) + " sample rate")
