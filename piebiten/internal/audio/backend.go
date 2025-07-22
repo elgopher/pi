@@ -13,9 +13,7 @@ import (
 const CtxSampleRate = 44100
 
 func StartAudioBackend(ctx *audio.Context) *Backend {
-	timeFromPlayer := make(chan float64, 100)
-
-	thePlayer := newPlayer(timeFromPlayer)
+	thePlayer := newPlayer()
 	ebitenPlayer, err := ctx.NewPlayer(thePlayer)
 	if err != nil {
 		panic("failed to create Ebitengine player: " + err.Error())
@@ -23,10 +21,9 @@ func StartAudioBackend(ctx *audio.Context) *Backend {
 	ebitenPlayer.SetBufferSize(time.Duration(audioBufferSizeInSeconds * float64(time.Second)))
 
 	b := &Backend{
-		ctx:            ctx,
-		timeFromPlayer: timeFromPlayer,
-		player:         thePlayer,
-		ebitenPlayer:   ebitenPlayer,
+		ctx:          ctx,
+		player:       thePlayer,
+		ebitenPlayer: ebitenPlayer,
 	}
 
 	return b
@@ -36,12 +33,11 @@ func StartAudioBackend(ctx *audio.Context) *Backend {
 // blocks the main thread for too long. The backend should ideally use the
 // AudioWorklet API to avoid audio glitches.
 type Backend struct {
-	ctx            *audio.Context
-	timeFromPlayer chan float64
-	commands       []command
-	currentTime    float64
-	player         *player
-	ebitenPlayer   *audio.Player
+	ctx          *audio.Context
+	commands     []command
+	currentTime  float64
+	player       *player
+	ebitenPlayer *audio.Player
 }
 
 func (b *Backend) LoadSample(sample *piaudio.Sample) {
@@ -151,15 +147,8 @@ func (b *Backend) OnBeforeUpdate() {
 		b.ebitenPlayer.Play()
 	}
 
-	for {
-		select {
-		case t := <-b.timeFromPlayer:
-			b.currentTime = t
-			piaudio.Time = t
-		default:
-			return
-		}
-	}
+	b.currentTime = b.player.CurrentTime()
+	piaudio.Time = b.currentTime
 }
 
 func (b *Backend) OnAfterUpdate() {
