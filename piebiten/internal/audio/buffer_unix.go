@@ -3,6 +3,6 @@
 
 //go:build freebsd || linux || netbsd || openbsd
 
-package internal
+package audio
 
 const audioBufferSizeInSeconds = 0.02 // 20ms

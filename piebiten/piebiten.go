@@ -17,8 +17,9 @@ package piebiten
 import (
 	"errors"
 	"github.com/elgopher/pi/piaudio"
+	"github.com/elgopher/pi/piebiten/internal/audio"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/audio"
+	ebitenaudio "github.com/hajimehoshi/ebiten/v2/audio"
 	"strconv"
 
 	"github.com/elgopher/pi"
@@ -61,11 +62,11 @@ func CopyCanvasToEbitenImage(canvas pi.Canvas, dst *ebiten.Image) {
 // Use if you want only piaudio functionality without Pi's graphics.
 //
 // audio.Context must have a sample rate of 44100.
-func StartAudioBackend(ctx *audio.Context) Audio {
-	if ctx.SampleRate() != internal.CtxSampleRate {
-		panic("piebiten.StartAudioBackend: audio.Context must have " + strconv.Itoa(internal.CtxSampleRate) + " sample rate")
+func StartAudioBackend(ctx *ebitenaudio.Context) Audio {
+	if ctx.SampleRate() != audio.CtxSampleRate {
+		panic("piebiten.StartAudioBackend: audio.Context must have " + strconv.Itoa(audio.CtxSampleRate) + " sample rate")
 	}
-	return internal.StartAudioBackend(ctx)
+	return audio.StartAudioBackend(ctx)
 }
 
 type Audio interface {
