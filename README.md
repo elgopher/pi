@@ -224,10 +224,9 @@ The goal is to have fun, not get lost in complexity!
 
 ### Is Pi ready to use?
 
-Yes — the core functionality is implemented and ready to use.  
-Currently, the focus is on developer tools like [piscope](piscope).
+Yes — the core functionality is implemented and ready to use. Currently, the focus is on developer tools like [piscope](piscope).
 
-Note: Pi does not yet have high-level APIs for handling sound effects or music playback. However, there is a low-level [piaudio](piaudio) API that can be used to create custom packages for playing, for example, [MOD][mod] and [XM][xm] modules.
+Note: Pi does not yet have high-level APIs for music playback. However, there is a low-level [piaudio](piaudio) API that can be used to create custom packages for playing, for example, [MOD][mod] and [XM][xm] modules.
 
 ### What similarities does Pi have with Pico-8 on the API level?
 
