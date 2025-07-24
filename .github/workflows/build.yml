@@ -45,7 +45,7 @@ jobs:
         run: make test
 
       - name: Install chrome
-        uses: browser-actions/setup-chrome@latest
+        uses: browser-actions/setup-chrome@v2
 
       - name: Install wasmbrowsertest
         run: go install github.com/agnivade/wasmbrowsertest@latest
