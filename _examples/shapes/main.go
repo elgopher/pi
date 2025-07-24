@@ -114,7 +114,7 @@ func main() {
 }
 
 func drawMousePointer() {
-	pi.Spr(cursorSprites[currentShapeIdx], pimouse.Position.X, pimouse.Position.Y)
+	pi.DrawSprite(cursorSprites[currentShapeIdx], pimouse.Position.X, pimouse.Position.Y)
 }
 
 func radius(x0, y0, x1, y1 int) int {

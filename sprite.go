@@ -7,20 +7,20 @@ import (
 	"fmt"
 )
 
-// Spr draws the given sprite at (dx, dy) on the current draw target.
+// DrawSprite draws the given sprite at (dx, dy) on the current draw target.
 //
 // It takes into account the camera position, clipping region,
 // color tables, and masks.
-func Spr(sprite Sprite, dx, dy int) {
+func DrawSprite(sprite Sprite, dx, dy int) {
 	Stretch(sprite, dx, dy, sprite.W, sprite.H)
 }
 
-// Blit draws the contents of the src Canvas at (x, y) on the current draw target.
+// DrawCanvas draws the contents of the src Canvas at (x, y) on the current draw target.
 //
 // It takes into account the camera position, clipping region,
 // color tables, and masks.
-func Blit(src Canvas, x int, y int) {
-	Spr(CanvasSprite(src), x, y)
+func DrawCanvas(src Canvas, x int, y int) {
+	DrawSprite(CanvasSprite(src), x, y)
 }
 
 // CanvasSprite returns a Sprite covering the entire canvas.
@@ -41,7 +41,7 @@ func SpriteFrom(canvas Canvas, x, y, w, h int) Sprite {
 // It takes into account the camera position, clipping region,
 // color tables, and masks.
 func Stretch(sprite Sprite, dx, dy, dw, dh int) {
-	// Stretch is fast, so there is no need to implement dedicated Spr or Blit
+	// Stretch is fast, so there is no need to implement dedicated DrawSprite or DrawCanvas
 	// functions.
 	dx -= Camera.X
 	dy -= Camera.Y

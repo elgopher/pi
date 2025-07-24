@@ -73,7 +73,7 @@ type Number interface {
 }
 
 // SetDrawTarget sets c as the target Canvas for all subsequent drawing,
-// including functions like Spr, SetPixel, Line, etc.
+// including functions like DrawSprite, SetPixel, Line, etc.
 //
 // This function also automatically sets the clip region to cover the entire area of c.
 func SetDrawTarget(c Canvas) (prev Canvas) {
