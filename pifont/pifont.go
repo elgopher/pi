@@ -52,7 +52,7 @@ func (s Sheet) Print(str string, x, y int) (currentX, currentY int) {
 
 	// make bgColor transparent
 	prevBgColorTable = pi.ColorTables[0][bgColor]
-	pi.Palt(bgColor, true)
+	pi.SetTransparency(bgColor, true)
 
 	// now copy text in target color on original draw target
 	coloredText := pi.Sprite{

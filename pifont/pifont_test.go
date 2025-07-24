@@ -91,7 +91,7 @@ func TestSheet_Print(t *testing.T) {
 
 				pi.Screen().Clear(testCase.bgColor)
 				pi.SetColor(testCase.textColor)
-				pi.Palt(testCase.textColor, false)
+				pi.SetTransparency(testCase.textColor, false)
 				// when
 				fontSheet.Print("S", 0, 0)
 				// then
