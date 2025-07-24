@@ -39,8 +39,8 @@ func (s Sheet) Print(str string, x, y int) (currentX, currentY int) {
 	// create fake bg color to avoid a situation when fg and bg colors are the same
 	bgColor := (currentColor + 1) % pi.MaxColors
 	intermediateCanvas.Clear(s.BgColor)
-	pi.Pal(s.FgColor, currentColor)
-	pi.Pal(s.BgColor, bgColor)
+	pi.RemapColor(s.FgColor, currentColor)
+	pi.RemapColor(s.BgColor, bgColor)
 	pi.SetDrawTarget(intermediateCanvas)
 
 	// first draw text in selected color on intermediateCanvas

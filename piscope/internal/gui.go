@@ -84,8 +84,8 @@ func attachIconButton(parent *pigui.Element, icon pi.Sprite, x int) *IconButton 
 		defer func() {
 			pi.ColorTables[0] = prevColorTable
 		}()
-		pi.Pal(0, *bgColor) // 0 is bg color in icons.png
-		pi.Pal(1, *fgColor) // 1 is fg color in icons.png
+		pi.RemapColor(0, *bgColor) // 0 is bg color in icons.png
+		pi.RemapColor(1, *fgColor) // 1 is fg color in icons.png
 		pi.DrawSprite(iconBtn.Icon, 0, y)
 	}
 	return iconBtn

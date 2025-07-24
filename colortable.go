@@ -53,8 +53,20 @@ func ResetColorTables() {
 	ColorTables[1] = identityColorTable
 }
 
-func Pal(fromColor, toColor Color) {
-	ColorTables[0][fromColor] = opaqueColorTable[toColor]
+// RemapColor changes how the color from is rendered by replacing it with the color to.
+//
+// This affects all future drawing operations (sprites, shapes, text, etc.).
+// It does not modify the original image or sprite data — only how colors appear on screen.
+//
+// For example, calling:
+//
+//	RemapColor(1, 15)
+//
+// causes all pixels with color index 1 to be drawn using color 15 instead.
+//
+// This function updates the color tables. To reset the changes, use ResetColorTables.
+func RemapColor(from, to Color) {
+	ColorTables[0][from] = opaqueColorTable[to]
 }
 
 func Palt(color Color, t bool) {

@@ -63,15 +63,15 @@ func main() {
 		// Map each key color to either white (tone) or black (semitone)
 		for key, color := range keyColors {
 			if slices.Contains(semitoneLetters, key) {
-				pi.Pal(color, 0)
+				pi.RemapColor(color, 0)
 			} else {
-				pi.Pal(color, 7)
+				pi.RemapColor(color, 7)
 			}
 		}
 
 		// Highlight the last pressed key in gray
 		if selectedKey != "" {
-			pi.Pal(keyColors[selectedKey], 6)
+			pi.RemapColor(keyColors[selectedKey], 6)
 		}
 
 		// Draw the piano image with updated color tables
