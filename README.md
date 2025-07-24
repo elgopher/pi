@@ -228,9 +228,9 @@ Yes — the core functionality is implemented and ready to use. Currently, the f
 
 Note: Pi does not yet have high-level APIs for music playback. However, there is a low-level [piaudio](piaudio) API that can be used to create custom packages for playing, for example, [MOD][mod] and [XM][xm] modules.
 
-### What similarities does Pi have with Pico-8 on the API level?
+### What similarities does Pi have with Pico-8/Picotron on the API level?
 
-* Many core concepts are similar: game loop, drawing sprites and shapes, printing text, clipping, camera movement, palette swapping, and handling input. Some functions even share the same names.
+* Many core concepts are similar: game loop, drawing sprites and shapes, printing text, clipping, camera movement, palette swapping, color tables, and handling input.
 * The screen resolution is small and the number of colors is limited — just like in Pico-8.  
   However, in Pi you can freely change the resolution and customize the palette.
 

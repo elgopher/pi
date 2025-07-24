@@ -10,7 +10,7 @@ import (
 	"github.com/elgopher/pi"
 )
 
-func BenchmarkSpr(b *testing.B) {
+func BenchmarkDrawSprite(b *testing.B) {
 	pi.SetScreenSize(256, 256)
 	canvas := pi.NewCanvas(256, 256)
 	for i := 0; i < canvas.W()*canvas.H(); i++ {
@@ -20,7 +20,7 @@ func BenchmarkSpr(b *testing.B) {
 	sprite := pi.SpriteFrom(canvas, 128, 128, 16, 16) //  396.6 (1 color table), 510 (4), vs 559 (ReadMask and TargetMask)
 
 	for b.Loop() {
-		pi.Spr(sprite, 10, 10)
+		pi.DrawSprite(sprite, 10, 10)
 	}
 }
 

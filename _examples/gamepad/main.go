@@ -32,11 +32,11 @@ func main() {
 
 	pi.Draw = func() {
 		pi.Cls()
-		pi.Blit(gamepad, 0, 0)
+		pi.DrawCanvas(gamepad, 0, 0)
 
 		for button, sprite := range buttonSprites {
 			if pipad.Duration(button) > 0 { // duration is > 0 when button is pressed
-				pi.Spr(sprite, sprite.X, sprite.Y+1) // draw pressed button
+				pi.DrawSprite(sprite, sprite.X, sprite.Y+1) // draw pressed button
 			}
 		}
 

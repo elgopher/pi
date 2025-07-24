@@ -138,7 +138,7 @@ func drawGrid() {
 
 func drawFruit() {
 	verticalShift := frame % 10 / 5 // simple animation
-	pi.Spr(fruitSprite, fruit.X*gridSize, fruit.Y*gridSize+verticalShift)
+	pi.DrawSprite(fruitSprite, fruit.X*gridSize, fruit.Y*gridSize+verticalShift)
 }
 
 func drawSnake() {
@@ -153,10 +153,10 @@ func drawSnake() {
 	case downDirection:
 		headSprite = headVertical.WithFlipY(true) // reuse sprite
 	}
-	pi.Spr(headSprite, snake[0].X*gridSize, snake[0].Y*gridSize)
+	pi.DrawSprite(headSprite, snake[0].X*gridSize, snake[0].Y*gridSize)
 	for i := 1; i < len(snake); i++ {
 		bodySegment := snake[i]
-		pi.Spr(bodySprite, bodySegment.X*gridSize, bodySegment.Y*gridSize)
+		pi.DrawSprite(bodySprite, bodySegment.X*gridSize, bodySegment.Y*gridSize)
 	}
 }
 

@@ -75,7 +75,7 @@ func main() {
 		}
 
 		// Draw the piano image with updated color tables
-		pi.Blit(pianoCanvas, 0, 0)
+		pi.DrawCanvas(pianoCanvas, 0, 0)
 
 		// Draw labels for each piano key
 		printLetters()

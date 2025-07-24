@@ -155,7 +155,7 @@ func BenchmarkSurface_Get(b *testing.B) {
 	}
 }
 
-func BenchmarkBlit(b *testing.B) {
+func BenchmarkDrawCanvas(b *testing.B) {
 	dst := pi.NewCanvas(320, 180)
 	pi.SetDrawTarget(dst)
 
@@ -163,7 +163,7 @@ func BenchmarkBlit(b *testing.B) {
 	src.Clear(7)
 
 	for b.Loop() {
-		pi.Blit(src, 130, 130)
+		pi.DrawCanvas(src, 130, 130)
 	}
 }
 

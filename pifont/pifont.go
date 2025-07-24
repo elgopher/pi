@@ -65,7 +65,7 @@ func (s Sheet) Print(str string, x, y int) (currentX, currentY int) {
 		Source: intermediateCanvas,
 	}
 	pi.SetDrawTarget(originalDrawTarget)
-	pi.Spr(coloredText, x, y)
+	pi.DrawSprite(coloredText, x, y)
 
 	// revert bgColor transparency
 	pi.ColorTables[0][bgColor] = prevBgColorTable
@@ -85,7 +85,7 @@ func (s Sheet) PrintOriginal(str string, x, y int) (maxX, currentY int) {
 			continue
 		}
 		sprite := s.Chars[r]
-		pi.Spr(sprite, currentX, currentY)
+		pi.DrawSprite(sprite, currentX, currentY)
 		currentX += sprite.W
 		maxX = max(maxX, currentX)
 	}
