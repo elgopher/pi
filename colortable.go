@@ -69,7 +69,22 @@ func RemapColor(from, to Color) {
 	ColorTables[0][from] = opaqueColorTable[to]
 }
 
-func Palt(color Color, t bool) {
+// SetTransparency sets whether the given color is treated as transparent.
+//
+// When transparency is enabled for a color, pixels using that color will not be drawn.
+// This affects all future drawing operations (sprites, shapes, text, etc.).
+// It does not modify the original image or sprite data — only how colors appear on screen.
+//
+// For example, calling:
+//
+//	SetTransparency(0, true)
+//
+// makes color 0 transparent, meaning all pixels with color index 0 will be skipped during drawing.
+//
+// To disable transparency for a color, pass false as the second argument.
+//
+// This function updates the color tables. To reset the changes, use ResetColorTables.
+func SetTransparency(color Color, t bool) {
 	if t {
 		ColorTables[0][color] = transparentColor
 	} else {

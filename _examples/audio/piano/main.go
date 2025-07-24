@@ -35,7 +35,7 @@ func main() {
 	pianoCanvas := pi.DecodeCanvas(pianoPNG)
 
 	pi.SetScreenSize(113, 46)
-	pi.Palt(0, false) // disable transparency for color 0
+	pi.SetTransparency(0, false) // disable transparency for color 0
 
 	pi.Init = func() {
 		// The sample must be loaded before use,
