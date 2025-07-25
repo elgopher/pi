@@ -243,7 +243,7 @@ func (m Surface[T]) EntireArea() IntArea {
 }
 
 func (m Surface[T]) Clear(v T) {
-	// color only first line
+	// color only the first line
 	var firstLine = m.data[:m.width]
 	for i := 0; i < m.width; i++ {
 		firstLine[i] = v

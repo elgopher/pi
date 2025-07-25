@@ -227,18 +227,71 @@ func BenchmarkSurface_LinesIterator(b *testing.B) {
 }
 
 func TestSurface_SetMany(t *testing.T) {
-	// temporary test
-	canvas := pi.NewCanvas(4, 4)
-	canvas.SetMany(1, 1,
-		2, 3, 4, 5)
-	canvas.SetMany(-1, 0,
-		2, 3, 4, 5)
-	canvas.SetMany(0, -1,
-		2, 3, 4, 5)
-	canvas.SetMany(3, 3,
-		2, 3, 4, 5)
-	canvas.SetMany(4, 4,
-		2, 3, 4, 5)
+	t.Run("inside surface", func(t *testing.T) {
+		surface := pi.NewSurface[rune](3, 2)
+		// when
+		surface.SetMany(1, 0, 'a', 'b', 'c', 'd')
+		// then
+		expected := pi.NewSurface[rune](3, 2)
+		expected.Set(1, 0, 'a')
+		expected.Set(2, 0, 'b')
+		expected.Set(0, 1, 'c')
+		expected.Set(1, 1, 'd')
+
+		pitest.AssertSurfaceEqual(t, expected, surface)
+	})
+
+	t.Run("partially outside left", func(t *testing.T) {
+		surface := pi.NewSurface[rune](3, 2)
+		// when
+		surface.SetMany(-1, 0, 'a', 'b', 'c')
+		// then
+		expected := pi.NewSurface[rune](3, 2)
+		expected.Set(0, 0, 'b')
+		expected.Set(1, 0, 'c')
+
+		pitest.AssertSurfaceEqual(t, expected, surface)
+	})
+
+	t.Run("partially outside top", func(t *testing.T) {
+		surface := pi.NewSurface[rune](2, 2)
+		// when
+		surface.SetMany(0, -1, 'a', 'b', 'c')
+		// then
+		expected := pi.NewSurface[rune](2, 2)
+		expected.Set(0, 0, 'c')
+
+		pitest.AssertSurfaceEqual(t, expected, surface)
+	})
+
+	t.Run("start far left with too few values", func(t *testing.T) {
+		surface := pi.NewSurface[rune](2, 2)
+		original := surface.Clone()
+		// when
+		surface.SetMany(-3, 0, 'a')
+		// then
+		pitest.AssertSurfaceEqual(t, original, surface)
+	})
+
+	t.Run("outside bottom-right", func(t *testing.T) {
+		surface := pi.NewSurface[rune](2, 2)
+		original := surface.Clone()
+		// when
+		surface.SetMany(2, 2, 'a', 'b')
+		// then
+		pitest.AssertSurfaceEqual(t, original, surface)
+	})
+
+	t.Run("truncate at surface end", func(t *testing.T) {
+		surface := pi.NewSurface[rune](2, 2)
+		// when
+		surface.SetMany(1, 1, 'a', 'b')
+		// then
+		expected := pi.NewSurface[rune](2, 2)
+		expected.Set(1, 1, 'a')
+
+		pitest.AssertSurfaceEqual(t, expected, surface)
+	})
 }
 
 func TestSurface_Clear(t *testing.T) {
