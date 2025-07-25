@@ -159,15 +159,51 @@ func BenchmarkSurface_SetArea(b *testing.B) {
 }
 
 func TestSurface_SetSurface(t *testing.T) {
-	// temporary test
-	surface := pi.NewSurface[int](4, 4)
-	src := pi.NewSurface[int](2, 2)
+	src := pi.NewSurface[rune](2, 2)
+	src.SetAll(
+		'a', 'b',
+		'c', 'd',
+	)
 
-	surface.SetSurface(-1, 0, src)
-	surface.SetSurface(0, -1, src)
-	surface.SetSurface(3, 3, src)
-	surface.SetSurface(2, 2, src)
-	surface.SetSurface(4, 4, src)
+	t.Run("inside destination", func(t *testing.T) {
+		dst := pi.NewSurface[rune](4, 4)
+		// when
+		dst.SetSurface(1, 1, src)
+		// then
+		expected := pi.NewSurface[rune](4, 4)
+		expected.SetMany(1, 1, 'a', 'b')
+		expected.SetMany(1, 2, 'c', 'd')
+		pitest.AssertSurfaceEqual(t, expected, dst)
+	})
+
+	t.Run("partially outside top-left", func(t *testing.T) {
+		dst := pi.NewSurface[rune](4, 4)
+		// when
+		dst.SetSurface(-1, -1, src)
+		// then
+		expected := pi.NewSurface[rune](4, 4)
+		expected.Set(0, 0, 'd')
+		pitest.AssertSurfaceEqual(t, expected, dst)
+	})
+
+	t.Run("partially outside bottom-right", func(t *testing.T) {
+		dst := pi.NewSurface[rune](4, 4)
+		// when
+		dst.SetSurface(3, 3, src)
+		// then
+		expected := pi.NewSurface[rune](4, 4)
+		expected.Set(3, 3, 'a')
+		pitest.AssertSurfaceEqual(t, expected, dst)
+	})
+
+	t.Run("completely outside", func(t *testing.T) {
+		dst := pi.NewSurface[rune](4, 4)
+		// when
+		dst.SetSurface(4, 4, src)
+		// then
+		expected := pi.NewSurface[rune](4, 4)
+		pitest.AssertSurfaceEqual(t, expected, dst)
+	})
 }
 
 func TestSurface_LinesIterator(t *testing.T) {
