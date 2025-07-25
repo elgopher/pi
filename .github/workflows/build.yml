@@ -63,7 +63,7 @@ jobs:
           version: v2.2.1
 
       - name: Generate coverage report
-        run: go test -v -coverprofile coverage.txt -covermode atomic ./...
+        run: go test -v -coverprofile coverage.txt -covermode atomic -coverpkg ./... ./...
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
