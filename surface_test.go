@@ -207,14 +207,52 @@ func TestSurface_SetSurface(t *testing.T) {
 }
 
 func TestSurface_LinesIterator(t *testing.T) {
-	// temporary test
-	surface := pi.NewSurface[int](2, 2)
-	for range surface.LinesIterator(pi.IntArea{W: 2, H: 2}) {
-	}
+	surface := pi.NewSurface[rune](4, 3)
+	surface.SetAll(
+		'a', 'b', 'c', 'd',
+		'e', 'f', 'g', 'h',
+		'i', 'j', 'k', 'l',
+	)
+
+	t.Run("iterate over area", func(t *testing.T) {
+		area := pi.IntArea{X: 1, Y: 1, W: 2, H: 2}
+		expectedPos := []pi.Position{
+			{1, 1},
+			{1, 2},
+		}
+		expectedLines := [][]rune{
+			{'f', 'g'},
+			{'j', 'k'},
+		}
+
+		var i int
+		for pos, line := range surface.LinesIterator(area) {
+			require.Less(t, i, len(expectedPos))
+			assert.Equal(t, expectedPos[i], pos)
+			assert.Equal(t, expectedLines[i], line)
+			i++
+		}
+		assert.Equal(t, len(expectedPos), i)
+	})
+
+	t.Run("modifies underlying data", func(t *testing.T) {
+		area := pi.IntArea{X: 1, Y: 1, W: 2, H: 1}
+		for _, line := range surface.LinesIterator(area) {
+			line[0] = 'z'
+		}
+		assert.Equal(t, 'z', surface.Get(1, 1))
+	})
+
+	t.Run("panic on area outside surface", func(t *testing.T) {
+		area := pi.IntArea{X: -1, Y: 0, W: 2, H: 1}
+		require.Panics(t, func() {
+			for range surface.LinesIterator(area) {
+			}
+		})
+	})
 }
 
 func BenchmarkSurface_LinesIterator(b *testing.B) {
-	// temporary test
 	surface := pi.NewSurface[int](2, 2)
 	area := pi.IntArea{W: 2, H: 2}
 	b.ResetTimer()
