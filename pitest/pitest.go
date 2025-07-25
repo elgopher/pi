@@ -37,7 +37,7 @@ func AssertSurfaceEqual[T comparable](t *testing.T, expected, actual pi.Surface[
 				if !hasDifferentData {
 					t.Errorf("\nexpected:\n%s\nactual:\n%s", expected, actual)
 				}
-				t.Errorf("expected pixel at (%d,%d): %v, actual: %v", x, y, e, a)
+				t.Errorf("expected at (%d,%d): %v, actual: %v", x, y, e, a)
 				hasDifferentData = true
 				equal = false
 			}
