@@ -88,19 +88,63 @@ func TestSurface_Set(t *testing.T) {
 }
 
 func TestSurface_SetArea(t *testing.T) {
-	// temporary test
-	surface := pi.NewSurface[int](2, 2)
-	area := pi.IntArea{X: -1, Y: 0, W: 2, H: 2}
-	surface.SetArea(area, 1, 2, 3, 4)
-	surface.SetArea(area, []int{1, 2, 3, 4}...)
+	t.Run("inside surface", func(t *testing.T) {
+		surface := pi.NewSurface[rune](4, 3)
+		area := pi.IntArea{X: 1, Y: 1, W: 2, H: 2}
+		// when
+		surface.SetArea(area,
+			'a', 'b',
+			'c', 'd',
+		)
+		// then
+		expected := pi.NewSurface[rune](4, 3)
+		expected.SetMany(1, 1, 'a', 'b')
+		expected.SetMany(1, 2, 'c', 'd')
 
-	area2 := pi.IntArea{X: -2, Y: -2, W: 2, H: 2}
-	surface.SetArea(area2, []int{1, 2, 3, 4}...)
+		pitest.AssertSurfaceEqual(t, expected, surface)
+	})
+
+	t.Run("clipped area", func(t *testing.T) {
+		surface := pi.NewSurface[rune](2, 2)
+		area := pi.IntArea{X: -1, Y: -1, W: 3, H: 3}
+		// when
+		surface.SetArea(area,
+			'a', 'b', 'c',
+			'd', 'e', 'f',
+			'g', 'h', 'i',
+		)
+		// then
+		expected := pi.NewSurface[rune](2, 2)
+		expected.SetMany(0, 0, 'e', 'f')
+		expected.SetMany(0, 1, 'h', 'i')
+
+		pitest.AssertSurfaceEqual(t, expected, surface)
+	})
+
+	t.Run("area outside surface", func(t *testing.T) {
+		surface := pi.NewSurface[rune](2, 2)
+		original := surface.Clone()
+		area := pi.IntArea{X: 3, Y: 3, W: 2, H: 2}
+		// when
+		surface.SetArea(area,
+			'a', 'b',
+			'c', 'd')
+		// then
+		pitest.AssertSurfaceEqual(t, original, surface)
+	})
+
+	t.Run("panic on too few values", func(t *testing.T) {
+		surface := pi.NewSurface[rune](2, 2)
+		area := pi.IntArea{W: 2, H: 2}
+
+		require.Panics(t, func() {
+			surface.SetArea(area, 'a', 'b', 'c')
+		})
+	})
 }
 
 func BenchmarkSurface_SetArea(b *testing.B) {
-	// temporary test
-	surface := pi.NewSurface[int](1920, 1080)
+	surface := pi.NewSurface[int](320, 180)
 	area := pi.IntArea{X: -1, Y: 0, W: 32, H: 32}
 	slice := make([]int, area.Size())
 	for i := 0; i < len(slice); i++ {
