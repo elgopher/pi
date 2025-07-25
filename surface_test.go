@@ -53,7 +53,7 @@ func TestDecodeCanvasOrErr(t *testing.T) {
 	}
 }
 
-func TestSet(t *testing.T) {
+func TestSurface_Set(t *testing.T) {
 	t.Run("should be noop when outside surface", func(t *testing.T) {
 		width := 2
 		height := 3
