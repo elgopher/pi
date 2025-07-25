@@ -4,6 +4,9 @@
 package pi_test
 
 import (
+	_ "embed"
+	"github.com/elgopher/pi/pitest"
+	"github.com/stretchr/testify/require"
 	"math/rand"
 	"testing"
 
@@ -11,6 +14,44 @@ import (
 
 	"github.com/elgopher/pi"
 )
+
+var (
+	//go:embed "internal/test/decode/indexed.png"
+	indexedPNG []byte
+	//go:embed "internal/test/decode/rgb.png"
+	rgbPNG []byte
+	//go:embed "internal/test/decode/indexed-brighter.png"
+	brighterIndexedPNG []byte
+	//go:embed "internal/test/decode/rgb-brighter.png"
+	rgbBrighterPNG []byte
+)
+
+func TestDecodeCanvasOrErr(t *testing.T) {
+	tests := map[string][]byte{
+		"indexed png when palette is the same": indexedPNG,
+		"RGB png":                              rgbPNG,
+		"indexed png when palette is slightly brighter": brighterIndexedPNG,
+		"RGB png when palette is slightly brighter":     rgbBrighterPNG,
+	}
+
+	for testName, png := range tests {
+		t.Run(testName, func(t *testing.T) {
+			pi.Palette = pi.DecodePalette(indexedPNG)
+			// when
+			canvas, err := pi.DecodeCanvasOrErr(png)
+			// then
+			require.NoError(t, err)
+			expected := pi.NewCanvas(4, 4)
+			expected.SetAll(
+				0, 1, 2, 3,
+				4, 5, 6, 7,
+				8, 9, 10, 11,
+				12, 13, 14, 15,
+			)
+			pitest.AssertSurfaceEqual(t, expected, canvas)
+		})
+	}
+}
 
 func TestSet(t *testing.T) {
 	t.Run("should be noop when outside surface", func(t *testing.T) {
