@@ -4,12 +4,88 @@
 package pi_test
 
 import (
+	_ "embed"
+	"github.com/elgopher/pi/pitest"
 	"testing"
 
 	"github.com/elgopher/pi"
 )
 
+var (
+	//go:embed internal/test/stretch/sprite.png
+	spritePNG []byte
+	//go:embed internal/test/stretch/sprite-3x3.png
+	sprite3x3PNG []byte
+	//go:embed internal/test/stretch/sprite-6x6.png
+	sprite6x6PNG []byte
+	//go:embed internal/test/stretch/sprite-6x3.png
+	sprite6x3PNG []byte
+	//go:embed internal/test/stretch/sprite-2x6.png
+	sprite2x6PNG []byte
+	//go:embed internal/test/stretch/sprite-4x3.png
+	sprite4x3PNG []byte
+	//go:embed internal/test/stretch/sprite-5x3.png
+	sprite5x3PNG []byte
+	//go:embed internal/test/stretch/sprite-3x4.png
+	sprite3x4PNG []byte
+	//go:embed internal/test/stretch/sprite-3x5.png
+	sprite3x5PNG []byte
+)
+
 func TestStretch(t *testing.T) {
+	t.Run("inside screen", func(t *testing.T) {
+		tests := map[string]struct {
+			dw, dh int
+			png    []byte
+		}{
+			"3x3": {
+				dw: 3, dh: 3,
+				png: sprite3x3PNG,
+			},
+			"6x6": {
+				dw: 6, dh: 6,
+				png: sprite6x6PNG,
+			},
+			"6x3": {
+				dw: 6, dh: 3,
+				png: sprite6x3PNG,
+			},
+			"3x6": {
+				dw: 3, dh: 6,
+				png: sprite2x6PNG,
+			},
+			"4x3": {
+				dw: 4, dh: 3,
+				png: sprite4x3PNG,
+			},
+			"5x3": {
+				dw: 5, dh: 3,
+				png: sprite5x3PNG,
+			},
+			"3x4": {
+				dw: 3, dh: 4,
+				png: sprite3x4PNG,
+			},
+			"3x5": {
+				dw: 3, dh: 5,
+				png: sprite3x5PNG,
+			},
+		}
+		for testName, testCase := range tests {
+			t.Run(testName, func(t *testing.T) {
+				pi.SetScreenSize(8, 8)
+				pi.Cls()
+				pi.Palette = pi.DecodePalette(spritePNG)
+				sprite := pi.SpriteFrom(pi.DecodeCanvas(spritePNG), 1, 1, 3, 3)
+				// when
+				pi.Stretch(sprite, 1, 1, testCase.dw, testCase.dh)
+				// then
+				expected := pi.DecodeCanvas(testCase.png)
+				pitest.AssertSurfaceEqual(t, expected, pi.Screen())
+			})
+		}
+	})
+
 	// temporary test
 	dst := pi.NewCanvas(16, 16)
 	pi.SetDrawTarget(dst)
