@@ -31,7 +31,7 @@ func registerShortcuts() {
 			exitConsoleMode()
 		}
 	}
-	pikey.RegisterShortcut(onCtrlShiftI, pikey.Control, pikey.Shift, pikey.I)
+	pikey.RegisterShortcut(onCtrlShiftI, pikey.Ctrl, pikey.Shift, pikey.I)
 
 	// F12
 	f12Down := pikey.Event{Type: pikey.EventDown, Key: pikey.F12}
