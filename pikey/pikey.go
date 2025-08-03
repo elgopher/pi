@@ -111,9 +111,9 @@ const (
 	Slash        Key = "/"
 	Space        Key = " "
 	Tab          Key = "Tab"
-	Alt          Key = "Alt"     // alt left or right
-	Control      Key = "Control" // control left or right
-	Shift        Key = "Shift"   // shift left or right
+	Alt          Key = "Alt"   // alt left or right (virtual key)
+	Ctrl         Key = "Ctrl"  // ctrl left or right (virtual key)
+	Shift        Key = "Shift" // shift left or right (virtual key)
 )
 
 var target = pievent.NewTarget[Event]()

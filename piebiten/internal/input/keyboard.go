@@ -150,7 +150,7 @@ var keyMap = map[ebiten.Key]pikey.Key{
 	ebiten.KeySpace:          pikey.Space,
 	ebiten.KeyTab:            pikey.Tab,
 	ebiten.KeyAlt:            pikey.Alt,
-	ebiten.KeyControl:        pikey.Control,
+	ebiten.KeyControl:        pikey.Ctrl,
 	ebiten.KeyShift:          pikey.Shift,
 	ebiten.KeyMeta:           "Meta",
 }
