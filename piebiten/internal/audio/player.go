@@ -236,12 +236,11 @@ func (p *player) clearChan(ch piaudio.Chan, time float64) {
 	for i := 0; i < chanLen; i++ {
 		chanNum := piaudio.Chan(1 << i)
 		if ch&chanNum != 0 {
-			idx := slices.IndexFunc(p.commandsByTime[i], func(c command) bool {
-				return c.time >= time
+			idx := sort.Search(len(p.commandsByTime[i]), func(idx int) bool {
+				cmd := p.commandsByTime[i][idx]
+				return cmd.time >= time
 			})
-			if idx != -1 {
-				p.commandsByTime[i] = p.commandsByTime[i][:idx]
-			}
+			p.commandsByTime[i] = p.commandsByTime[i][:idx]
 		}
 	}
 }
