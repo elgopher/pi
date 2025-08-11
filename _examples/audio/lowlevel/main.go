@@ -9,13 +9,14 @@ package main
 
 import (
 	_ "embed"
+	"log"
+
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/piaudio"
 	"github.com/elgopher/pi/piebiten"
 	"github.com/elgopher/pi/pievent"
 	"github.com/elgopher/pi/piloop"
 	"github.com/elgopher/pi/pimouse"
-	"log"
 )
 
 //go:embed "wave.wav"

@@ -4,15 +4,18 @@
 package audio
 
 import (
-	"github.com/elgopher/pi/piaudio"
-	"github.com/elgopher/pi/pimath"
 	"log"
 	"math"
 	"slices"
 	"sort"
 	"sync"
 	"unsafe"
+
+	"github.com/elgopher/pi/piaudio"
+	"github.com/elgopher/pi/pimath"
 )
+
+const chanLen = 4
 
 func newPlayer() *player {
 	defaultChannel := channel{
@@ -25,7 +28,7 @@ func newPlayer() *player {
 	}
 	return &player{
 		samplesByAddr: map[uintptr]*piaudio.Sample{},
-		channels: [4]channel{
+		channels: [chanLen]channel{
 			defaultChannel, defaultChannel, defaultChannel, defaultChannel,
 		},
 	}
@@ -34,9 +37,9 @@ func newPlayer() *player {
 type player struct {
 	mutex         sync.Mutex
 	samplesByAddr map[uintptr]*piaudio.Sample
-	channels      [4]channel
+	channels      [chanLen]channel
 
-	commandsByTime []command // all planned commands sorted by time
+	commandsByTime [chanLen][]command // each channel's planned commands sorted by time
 
 	currentTime float64
 }
@@ -115,51 +118,48 @@ func (p *player) Read(out []byte) (n int, err error) {
 }
 
 func (p *player) runCommands() {
-	processed := 0
+	for i := 0; i < chanLen; i++ {
+		selectedChan := &p.channels[i]
 
-	for _, cmd := range p.commandsByTime {
-		if cmd.time > p.currentTime {
-			break
-		}
+		processed := 0
 
-		for i := 0; i < 4; i++ {
-			selectedChan := &p.channels[i]
-			chanNum := piaudio.Chan(1 << i)
-			// a single command can be executed on multiple channels at once
-			if cmd.ch&chanNum == chanNum {
-				switch cmd.kind {
-				case cmdKindSetSample:
-					switch {
-					case cmd.sampleAddr == 0:
-						selectedChan.active = false
-						selectedChan.sampleData = nil
-					case p.samplesByAddr[cmd.sampleAddr] == nil:
-						log.Printf("[piaudio] SetSample failed: Sample not found, addr: 0x%x", cmd.sampleAddr)
-						selectedChan.active = false
-						selectedChan.sampleData = nil
-					default:
-						selectedChan.active = true
-						sample := p.samplesByAddr[cmd.sampleAddr]
-						selectedChan.sampleData = sample.Data()
-						selectedChan.sampleRate = sample.SampleRate()
-					}
-					selectedChan.position = float64(cmd.offset)
-				case cmdKindSetLoop:
-					selectedChan.loop = cmd.loop
-				case cmdKindSetPitch:
-					selectedChan.pitch = cmd.pitch
-				case cmdKindSetVolume:
-					selectedChan.volume = cmd.vol
-				case cmdKindClearChan:
-					// ClearChan was already called in SendCommands
-				}
+		for _, cmd := range p.commandsByTime[i] {
+			if cmd.time > p.currentTime {
+				break
 			}
-		}
-		processed++
-	}
 
-	copy(p.commandsByTime, p.commandsByTime[processed:])
-	p.commandsByTime = p.commandsByTime[:len(p.commandsByTime)-processed]
+			switch cmd.kind {
+			case cmdKindSetSample:
+				switch {
+				case cmd.sampleAddr == 0:
+					selectedChan.active = false
+					selectedChan.sampleData = nil
+				case p.samplesByAddr[cmd.sampleAddr] == nil:
+					log.Printf("[piaudio] SetSample failed: Sample not found, addr: 0x%x", cmd.sampleAddr)
+					selectedChan.active = false
+					selectedChan.sampleData = nil
+				default:
+					selectedChan.active = true
+					sample := p.samplesByAddr[cmd.sampleAddr]
+					selectedChan.sampleData = sample.Data()
+					selectedChan.sampleRate = sample.SampleRate()
+				}
+				selectedChan.position = float64(cmd.offset)
+			case cmdKindSetLoop:
+				selectedChan.loop = cmd.loop
+			case cmdKindSetPitch:
+				selectedChan.pitch = cmd.pitch
+			case cmdKindSetVolume:
+				selectedChan.volume = cmd.vol
+			case cmdKindClearChan:
+				// ClearChan was already called in SendCommands
+			}
+			processed++
+		}
+
+		copy(p.commandsByTime[i], p.commandsByTime[i][processed:])
+		p.commandsByTime[i] = p.commandsByTime[i][:len(p.commandsByTime[i])-processed]
+	}
 }
 
 func (p *player) read(out []byte) {
@@ -215,34 +215,32 @@ func (p *player) SendCommands(cmds []command) {
 			p.clearChan(cmd.ch, cmd.time)
 			continue
 		}
-		p.commandsByTime = append(p.commandsByTime, cmd)
+		for i := 0; i < chanLen; i++ {
+			chanNum := piaudio.Chan(1 << i)
+			// a single command can be executed on multiple channels at once
+			if cmd.ch&chanNum != 0 {
+				p.commandsByTime[i] = append(p.commandsByTime[i], cmd)
+			}
+		}
 	}
 
-	// sort again by time, because new commands may have been inserted between existing ones
-	sort.SliceStable(p.commandsByTime, func(i, j int) bool {
-		return p.commandsByTime[i].time < p.commandsByTime[j].time
-	})
+	for _, commands := range p.commandsByTime {
+		// sort again by time, because new commands may have been inserted between existing ones
+		sort.SliceStable(commands, func(i, j int) bool {
+			return commands[i].time < commands[j].time
+		})
+	}
 }
 
-// clearChan is O(n^2).
-// It could be optimized to use a separate command list for each channel.
-// Then complexity will be O(n)
 func (p *player) clearChan(ch piaudio.Chan, time float64) {
-	for j := len(p.commandsByTime) - 1; j >= 0; j-- {
-		cmd := p.commandsByTime[j]
-		noMoreCommands := cmd.time < time
-		if noMoreCommands {
-			return
-		}
-		if cmd.ch&ch != 0 {
-			remaining := cmd.ch &^ ch
-			if remaining == 0 {
-				// remove cmd
-				copy(p.commandsByTime[j:], p.commandsByTime[j+1:])
-				p.commandsByTime = p.commandsByTime[:len(p.commandsByTime)-1]
-			} else {
-				// update cmd to apply only to the remaining channels
-				p.commandsByTime[j].ch = remaining
+	for i := 0; i < chanLen; i++ {
+		chanNum := piaudio.Chan(1 << i)
+		if ch&chanNum != 0 {
+			idx := slices.IndexFunc(p.commandsByTime[i], func(c command) bool {
+				return c.time >= time
+			})
+			if idx != -1 {
+				p.commandsByTime[i] = p.commandsByTime[i][:idx]
 			}
 		}
 	}

@@ -8,13 +8,14 @@ package main
 
 import (
 	_ "embed"
+	"math"
+	"slices"
+
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/piaudio"
 	"github.com/elgopher/pi/picofont"
 	"github.com/elgopher/pi/piebiten"
 	"github.com/elgopher/pi/pikey"
-	"math"
-	"slices"
 )
 
 var (
