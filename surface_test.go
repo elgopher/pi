@@ -375,7 +375,7 @@ func BenchmarkDrawCanvas(b *testing.B) {
 	src.Clear(7)
 
 	for b.Loop() {
-		pi.DrawCanvas(src, 130, 130)
+		pi.DrawCanvas(src, 130, 130) // 2256 ns/op
 	}
 }
 
