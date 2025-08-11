@@ -13,7 +13,7 @@ concurrency:
 jobs:
 
   all:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         go: [ "1.24" ]
@@ -45,7 +45,7 @@ jobs:
         run: make test
 
       - name: Install chrome
-        uses: browser-actions/setup-chrome@v2
+        uses: browser-actions/setup-chrome@latest
 
       - name: Install wasmbrowsertest
         run: go install github.com/agnivade/wasmbrowsertest@latest
@@ -54,7 +54,11 @@ jobs:
         run: mv $(go env GOPATH)/bin/wasmbrowsertest $(go env GOPATH)/bin/go_js_wasm_exec
 
       - name: Test in the browser
-        run: GOOS=js GOARCH=wasm go test -v ./...
+        run: |
+          # Disable AppArmor for Ubuntu 23.10+.
+          # https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md
+          echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
+          GOOS=js GOARCH=wasm go test -v ./...
 
       - name: Lint
         uses: golangci/golangci-lint-action@v8
