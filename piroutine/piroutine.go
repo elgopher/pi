@@ -21,6 +21,12 @@ import (
 
 // New creates a new Routine composed of the provided steps.
 func New(steps ...Step) *Routine {
+	if len(steps) == 0 {
+		return &Routine{
+			stopped: true,
+		}
+	}
+
 	return &Routine{steps: steps}
 }
 
