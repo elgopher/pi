@@ -6,7 +6,7 @@ package piring_test
 import (
 	"testing"
 
-	"github.com/elgopher/pi/piring"
+	"github.com/elgopher/pi/internal/piring"
 )
 
 func BenchmarkBuffer_NextWritePointer(b *testing.B) {
