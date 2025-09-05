@@ -13,6 +13,7 @@ import (
 
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/piaudio"
+	"github.com/elgopher/pi/picofont"
 	"github.com/elgopher/pi/piebiten"
 	"github.com/elgopher/pi/pievent"
 	"github.com/elgopher/pi/piloop"
@@ -24,6 +25,8 @@ var clickWav []byte
 
 func main() {
 	sample := piaudio.DecodeWav(clickWav)
+
+	picofont.Print("PRESS LEFT MOUSE BUTTON TO PLAY SFX", 90, 80)
 
 	pi.Init = func() {
 		// The sample must be loaded before use,
