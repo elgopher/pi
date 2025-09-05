@@ -4,10 +4,11 @@
 package audio
 
 import (
+	"time"
+
 	"github.com/elgopher/pi/piaudio"
 	"github.com/elgopher/pi/pimath"
 	"github.com/hajimehoshi/ebiten/v2/audio"
-	"time"
 )
 
 const CtxSampleRate = 48000
@@ -55,11 +56,11 @@ func (b *Backend) scheduleTime(delay float64) float64 {
 func (b *Backend) SetSample(ch piaudio.Chan, sample *piaudio.Sample, offset int, delay float64) {
 	b.commands = append(b.commands,
 		command{
-			kind:       cmdKindSetSample,
-			ch:         ch,
-			sampleAddr: getPointerAddr(sample),
-			offset:     offset,
-			time:       b.scheduleTime(delay),
+			kind:   cmdKindSetSample,
+			ch:     ch,
+			sample: sample,
+			offset: offset,
+			time:   b.scheduleTime(delay),
 		},
 	)
 }
@@ -132,14 +133,14 @@ const (
 )
 
 type command struct {
-	kind       cmdKind
-	ch         piaudio.Chan
-	sampleAddr uintptr
-	offset     int
-	pitch      float64
-	time       float64
-	vol        float64
-	loop       loop
+	kind   cmdKind
+	ch     piaudio.Chan
+	sample *piaudio.Sample
+	offset int
+	pitch  float64
+	time   float64
+	vol    float64
+	loop   loop
 }
 
 func (b *Backend) OnBeforeUpdate() {
