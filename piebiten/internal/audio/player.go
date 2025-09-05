@@ -9,7 +9,6 @@ import (
 	"slices"
 	"sort"
 	"sync"
-	"unsafe"
 
 	"github.com/elgopher/pi/piaudio"
 	"github.com/elgopher/pi/pimath"
@@ -27,7 +26,7 @@ func newPlayer() *player {
 		},
 	}
 	return &player{
-		samplesByAddr: map[uintptr]*piaudio.Sample{},
+		sampleClones: map[*piaudio.Sample]*piaudio.Sample{},
 		channels: [chanLen]channel{
 			defaultChannel, defaultChannel, defaultChannel, defaultChannel,
 		},
@@ -35,9 +34,9 @@ func newPlayer() *player {
 }
 
 type player struct {
-	mutex         sync.Mutex
-	samplesByAddr map[uintptr]*piaudio.Sample
-	channels      [chanLen]channel
+	mutex        sync.Mutex
+	sampleClones map[*piaudio.Sample]*piaudio.Sample // key is pointer to original Sample, value is a sample clone
+	channels     [chanLen]channel
 
 	commandsByTime [chanLen][]command // each channel's planned commands sorted by time
 
@@ -86,18 +85,14 @@ func (p *player) LoadSample(sample *piaudio.Sample) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	p.samplesByAddr[getPointerAddr(sample)] = piaudio.NewSample(slices.Clone(sample.Data()), sample.SampleRate())
+	p.sampleClones[sample] = piaudio.NewSample(slices.Clone(sample.Data()), sample.SampleRate())
 }
 
 func (p *player) UnloadSample(sample *piaudio.Sample) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	delete(p.samplesByAddr, getPointerAddr(sample))
-}
-
-func getPointerAddr(sample *piaudio.Sample) uintptr {
-	return uintptr(unsafe.Pointer(sample))
+	delete(p.sampleClones, sample)
 }
 
 // Read is called by Ebitengine from a separate goroutine.
@@ -131,16 +126,16 @@ func (p *player) runCommands() {
 			switch cmd.kind {
 			case cmdKindSetSample:
 				switch {
-				case cmd.sampleAddr == 0:
+				case cmd.sample == nil:
 					selectedChan.active = false
 					selectedChan.sampleData = nil
-				case p.samplesByAddr[cmd.sampleAddr] == nil:
-					log.Printf("[piaudio] SetSample failed: Sample not found, addr: 0x%x", cmd.sampleAddr)
+				case p.sampleClones[cmd.sample] == nil:
+					log.Printf("[piaudio] SetSample failed: Sample not found: %p", cmd.sample)
 					selectedChan.active = false
 					selectedChan.sampleData = nil
 				default:
 					selectedChan.active = true
-					sample := p.samplesByAddr[cmd.sampleAddr]
+					sample := p.sampleClones[cmd.sample]
 					selectedChan.sampleData = sample.Data()
 					selectedChan.sampleRate = sample.SampleRate()
 				}
@@ -227,6 +222,7 @@ func (p *player) SendCommands(cmds []command) {
 	for _, commands := range p.commandsByTime {
 		// sort again by time, because new commands may have been inserted between existing ones
 		sort.SliceStable(commands, func(i, j int) bool {
+			// TODO Optimize - sort cmds first and merge with commandsByTime
 			return commands[i].time < commands[j].time
 		})
 	}
