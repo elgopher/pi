@@ -1,15 +1,18 @@
 // Copyright 2025 Jacek Olszak
 // This code is licensed under MIT license (see LICENSE for details)
 
+//go:build !js
+
 package piebiten_test
 
 import (
+	"testing"
+
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/piebiten"
 	"github.com/elgopher/pi/piebiten/internal/ebitentesting"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestMain(m *testing.M) {
