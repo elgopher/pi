@@ -6,9 +6,8 @@ package piring_test
 import (
 	"testing"
 
+	"github.com/elgopher/pi/internal/piring"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elgopher/pi/piring"
 )
 
 func TestBuffer(t *testing.T) {

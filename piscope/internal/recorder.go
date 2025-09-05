@@ -5,7 +5,7 @@ package internal
 
 import (
 	"github.com/elgopher/pi"
-	"github.com/elgopher/pi/piring"
+	"github.com/elgopher/pi/internal/piring"
 )
 
 var theScreenRecorder = newScreenRecorder(128)
