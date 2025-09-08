@@ -218,4 +218,5 @@ func (t *TrackingTarget[T]) UnsubscribeAll() {
 	for _, handler := range t.handlers {
 		t.wrappedTarget.Unsubscribe(handler)
 	}
+	t.handlers = nil
 }
