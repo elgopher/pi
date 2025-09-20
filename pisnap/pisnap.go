@@ -7,12 +7,13 @@ package pisnap
 import (
 	"errors"
 	"fmt"
-	"github.com/elgopher/pi"
 	"image"
 	"image/color"
 	"image/png"
 	"os"
 	"runtime"
+
+	"github.com/elgopher/pi"
 )
 
 // CaptureOrErr captures a screenshot and saves it to the temporary directory.
