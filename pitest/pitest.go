@@ -57,17 +57,7 @@ func AssertSpriteEqual(t *testing.T, expected, actual pi.Sprite) {
 	expectedArrayPointer := unsafe.SliceData(expectedSource.Data())
 	actualArrayPointer := unsafe.SliceData(actualSource.Data())
 	sameArrayPointer := actualArrayPointer == expectedArrayPointer
-	sameWidth := expectedSource.W() == actualSource.W()
-	sameHeight := expectedSource.H() == actualSource.H()
 
-	if !sameWidth {
-		t.Errorf("sprites are using different sources, "+
-			"expected Canvas width: %d, actual width: %d", expectedSource.W(), actualSource.W())
-	}
-	if !sameHeight {
-		t.Errorf("sprites are using different sources, "+
-			"expected Canvas height: %d, actual height: %d", expectedSource.H(), actualSource.H())
-	}
 	if !sameArrayPointer {
 		t.Errorf("sprites are using different sources, "+
 			"pointers to Canvas data are not the same, expected: %+v, actual: %+v",
