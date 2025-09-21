@@ -3,6 +3,7 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/elgopher/pi.svg)][pi-godoc]
 [![codecov](https://codecov.io/gh/elgopher/pi/branch/master/graph/badge.svg)][pi-codecov]
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)][repostatus-active]
+[![Go Report Card](https://goreportcard.com/badge/github.com/elgopher/pi)](https://goreportcard.com/report/github.com/elgopher/pi)
 
 ## Table of Contents
 
