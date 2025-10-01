@@ -5,10 +5,12 @@ package pi_test
 
 import (
 	_ "embed"
-	"github.com/elgopher/pi"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
+
+	"github.com/elgopher/pi"
 )
 
 var (
@@ -70,4 +72,49 @@ func TestDecodePaletteOrErr(t *testing.T) {
 			})
 		}
 	})
+}
+
+func TestFromRGB(t *testing.T) {
+	// when
+	rgb := pi.FromRGB(1, 128, 255)
+	// then
+	r, g, b := rgb.RGB()
+	assert.Equal(t, uint8(1), r)
+	assert.Equal(t, uint8(128), g)
+	assert.Equal(t, uint8(255), b)
+}
+
+func TestFromRGBf(t *testing.T) {
+	// when
+	rgb := pi.FromRGBf(0.004, 0.5, 1.0)
+	// then
+	rf, gf, bf := rgb.RGBf()
+	assert.InDelta(t, 0.004, rf, 0.01)
+	assert.InDelta(t, 0.5, gf, 0.01)
+	assert.InDelta(t, 1.0, bf, 0.01)
+}
+
+func TestRGB_String(t *testing.T) {
+	rgb := pi.RGB(0x304050)
+	assert.Equal(t, "0x304050", rgb.String())
+}
+
+func TestPaletteArray_String(t *testing.T) {
+	var p pi.PaletteArray
+	p[0] = pi.RGB(0x010101)
+	p[1] = pi.RGB(0x020202)
+	p[63] = pi.RGB(0x636363)
+	// when
+	actual := p.String()
+	// then
+	assert.Equal(t,
+		"{0:0x010101, 1:0x020202, 2:0x000000, 3:0x000000, 4:0x000000, 5:0x000000, 6:0x000000, 7:0x000000, 8:0x000000, "+
+			"9:0x000000, 10:0x000000, 11:0x000000, 12:0x000000, 13:0x000000, 14:0x000000, 15:0x000000, 16:0x000000, "+
+			"17:0x000000, 18:0x000000, 19:0x000000, 20:0x000000, 21:0x000000, 22:0x000000, 23:0x000000, 24:0x000000, "+
+			"25:0x000000, 26:0x000000, 27:0x000000, 28:0x000000, 29:0x000000, 30:0x000000, 31:0x000000, 32:0x000000, "+
+			"33:0x000000, 34:0x000000, 35:0x000000, 36:0x000000, 37:0x000000, 38:0x000000, 39:0x000000, 40:0x000000, "+
+			"41:0x000000, 42:0x000000, 43:0x000000, 44:0x000000, 45:0x000000, 46:0x000000, 47:0x000000, 48:0x000000, "+
+			"49:0x000000, 50:0x000000, 51:0x000000, 52:0x000000, 53:0x000000, 54:0x000000, 55:0x000000, 56:0x000000, "+
+			"57:0x000000, 58:0x000000, 59:0x000000, 60:0x000000, 61:0x000000, 62:0x000000, 63:0x636363, }",
+		actual)
 }
