@@ -5,6 +5,7 @@ package pi
 
 import (
 	"fmt"
+	"github.com/elgopher/pi/pimath"
 )
 
 // DrawSprite draws the given sprite at (dx, dy) on the current draw target.
@@ -72,31 +73,45 @@ func Stretch(sprite Sprite, dx, dy, dw, dh int) {
 	targetStride := drawTarget.width - int(dst.W)
 	srcSource := sprite.Source
 
-	if sprite.FlipY {
-		src.Y += float64(dh-1) * stepY
-		stepY *= -1
-	}
+	stepXAbs := src.W / dst.W
+	stepYAbs := src.H / dst.H
 
+	// start sampling from half-step offsets
 	if sprite.FlipX {
-		src.X += float64(dw-1) * stepX
-		stepX *= -1
+		src.X += src.W - stepXAbs/2
+		stepXAbs = -stepXAbs
+	} else {
+		src.X += stepXAbs / 2
 	}
 
-	srcX, srcY := src.X, src.Y
+	if sprite.FlipY {
+		src.Y += src.H - stepYAbs/2
+		stepYAbs = -stepYAbs
+	} else {
+		src.Y += stepYAbs / 2
+	}
+
+	srcY := src.Y
+
+	srcMaxX := int(src.X + src.W)
+	srcMaxY := int(src.Y + src.H)
 
 	for line := 0.0; line < dst.H; line++ {
-		srcLineIdx := int(srcY) * srcSource.width // multiplication, but only once per line, so it's not a performance problem
+		syIndex := pimath.Clamp(int(srcY), 0, srcMaxY-1)
+		srcLineIdx := syIndex * srcSource.width
 
-		for cell := 0.0; cell < dst.W; cell++ {
-			sourceColor := srcSource.data[srcLineIdx+int(srcX)] & ReadMask
+		srcX := src.X
+		for cell := 0; cell < int(dst.W); cell++ {
+			sxIndex := pimath.Clamp(int(srcX), 0, srcMaxX-1)
+
+			sourceColor := srcSource.data[srcLineIdx+sxIndex] & ReadMask
 			targetColor := drawTarget.data[targetIdx] & TargetMask
 			drawTarget.data[targetIdx] =
 				ColorTables[(sourceColor|targetColor)>>6][sourceColor&(MaxColors-1)][targetColor&(MaxColors-1)]
-			srcX += stepX
+			srcX += stepXAbs
 			targetIdx++
 		}
-		srcX = src.X
-		srcY += stepY
+		srcY += stepYAbs
 		targetIdx += targetStride
 	}
 }
