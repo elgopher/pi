@@ -57,8 +57,9 @@
 package pipad
 
 import (
-	"github.com/elgopher/pi/internal/input"
 	"log"
+
+	"github.com/elgopher/pi/internal/input"
 
 	"github.com/elgopher/pi"
 	"github.com/elgopher/pi/pievent"
@@ -82,9 +83,17 @@ const (
 	Y Button = "Y"
 )
 
-// Duration returns button press duration for any controller
+// Duration returns button press duration for any controller.
+// If multiple controllers are pressed simultaneously, it returns
+// the longest duration among them.
 func Duration(b Button) int {
-	return buttonAnyState.Duration(b)
+	duration := 0
+
+	for _, state := range buttonState {
+		duration = max(duration, state.Duration(b))
+	}
+
+	return duration
 }
 
 // PlayerCount returns the number of connected controllers
@@ -102,7 +111,6 @@ func PlayerDuration(b Button, player int) int {
 }
 
 var buttonState = map[int]*input.State[Button]{}
-var buttonAnyState input.State[Button]
 
 func init() {
 	ButtonTarget().SubscribeAll(onButton)
@@ -117,10 +125,8 @@ func onButton(event EventButton, _ pievent.Handler) {
 	switch event.Type {
 	case EventDown:
 		buttonState[event.Player].SetDownFrame(event.Button, pi.Frame)
-		buttonAnyState.SetDownFrame(event.Button, pi.Frame)
 	case EventUp:
 		buttonState[event.Player].SetUpFrame(event.Button, pi.Frame)
-		buttonAnyState.SetUpFrame(event.Button, pi.Frame)
 	}
 }
 
