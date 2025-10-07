@@ -17,3 +17,9 @@ sudo pacman -S gcc mesa libxrandr libxcursor libxinerama libxi pkg-config
 ```sh
 sudo dnf install gcc mesa-libGLU-devel mesa-libGLES-devel libXrandr-devel libXcursor-devel libXinerama-devel libXi-devel libXxf86vm-devel alsa-lib-devel pkg-config
 ```
+
+## ChromeOS
+
+```sh
+sudo apt install pkg-config libx11-dev libgl-dev libxcursor-dev libxi-dev libxrandr-dev libxxf86vm-dev libwayland-dev libasound2-dev libpulse-dev libxinerama-dev
+```
