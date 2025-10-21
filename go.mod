@@ -4,7 +4,7 @@ go 1.24.2
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.9.2
-	github.com/shirou/gopsutil/v4 v4.25.8
+	github.com/shirou/gopsutil/v4 v4.25.9
 	github.com/stretchr/testify v1.11.1
 )
 
