@@ -17,6 +17,10 @@ func DebugTarget() pievent.Target[Event] {
 	return debugTarget
 }
 
+func Stop() {
+	Target().Publish(EventStop)
+}
+
 var (
 	target      = pievent.NewTarget[Event]()
 	debugTarget = pievent.NewTarget[Event]()
