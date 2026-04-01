@@ -13,4 +13,5 @@ const (
 	EventDraw        Event = "draw"         // after pi.Draw
 	EventLateDraw    Event = "late_draw"    // after EventDraw
 	EventWindowClose Event = "window_close" // when a user closes the window (desktop only)
+	EventStop        Event = "stop"         // when game loop is stopped by calling piloop.Stop()
 )
