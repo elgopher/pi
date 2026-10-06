@@ -41,7 +41,7 @@ Because it's probably the easiest and most fun way to write a game in Go. No com
 ## How to get started?
 
 1. Install dependencies
-    * [Go 1.24+][go-downloads]
+    * [Go 1.25+][go-downloads]
     * If you are not on Windows, install additional dependencies for:
         * [Linux](docs/install-linux.md)
         * [macOS](docs/install-macos.md)
