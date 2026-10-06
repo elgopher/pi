@@ -64,10 +64,10 @@ jobs:
           GOOS=js GOARCH=wasm go test -v ./...
 
       - name: Lint
-        uses: golangci/golangci-lint-action@v8
+        uses: golangci/golangci-lint-action@v9
         with:
           args: "-v"
-          version: v2.2.1
+          version: v2.14.0
 
       - name: Generate coverage report
         run: go test -v -coverprofile coverage.txt -covermode atomic -coverpkg ./... ./...

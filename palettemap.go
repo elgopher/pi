@@ -25,7 +25,7 @@ func (p PaletteMap) String() string {
 	var s strings.Builder
 	s.WriteString("{")
 	for i := 0; i < len(p); i++ {
-		s.WriteString(fmt.Sprintf("%d:%v, ", i, p[i]))
+		_, _ = fmt.Fprintf(&s, "%d:%v, ", i, p[i])
 	}
 	s.WriteString("}")
 	return s.String()
