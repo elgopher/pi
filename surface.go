@@ -55,7 +55,7 @@ type Surface[T any] struct {
 func (m Surface[T]) String() string {
 	var b strings.Builder
 	for _, line := range m.LinesIterator(m.EntireArea()) { // escapes to heap
-		b.WriteString(fmt.Sprintf("%+v", line))
+		_, _ = fmt.Fprintf(&b, "%+v", line)
 		b.WriteByte('\n')
 	}
 	return b.String()

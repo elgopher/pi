@@ -27,7 +27,7 @@ type ColorTable [MaxColors][MaxColors]Color
 func (p ColorTable) String() string {
 	var s strings.Builder
 	for i := 0; i < len(p); i++ {
-		s.WriteString(fmt.Sprintf("%d :%v\n", i, p[i]))
+		_, _ = fmt.Fprintf(&s, "%d :%v\n", i, p[i])
 	}
 	return s.String()
 }
