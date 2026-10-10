@@ -17,6 +17,11 @@ func DebugTarget() pievent.Target[Event] {
 	return debugTarget
 }
 
+// Stop stops the game loop.
+func Stop() {
+	Target().Publish(EventStop)
+}
+
 var (
 	target      = pievent.NewTarget[Event]()
 	debugTarget = pievent.NewTarget[Event]()

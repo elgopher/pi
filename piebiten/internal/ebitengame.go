@@ -4,12 +4,13 @@
 package internal
 
 import (
+	"math"
+	"time"
+
 	"github.com/elgopher/pi/piaudio"
 	"github.com/elgopher/pi/piebiten/internal/audio"
 	"github.com/elgopher/pi/piebiten/internal/input"
 	ebitenaudio "github.com/hajimehoshi/ebiten/v2/audio"
-	"math"
-	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 
@@ -40,6 +41,7 @@ func RunEbitenGame() *EbitenGame {
 	}
 
 	pidebug.Target().SubscribeAll(game.onPidebugEvent)
+	piloop.Target().Subscribe(piloop.EventStop, game.onPiloopStopEvent)
 
 	return game
 }
@@ -87,9 +89,14 @@ type EbitenGame struct {
 	inputBackend *input.Backend
 
 	ebitenFrame int // frame incremented on each Ebiten tick
+
+	stopped bool
 }
 
 func (g *EbitenGame) Update() error {
+	if g.stopped {
+		return ebiten.Termination
+	}
 	if ebiten.IsWindowBeingClosed() {
 		piloop.Target().Publish(piloop.EventWindowClose)
 		return ebiten.Termination
@@ -216,4 +223,8 @@ func (g *EbitenGame) onPidebugEvent(event pidebug.Event, _ pievent.Handler) {
 	case pidebug.EventResume:
 		g.paused = false
 	}
+}
+
+func (g *EbitenGame) onPiloopStopEvent(piloop.Event, pievent.Handler) {
+	g.stopped = true
 }
